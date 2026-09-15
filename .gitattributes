@@ -1,0 +1,4 @@
+* text=auto eol=lf
+patches/*.patch -text whitespace=-blank-at-eol,cr-at-eol
+build/original-build-receipt.json -text
+LICENSE -text whitespace=cr-at-eol

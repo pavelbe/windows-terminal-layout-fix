@@ -1,0 +1,128 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://raw.githubusercontent.com/microsoft/terminal/main/doc/cascadia/profiles.schema.json",
+    "actions":
+    [
+        {
+            "command": "closeTab",
+            "id": "User.CloseTab"
+        }
+    ],
+    "launchMode": "maximized",
+    "disableAnimations": true,
+    "experimental.detectURLs": false,
+    "experimental.scrollToChangeOpacity": false,
+    "copyFormatting": "none",
+    "defaultProfile": "{52d9ee01-10f5-4261-b4f6-7e4c493c6749}",
+    "disabledProfileSources":
+    [
+        "Windows.Terminal.Wsl",
+        "Windows.Terminal.Azure",
+        "Windows.Terminal.PowershellCore",
+        "Windows.Terminal.VisualStudio",
+        "Windows.Terminal.SSH"
+    ],
+    "firstWindowPreference": "persistedLayoutAndContent",
+    "keybindings":
+    [
+        {
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "Terminal.DuplicatePaneAuto",
+            "keys": "alt+shift+d"
+        },
+        {
+            "id": null,
+            "keys": "ctrl+shift+period"
+        },
+        {
+            "id": "User.CloseTab",
+            "keys": "ctrl+w"
+        }
+    ],
+    "newTabMenu":
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles":
+    {
+        "defaults":
+        {
+            "antialiasingMode": "cleartype",
+            "bellStyle": "none",
+            "font":
+            {
+                "face": "Cascadia Code",
+                "size": 11
+            },
+            "scrollbarState": "visible"
+        },
+        "list":
+        [
+            {
+                "commandline": "cmd.exe /d",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "CMD"
+            },
+            {
+                "commandline": "wsl.exe -d Ubuntu",
+                "guid": "{52d9ee01-10f5-4261-b4f6-7e4c493c6749}",
+                "name": "Ubuntu",
+                "startingDirectory": "~"
+            },
+            {
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "guid": "{4f596825-d564-5ca5-bb0c-5304ac0c2247}",
+                "hidden": false,
+                "name": "PortableWork",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{5bac94f4-2b58-5b17-a53c-511308002210}",
+                "hidden": true,
+                "name": "Ubuntu",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{7cc61249-c7b1-5b0a-b932-9ce24f8db665}",
+                "hidden": false,
+                "name": "ClaudeClient",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{a37abfb4-b81e-5bdc-aafe-32a1496e99e7}",
+                "hidden": false,
+                "name": "PortableClient",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{c87b03b1-368c-5f86-a319-28e0389d1e17}",
+                "hidden": false,
+                "name": "Ubuntu-W",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{dd884a80-7470-5daf-b4f1-9e89c6c613e4}",
+                "hidden": false,
+                "name": "ClaudeWork",
+                "source": "Microsoft.WSL"
+            }
+        ]
+    },
+    "schemes": [],
+    "themes": [],
+    "warning.confirmCloseAllTabs": false,
+    "windowingBehavior": "useAnyExisting"
+}

@@ -1,0 +1,122 @@
+diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
+index e5b238e..279042f 100644
+--- a/src/cascadia/TerminalApp/TerminalPage.cpp
++++ b/src/cascadia/TerminalApp/TerminalPage.cpp
+@@ -3901,24 +3901,34 @@ namespace winrt::TerminalApp::implementation
+         // up the previous ones we built.
+         _terminalSettingsCache->Reset(_settings);
+ 
+-        for (const auto& tab : _tabs)
++        // Each pane can raise BackgroundBrush changes while applying settings.
++        // Defer their window-wide theme updates until the final refresh below,
++        // instead of refreshing every tab for every pane in this loop.
+         {
+-            if (auto tabImpl{ _GetTabImpl(tab) })
++            const auto wasUpdating = std::exchange(_updatingTerminalSettings, true);
++            const auto restoreUpdating = wil::scope_exit([&]() {
++                _updatingTerminalSettings = wasUpdating;
++            });
++
++            for (const auto& tab : _tabs)
+             {
+-                // Let the tab know that there are new settings. It's up to each content to decide what to do with them.
+-                tabImpl->UpdateSettings(_settings);
++                if (auto tabImpl{ _GetTabImpl(tab) })
++                {
++                    // Let the tab know that there are new settings. It's up to each content to decide what to do with them.
++                    tabImpl->UpdateSettings(_settings);
+ 
+-                // Update the icon of the tab for the currently focused profile in that tab.
+-                // Only do this for TerminalTabs. Other types of tabs won't have multiple panes
+-                // and profiles so the Title and Icon will be set once and only once on init.
+-                _UpdateTabIcon(*tabImpl);
++                    // Update the icon of the tab for the currently focused profile in that tab.
++                    // Only do this for TerminalTabs. Other types of tabs won't have multiple panes
++                    // and profiles so the Title and Icon will be set once and only once on init.
++                    _UpdateTabIcon(*tabImpl);
+ 
+-                // Force the TerminalTab to re-grab its currently active control's title.
+-                tabImpl->UpdateTitle();
+-            }
++                    // Force the TerminalTab to re-grab its currently active control's title.
++                    tabImpl->UpdateTitle();
++                }
+ 
+-            auto tabImpl{ winrt::get_self<Tab>(tab) };
+-            tabImpl->SetActionMap(_settings.ActionMap());
++                auto tabImpl{ winrt::get_self<Tab>(tab) };
++                tabImpl->SetActionMap(_settings.ActionMap());
++            }
+         }
+ 
+         if (const auto focusedTab{ _GetFocusedTabImpl() })
+@@ -4951,6 +4961,11 @@ namespace winrt::TerminalApp::implementation
+ 
+     void TerminalPage::_updateThemeColors()
+     {
++        if (_updatingTerminalSettings)
++        {
++            return;
++        }
++
+         if (_settings == nullptr)
+         {
+             return;
+diff --git a/src/cascadia/TerminalApp/TerminalPage.h b/src/cascadia/TerminalApp/TerminalPage.h
+index 67ed4a7..2ef43e1 100644
+--- a/src/cascadia/TerminalApp/TerminalPage.h
++++ b/src/cascadia/TerminalApp/TerminalPage.h
+@@ -228,6 +228,7 @@ namespace winrt::TerminalApp::implementation
+         winrt::TerminalApp::ColorPickupFlyout _tabColorPicker{ nullptr };
+ 
+         Microsoft::Terminal::Settings::Model::CascadiaSettings _settings{ nullptr };
++        bool _updatingTerminalSettings{ false };
+ 
+         Windows::Foundation::Collections::IObservableVector<TerminalApp::Tab> _tabs;
+         Windows::Foundation::Collections::IObservableVector<TerminalApp::Tab> _mruTabs;
+diff --git a/src/cascadia/TerminalControl/TermControl.cpp b/src/cascadia/TerminalControl/TermControl.cpp
+index 2ea1ff9..da26920 100644
+--- a/src/cascadia/TerminalControl/TermControl.cpp
++++ b/src/cascadia/TerminalControl/TermControl.cpp
+@@ -1156,18 +1156,20 @@ namespace winrt::Microsoft::Terminal::Control::implementation
+             bg = Windows::UI::Colors::Transparent();
+         }
+ 
+-        if (auto acrylic = RootGrid().Background().try_as<Media::AcrylicBrush>())
++        const auto brush = RootGrid().Background();
++        auto changed = brush != _BackgroundBrush;
++        if (auto acrylic = brush.try_as<Media::AcrylicBrush>())
+         {
++            changed = changed || til::color{ acrylic.FallbackColor() } != bg || til::color{ acrylic.TintColor() } != bg;
+             acrylic.FallbackColor(bg);
+             acrylic.TintColor(bg);
+         }
+-        else if (auto solidColor = RootGrid().Background().try_as<Media::SolidColorBrush>())
++        else if (auto solidColor = brush.try_as<Media::SolidColorBrush>())
+         {
++            changed = changed || til::color{ solidColor.Color() } != bg;
+             solidColor.Color(bg);
+         }
+ 
+-        BackgroundBrush(RootGrid().Background());
+-
+         // Don't use the normal BackgroundBrush() Observable Property setter
+         // here. (e.g. `BackgroundBrush()`). The one from the macro will
+         // automatically ignore changes where the value doesn't _actually_
+@@ -1176,9 +1178,13 @@ namespace winrt::Microsoft::Terminal::Control::implementation
+         // Color() of the brush. This results in the event not getting bubbled
+         // up.
+         //
+-        // Firing it manually makes sure it does.
+-        _BackgroundBrush = RootGrid().Background();
+-        PropertyChanged.raise(*this, Data::PropertyChangedEventArgs{ L"BackgroundBrush" });
++        // Notify for changes to either identity or color, but not for a redraw
++        // that reports the same background color again.
++        _BackgroundBrush = brush;
++        if (changed)
++        {
++            PropertyChanged.raise(*this, Data::PropertyChangedEventArgs{ L"BackgroundBrush" });
++        }
+ 
+         _isBackgroundLight = _isColorLight(bg);
+     }

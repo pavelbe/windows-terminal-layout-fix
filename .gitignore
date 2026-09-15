@@ -1,0 +1,10 @@
+/dist/
+**/state.json
+**/buffer_*.txt
+**/elevated_*.txt
+*.bak
+*.dmp
+*.etl
+*.log
+.env
+.env.*

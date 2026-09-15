@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v1.25.1912.0-layout-fix.1",
+  "archive": {
+    "name": "WT-Layout-Fix-1.25.1912.0-win-x64.zip",
+    "sha256": "d1ce1044010842903a3ed3fb9bcafbfdc6c8c7c6f49c3a5238a4fab3c7b2be9e",
+    "size": 10950968,
+    "root": "WT-Layout-Fix-1.25.1912.0"
+  },
+  "upstreamTag": "v1.25.1912.0",
+  "upstreamCommit": "1cea42d433253d95c4487a3037db48197b5e72f4",
+  "sourcePatchCommit": "a34eea7b524f7516c68014a14bb94e215520e0fc",
+  "build": "Release/x64; MSVC 14.41.34120; SDK 10.0.22621.0",
+  "ownerAcceptance": {
+    "date": "2026-09-15",
+    "languageSwitchWithTenTabs": "owner-confirmed",
+    "dailySettingsAndSessionRestoration": "owner-confirmed",
+    "ctrlW": "configuration-verified; manual keypress not yet confirmed",
+    "freshWindowsInstallation": "NOT RUN",
+    "sameCurrentConfigStockComparison": "NOT RUN"
+  },
+  "exclusions": [
+    "session state and screen buffers",
+    "traces/dumps/logs/backups",
+    "WSL distributions",
+    "projects",
+    "credentials"
+  ],
+  "proof": "All receipt-listed runtime hashes matched; all archive names, CRCs, extracted sizes and SHA256 verified. Not a Windows launch smoke.",
+  "files": {
+    ".portable": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "LICENSE": {
+      "sha256": "5d177f23ecfeb0ea8e050b6a5a16355e1ae9a0b286436ca8f83ed08b3795be6b",
+      "size": 1116
+    },
+    "Microsoft.Terminal.Control.dll": {
+      "sha256": "8b980892c8c2f73a3cb205ac0c9fde80dda060cb8f4d6b92b051b0b466060caa",
+      "size": 1623040
+    },
+    "Microsoft.Terminal.Control.pri": {
+      "sha256": "f9435cb10646a217b533fdc4249a19ac1d4a30b58792feffebe494f998bc598d",
+      "size": 728
+    },
+    "Microsoft.Terminal.Control/SearchBoxControl.xaml": {
+      "sha256": "65ba3ad83b61785bc39d914fbf8acf4ff28142d30b1dc3b34f6088b905f00efa",
+      "size": 17900
+    },
+    "Microsoft.Terminal.Control/TermControl.xaml": {
+      "sha256": "7c3654b2d600b514565e1e7069d3972c357789b2c5449584de2a27e55207e54c",
+      "size": 118187
+    },
+    "Microsoft.Terminal.Settings.Editor.dll": {
+      "sha256": "e186d1b13b62e1ce004ca41b6a90a9770043dc8b6468bc8a3cf3b30e54b96adc",
+      "size": 3481600
+    },
+    "Microsoft.Terminal.Settings.Editor.pri": {
+      "sha256": "7fce27613b5e9bec2b7343baabc950d7700c5452eafea3b5828f295d84703bde",
+      "size": 676008
+    },
+    "Microsoft.Terminal.Settings.Editor/Actions.xaml": {
+      "sha256": "3ce27e581e1f37b804f5be7f5ea3e4ad17306e724327b561aba86e202b9e8ff3",
+      "size": 13109
+    },
+    "Microsoft.Terminal.Settings.Editor/AddProfile.xaml": {
+      "sha256": "44a44205eb4439c2ca8a808934992a22fce5a4354cbcf72cbd91a444d35f55cb",
+      "size": 4838
+    },
+    "Microsoft.Terminal.Settings.Editor/Appearances.xaml": {
+      "sha256": "01d31c6e52b47196fc6ff0fbf24abe2d15b95236ddf7c4a2637ef09773a8e8c7",
+      "size": 58770
+    },
+    "Microsoft.Terminal.Settings.Editor/ColorSchemes.xaml": {
+      "sha256": "5a1b7c4a08ba141a59e372c459bd695c512e57e262c4e91df7528dfbed54d72f",
+      "size": 14262
+    },
+    "Microsoft.Terminal.Settings.Editor/CommonResources.xaml": {
+      "sha256": "df92edc832e35b57076d1786c2c69d7a03764e536bd7efc25ee85224c6276a86",
+      "size": 94729
+    },
+    "Microsoft.Terminal.Settings.Editor/Compatibility.xaml": {
+      "sha256": "d45c46ffc67aaded655ea0a528fa3df7a386f0417b8e179e62513d3d3b8b1de5",
+      "size": 6120
+    },
+    "Microsoft.Terminal.Settings.Editor/EditAction.xaml": {
+      "sha256": "68bb18dfa81a382320f4b846492a6e31a1a3f3d9068760db17afe0d1f7fc7166",
+      "size": 47078
+    },
+    "Microsoft.Terminal.Settings.Editor/EditColorScheme.xaml": {
+      "sha256": "045fcc1e8ded37b711a2d0d482c2807445ce7a6addc0484f8989d700e4a071bc",
+      "size": 29821
+    },
+    "Microsoft.Terminal.Settings.Editor/Extensions.xaml": {
+      "sha256": "51cc752c5e5a2fc64ea7ceb9164795ed828c1c3711d2b401051581a70c375621",
+      "size": 34201
+    },
+    "Microsoft.Terminal.Settings.Editor/GlobalAppearance.xaml": {
+      "sha256": "48846088a0b2d396dc2f3eb42dd2b7bd249143b8daa5483fc2d8ad0fbaeac384",
+      "size": 8856
+    },
+    "Microsoft.Terminal.Settings.Editor/IconPicker.xaml": {
+      "sha256": "54d09a7a39a8c2230e991b1a87bba3758ef4b954c7d80f27a56d11f87e0fbbae",
+      "size": 4994
+    },
+    "Microsoft.Terminal.Settings.Editor/Interaction.xaml": {
+      "sha256": "cd366cb725fd1bd5b462c5d77282952158f5e85587f5bcf814b0b362e906c64e",
+      "size": 10171
+    },
+    "Microsoft.Terminal.Settings.Editor/KeyChordListener.xaml": {
+      "sha256": "30337d6c8784a9c9538e9a889e359c5d4738d0aed8c3cd67656618232e57af31",
+      "size": 838
+    },
+    "Microsoft.Terminal.Settings.Editor/Launch.xaml": {
+      "sha256": "2fbcbbe91e38cc45eb0b6f1b5f937c02cd9e1769b0648a18e32d10d2b83ec859",
+      "size": 19377
+    },
+    "Microsoft.Terminal.Settings.Editor/MainPage.xaml": {
+      "sha256": "56dfb079e7ba20aabf24fdebc0e6d1f7bb4c8c8e0f90401cb99e7bcd79093370",
+      "size": 15948
+    },
+    "Microsoft.Terminal.Settings.Editor/NewTabMenu.xaml": {
+      "sha256": "89e551b35e7bbf5d8820094efea6a99b9f50885df9fc2c09978007999c7e0415",
+      "size": 32392
+    },
+    "Microsoft.Terminal.Settings.Editor/NullableColorPicker.xaml": {
+      "sha256": "de2de4e1931dde37890fe03d854dd3eb83c4fc4cb9f419b11d6623f50177981d",
+      "size": 10144
+    },
+    "Microsoft.Terminal.Settings.Editor/Profiles_Advanced.xaml": {
+      "sha256": "8923930d8df0cd78eb4a64e833c563eeff83304eb8ffce3876c769488509e411",
+      "size": 19582
+    },
+    "Microsoft.Terminal.Settings.Editor/Profiles_Appearance.xaml": {
+      "sha256": "15f85fce6ccb047e806ba9842b00041c22ac42e8b5c12f0dc67597e5b0de89a3",
+      "size": 15573
+    },
+    "Microsoft.Terminal.Settings.Editor/Profiles_Base.xaml": {
+      "sha256": "87f98cd3ba4eb3dfe904d459f72930e8c1d01b26f65a14e1af5f5cb9d8d3a0e0",
+      "size": 14324
+    },
+    "Microsoft.Terminal.Settings.Editor/Profiles_Base_Orphaned.xaml": {
+      "sha256": "0c7a3028987fc05f42ae3389b965d8dcd132b11766df1e7eb49d2ad9b526f3d5",
+      "size": 3201
+    },
+    "Microsoft.Terminal.Settings.Editor/Profiles_Terminal.xaml": {
+      "sha256": "0500f5e772c5a8d712fdbcd7613e017c4743c51e1e9051c99fcf6ed95cd5ab29",
+      "size": 6376
+    },
+    "Microsoft.Terminal.Settings.Editor/Rendering.xaml": {
+      "sha256": "9ffda59da1763cdf2a6c194940c653d78ee8eb6de855301c226ae81c5209db82",
+      "size": 2555
+    },
+    "Microsoft.Terminal.Settings.Editor/SettingContainerStyle.xaml": {
+      "sha256": "dcce571054db863a7b5ea2af701f1bc1787259ff498903bdd6086709937a0a0f",
+      "size": 35116
+    },
+    "Microsoft.Terminal.Settings.Model.dll": {
+      "sha256": "1fc92356ad17c8d06bf981b334dfa6cedeb4899a4206baefba09b77e15e4c6a0",
+      "size": 2204672
+    },
+    "Microsoft.Terminal.Settings.Model.pri": {
+      "sha256": "133f34f40d6348938764fc43ba3c80f47b1c19f17ab4051001f440681147cefe",
+      "size": 760
+    },
+    "Microsoft.Terminal.TerminalConnection.pri": {
+      "sha256": "6ddf2b179bfa2f2dc83cacdf0b64226b321fb25fee11d60400b3f5186273efe4",
+      "size": 33448
+    },
+    "Microsoft.Terminal.UI.Markdown.dll": {
+      "sha256": "6e289d4ccd067ee7d897312c4b9e3e8fa4ec19df391863a553b4c4622c2cd889",
+      "size": 344576
+    },
+    "Microsoft.Terminal.UI.Markdown.pri": {
+      "sha256": "679cc8d8dbfd3f2698fc24bd19646cf17647539c6ad019c56f2103cf36057a0f",
+      "size": 5616
+    },
+    "Microsoft.Terminal.UI.Markdown/CodeBlock.xaml": {
+      "sha256": "f31cc0d526a8eb950bc4740a459f9169784dc6e8c22c151bef204130ef8c2f99",
+      "size": 12491
+    },
+    "Microsoft.Terminal.UI.dll": {
+      "sha256": "d6b7bffcfa42dc1bcd7b2ac4f1a9d360f3bc2e503f1d0504c756738544be06eb",
+      "size": 207360
+    },
+    "Microsoft.Terminal.UI.pri": {
+      "sha256": "1eebf8c675f22404491a1b2416bb650e43d837a6f1b08cbd9c79fa96f172d69a",
+      "size": 4240
+    },
+    "Microsoft.UI.Xaml.dll": {
+      "sha256": "8b92de46c8950ced663e970a3352d3930ff3c978f3c73770935b5316cf6ca5ad",
+      "size": 6115768
+    },
+    "Microsoft.UI.Xaml.pri": {
+      "sha256": "740d50a9e4b5bea02e39ae58a150a6e2937880615d13e4305563f89d5b8074c3",
+      "size": 1400
+    },
+    "Microsoft.UI.Xaml.xml": {
+      "sha256": "4e14ba162f69648c1b0b7f7d9634bc57e161f3a1bd899129113af599a7a4bee0",
+      "size": 426330
+    },
+    "OpenConsole.exe": {
+      "sha256": "bdf3d3db7d8bd0bd071b7e5bd5133f857b50236fe7fafff96f824b6c3c5b3388",
+      "size": 1141248
+    },
+    "OpenConsoleProxy.dll": {
+      "sha256": "c53cac87d4a472c9db69ed7804145d90096c1d589f0829234f6d6db3fdda96a5",
+      "size": 30720
+    },
+    "README.md": {
+      "sha256": "466ae6343ffb82c36f1fe4e87ba39febd1cd1b91a62d05c4e66b861491058fe5",
+      "size": 11646
+    },
+    "TerminalApp.dll": {
+      "sha256": "d50221102dffff987e9c5bf2b6106ba3ba3ef97f0a21a2fb56a2a1541c249b20",
+      "size": 2998784
+    },
+    "TerminalApp.pri": {
+      "sha256": "8c5c4a7570568c9ed8ec91696c5c4caf07378a5a4664a5dab7f99ac3dfd6d995",
+      "size": 672
+    },
+    "TerminalApp/AboutDialog.xaml": {
+      "sha256": "bd9b968e0c52de39bf97833d87f8fb3ba46bdc93534b4ef4e66589a7f28a17e1",
+      "size": 3593
+    },
+    "TerminalApp/App.xaml": {
+      "sha256": "54a7f78cf1cd317b6cfd59365484c386ddb7eac2cbffc03d3857c06ec5ba0411",
+      "size": 16095
+    },
+    "TerminalApp/ColorPickupFlyout.xaml": {
+      "sha256": "1b6047c2774999cea2994db53d7f44b34deea0f0cc546325e7fed21e988688d5",
+      "size": 8223
+    },
+    "TerminalApp/CommandPalette.xaml": {
+      "sha256": "35599f7bade433f58c49cdecc78474efb9c3c0efad63d4a4f4686dacc53fb536",
+      "size": 21524
+    },
+    "TerminalApp/HighlightedTextControlStyle.xaml": {
+      "sha256": "165fd16fccdfded4fc66fa8056611c05dc3c9640a0580b4f2ac9856b5e97c78c",
+      "size": 1051
+    },
+    "TerminalApp/MarkdownPaneContent.xaml": {
+      "sha256": "861af07dcf391879df4e110e840840efae6bdc5c8c76dde638d09e995666b743",
+      "size": 6264
+    },
+    "TerminalApp/MinMaxCloseControl.xaml": {
+      "sha256": "b0383bbcfefd6d9077409a73a87fe08ee9a789f77f4ea7b7de5dcd21969940a3",
+      "size": 25632
+    },
+    "TerminalApp/SnippetsPaneContent.xaml": {
+      "sha256": "1bd3c428a268c80e1858ef73315ad0b4152920214567e8b7be2545c24c94206f",
+      "size": 16556
+    },
+    "TerminalApp/SuggestionsControl.xaml": {
+      "sha256": "563865a48ef0dd8954e90765c93cc06a44217d1385e5295f0c2b6c852fc41af3",
+      "size": 12193
+    },
+    "TerminalApp/TabHeaderControl.xaml": {
+      "sha256": "8fd5dd1e4fe7a9dddf70937111e3069984061d8b2c962ff235ed95a37502d8e0",
+      "size": 3927
+    },
+    "TerminalApp/TabRowControl.xaml": {
+      "sha256": "d511be9b23b45dfeb28af402778e8540ad1fe736fde2dd6195e4806a6e277097",
+      "size": 8694
+    },
+    "TerminalApp/TerminalPage.xaml": {
+      "sha256": "fcfa214bd01dbf0854e3ba48eec856bb78f6d51a937d25b9b28dea568068d7a2",
+      "size": 12291
+    },
+    "TerminalApp/TitlebarControl.xaml": {
+      "sha256": "72ed392245215634a6bfbf3a471b13a7e7d92d725653130d24484866311af27a",
+      "size": 2115
+    },
+    "TerminalConnection.dll": {
+      "sha256": "452cc98abf7c6b45d4a88567fe92c06ac8c3dfa603915ada9a26f995dff7b9d9",
+      "size": 448000
+    },
+    "TerminalThemeHelpers.dll": {
+      "sha256": "929ddfb7696bbe75234b2bf2ae1997b05502cc45b263ce53a5d27e7bf23abd77",
+      "size": 40960
+    },
+    "WindowsTerminal.exe": {
+      "sha256": "1ec43a0043d49fd5136e02b2ca21528e03c6ec046c9b48a19febbec991efa82f",
+      "size": 611328
+    },
+    "build-receipt.json": {
+      "sha256": "830e001d4b2593743901ca6567c441afc8834d9babea73be0aaa24bb6665fd66",
+      "size": 8120
+    },
+    "layout-fix.patch": {
+      "sha256": "1abc24a13d6abca55f92e815d809451c5c9885134c2ccb01edaaa5da75798584",
+      "size": 5952
+    },
+    "resources.pri": {
+      "sha256": "5b1248d58265edde15e30ee67fd6760f3aec4e76c8328f78fc105e42006b8dbb",
+      "size": 11873664
+    },
+    "settings/settings.json": {
+      "sha256": "a977e1288d5eeb4362452c303f7feaa458b59e0893afd899e0afee3068c400af",
+      "size": 3674
+    }
+  }
+}
