@@ -6,6 +6,10 @@
         {
             "command": "closeTab",
             "id": "User.CloseTab"
+        },
+        {
+            "command": "newTab",
+            "id": "User.NewTab"
         }
     ],
     "launchMode": "maximized",
@@ -44,6 +48,10 @@
         {
             "id": "User.CloseTab",
             "keys": "ctrl+w"
+        },
+        {
+            "id": "User.NewTab",
+            "keys": "ctrl+n"
         }
     ],
     "newTabMenu":
