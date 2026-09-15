@@ -7,16 +7,27 @@ Windows x64**: готовая portable-сборка, рабочие настро
 зависаний с десятью вкладками; после настройки работает восстановление вкладок.
 Это проверка на текущем компьютере, а не подтверждённая установка на чистую Windows.
 
+Текущие настройки: [settings/settings.json](settings/settings.json).
+Переход на следующий официальный релиз, перенос патча, сборка, проверка и откат:
+[UPDATING.md](UPDATING.md). Патч C++, конфиг Terminal и обход ввода Codex в HCA
+обновляются отдельно; новый официальный EXE сам наш патч не подхватит.
+
 ## Быстро восстановить на другой Windows
 
 1. Войти в GitHub под аккаунтом с доступом к этому приватному репозиторию.
 2. Открыть [релиз layout-fix.1](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.1).
    Скачать **WT-Layout-Fix-1.25.1912.0-win-x64.zip** и одноимённый **.zip.sha256**
    в папку «Загрузки». GitHub-файл «Source code (zip)» не содержит готовую программу.
+   Также скачать актуальный [settings/settings.json](settings/settings.json)
+   через **Download raw file** как `Downloads\WT-Layout-Fix-settings.json`.
+   В старом ZIP нет последующих настроек Ctrl+N и Ctrl/Shift+Enter.
 3. В обычном Windows PowerShell выполнить:
 
 ```powershell
+$ErrorActionPreference = 'Stop'
 $zip = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-1.25.1912.0-win-x64.zip'
+$config = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-settings.json'
+$null = Get-Content -LiteralPath $config -Raw -Encoding UTF8 | ConvertFrom-Json
 $expected = ((Get-Content -LiteralPath ($zip + '.sha256') -Raw).Trim() -split '\s+')[0]
 if ($expected -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid checksum file' }
 if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ine $expected) {
@@ -28,6 +39,7 @@ if (Test-Path -LiteralPath $terminal) {
     throw 'Destination already exists; keep it and extract this archive into a different folder'
 }
 Expand-Archive -LiteralPath $zip -DestinationPath $programs -ErrorAction Stop
+Copy-Item -LiteralPath $config -Destination (Join-Path $terminal 'settings\settings.json')
 & (Join-Path $terminal 'WindowsTerminal.exe')
 ```
 
@@ -36,7 +48,9 @@ Expand-Archive -LiteralPath $zip -DestinationPath $programs -ErrorAction Stop
 5. Проверить кнопку **+**, разделение панели, RU/EN с 10 вкладками и восстановление.
 
 Распаковка в свой `%LOCALAPPDATA%` не требует регистрации MSIX. Portable-копия
-не заменяет Store/Preview и не становится автоматически системным терминалом.
+не заменяет Store/Preview; системный выбор default terminal доступен packaged-версии,
+а portable запускается своим EXE/ярлыком и командами HCA.
+См. [типы поставки Microsoft](https://learn.microsoft.com/en-us/windows/terminal/distributions).
 Это сборка x64; проверенная система — Windows 11, build 22631.6199.
 Перенос на другую версию Windows ещё не проверен.
 
@@ -87,7 +101,7 @@ Doctor должен показать канал `layout-fix`, EXE в `Programs/W
 Codex/Terminal повторите проверку кириллицы и Ctrl/Shift+Enter.
 
 Эти уточнения дополняют README внутри первоначального ZIP `layout-fix.1`.
-Сам архив, его настройки и SHA256 не изменялись; при переносе используйте эту
+Сам архив и его SHA256 не изменялись; конфиг в Git новее архивного. При переносе используйте эту
 актуальную инструкцию вместе с [runbook HCA](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md).
 
 ## Рабочие настройки
@@ -104,16 +118,17 @@ Codex/Terminal повторите проверку кириллицы и Ctrl/Sh
 | `Ctrl+C`, `Ctrl+V`, `Alt+Shift+D` | прежние привязки копирования, вставки, разделения |
 | `Ctrl+W` | закрыть всю вкладку вместе с её панелями; Terminal перехватывает сочетание у приложения |
 | `Ctrl+N` | новая вкладка профиля по умолчанию (Ubuntu), как кнопка **+** |
+| `Ctrl+Enter`, `Shift+Enter` | `User.AgentNewline`: отправить LF (`\n`) приложению |
 | `Ctrl+Shift+F`, `Ctrl+Shift+P` | стандартные поиск и палитра команд |
 
-`Ctrl+N` добавлен в установленную сборку и [settings/settings.json](settings/settings.json),
-но отсутствует в первоначальном ZIP `layout-fix.1`. При чистом восстановлении
-перед первым запуском замените архивный `settings/settings.json` этим файлом.
-
 `Ctrl+Shift+Period` освобождён от подсказок Terminal, как в прежнем Preview.
-Enter/Shift+Enter/Ctrl+Enter и Delete/Home/End не переназначались.
-Привязка `Ctrl+W` добавлена после подтверждения восстановления; её ручная проверка
-ещё не выполнена. Проверять на пустой тестовой вкладке, не на работающем агенте.
+Обычный Enter и Delete/Home/End в этом JSON не переназначены. Ctrl/Shift+Enter
+отправляют LF; реакцию определяет приложение: в обычной оболочке это может
+выполнить команду, в проверенной сессии Codex — добавить строку сообщения.
+Сохранены работающие привязки, а не возвращены прежние defaults.
+Ctrl+N/Ctrl+W перехватывает Terminal; проверки конфига пройдены, отдельного
+подтверждения ручного нажатия этих двух сочетаний пока нет. Проверять на пустой
+вкладке; `warning.confirmCloseAllTabs=false` отключает вопрос при закрытии окна.
 Названия существующих профилей других WSL-дистрибутивов сохранены; их присутствие
 в JSON не означает, что сами дистрибутивы перенесены.
 
@@ -148,16 +163,31 @@ Enter/Shift+Enter/Ctrl+Enter и Delete/Home/End не переназначали�
 восстановления предназначен проверенный бинарный ZIP из релиза.
 
 `build/original-build-receipt.json` сохранён без изменений. Его хеш настроек
-относится к тестовому конфигу **до** настройки повседневной работы. Новые хеши
-настроек и архивного payload принадлежат `build/recovery-manifest.json`.
+относится к тестовому конфигу **до** настройки повседневной работы.
+`build/recovery-manifest.json` описывает только неизменённый архив `layout-fix.1`,
+включая его тогдашний конфиг. Это не хеш текущего `settings/settings.json` из Git.
 
 ## Обновление резервной копии
 
-Редактировать настройки через работающий Terminal, затем копировать отдельно
-`settings.json` в этот репозиторий и просматривать diff. Никогда не добавлять
-всю рабочую папку Terminal: там появляются буферы, состояние и резервные копии.
-Новый бинарный архив/настройки публиковать отдельным приватным релизом с новым
-номером, SHA256 и ручной проверкой. Старый релиз не перезаписывать.
+Рабочий файл на этом ПК:
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json`.
+На 15.09.2026 сохранена его точная копия, включая перенос строки и Ctrl+N/Ctrl+W.
+После следующих настроек сначала проверить diff только этого JSON: там могут
+появиться личные пути и commandline. Буферы, состояние и авторизация в Git не идут.
+
+В WSL, из корня этого репозитория, после просмотра изменений:
+
+```bash
+cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0/settings/settings.json settings/settings.json
+python3 -m json.tool settings/settings.json > /dev/null
+cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0/settings/settings.json
+rtk proxy git diff -- settings/settings.json
+```
+
+Снимок JSON можно сохранять отдельным коммитом без пересборки EXE и нового ZIP.
+При создании нового бинарного архива нужен отдельный приватный релиз, SHA256,
+ведомость фактических файлов и проверка кандидата. Старый релиз и его receipts
+не перезаписывать. Полный порядок — [UPDATING.md](UPDATING.md).
 
 Portable-сборка сама не получает обновления Store. Перед переходом на новый
 upstream сначала проверить, исправлена ли проблема официально. GitHub Actions

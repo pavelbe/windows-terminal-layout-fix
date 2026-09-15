@@ -4,6 +4,13 @@
     "actions":
     [
         {
+            "command": {
+                "action": "sendInput",
+                "input": "\n"
+            },
+            "id": "User.AgentNewline"
+        },
+        {
             "command": "closeTab",
             "id": "User.CloseTab"
         },
@@ -29,6 +36,14 @@
     "firstWindowPreference": "persistedLayoutAndContent",
     "keybindings":
     [
+        {
+            "id": "User.AgentNewline",
+            "keys": "ctrl+enter"
+        },
+        {
+            "id": "User.AgentNewline",
+            "keys": "shift+enter"
+        },
         {
             "id": "Terminal.CopyToClipboard",
             "keys": "ctrl+c"
