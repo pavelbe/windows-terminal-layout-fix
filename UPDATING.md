@@ -178,15 +178,38 @@ UIA-тесты управляют мышью: запускать только в
 AppX x64 из зависимостей сборки; не выбирать первый найденный файл.
 
 ```powershell
-$ErrorActionPreference = 'Stop'
-$terminalPackage = Read-Host 'Full path to the newly built Terminal .msix/.appx'
-$xamlPackage = Read-Host 'Full path to matching Microsoft.UI.Xaml x64 .appx'
-$makeAppx = Read-Host 'Full path to MakeAppx.exe from the selected Windows SDK'
-$staging = Read-Host 'New empty staging directory outside the live installation'
-if (Test-Path -LiteralPath $staging) { throw 'Use a new staging directory' }
-& .\build\scripts\New-UnpackagedTerminalDistribution.ps1 -TerminalAppX $terminalPackage -XamlAppX $xamlPackage -MakeAppxPath $makeAppx -Destination $staging -PortableMode
-if ($LASTEXITCODE -ne 0) { throw 'Portable packaging failed' }
+& {
+    if ($PSVersionTable.PSVersion -lt [version]'7.4') { throw 'Use PowerShell 7.4+ for this packaging recipe' }
+    $ErrorActionPreference = 'Stop'
+    $PSNativeCommandUseErrorActionPreference = $true
+    $terminalPackage = Read-Host 'Full path to the newly built Terminal .msix/.appx'
+    $xamlPackage = Read-Host 'Full path to matching Microsoft.UI.Xaml x64 .appx'
+    $makeAppx = Read-Host 'Full path to MakeAppx.exe from the selected Windows SDK'
+    $staging = Read-Host 'New empty staging directory outside the live installation'
+    if (Test-Path -LiteralPath $staging) { throw 'Use a new staging directory' }
+    $result = @(& .\build\scripts\New-UnpackagedTerminalDistribution.ps1 -TerminalAppX $terminalPackage -XamlAppX $xamlPackage -MakeAppxPath $makeAppx -Destination $staging -PortableMode)
+    if ($result.Count -ne 1 -or $result[0] -isnot [System.IO.FileInfo] -or $result[0].Extension -ne '.zip' -or $result[0].Length -le 0) {
+        throw 'Packaging did not return one nonempty ZIP; do not use partial output'
+    }
+    $result[0]
+}
 ```
+
+Остановка на native-ошибке здесь обязательна и ограничена этим scriptblock:
+профиль PowerShell не меняется. В исходной цепочке базы `Merge-PriFiles.ps1`
+не проверяет exit `MakePri.exe new`; успешный последующий `tar` может затереть
+ошибку. Один `$LASTEXITCODE` после внешнего `.ps1` проверяет только последний
+native exit, а не все этапы. Поведение описано у Microsoft:
+[`$LASTEXITCODE`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables#lastexitcode),
+[`$PSNativeCommandUseErrorActionPreference`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables#psnativecommanduseerroractionpreference).
+При новом tag проверить всю цепочку helper-скриптов на локальные overrides и
+обработку ошибок; наличие ZIP ещё не доказывает целостность его ресурсов.
+
+Проверка 15.09.2026 на PowerShell 7.6.6: настоящий `Merge-PriFiles.ps1` базы с
+подставной утилитой, возвращающей 23, продолжал выполнение в старом режиме;
+следующий успешный native шаг давал 0. Новый режим остановил первый отказ;
+контроль с exit 0 прошёл. Это изолированная проверка контракта ошибок, не
+пересборка Terminal и не Windows UI smoke. Исторический ZIP не изменялся.
 
 Если имеется только layout с `AppxManifest.xml`, у базового скрипта есть
 `-TerminalLayout` вместо `-TerminalAppX`: он возвращает каталог во временной
