@@ -97,6 +97,7 @@
             },
             {
                 "commandline": "wsl.exe -d Ubuntu",
+                "compatibility.kittyKeyboardMode": false,
                 "guid": "{52d9ee01-10f5-4261-b4f6-7e4c493c6749}",
                 "name": "Ubuntu",
                 "startingDirectory": "~"
