@@ -21,7 +21,7 @@
     ],
     "launchMode": "maximized",
     "disableAnimations": true,
-    "experimental.detectURLs": false,
+    "experimental.detectURLs": true,
     "experimental.scrollToChangeOpacity": false,
     "copyFormatting": "none",
     "defaultProfile": "{52d9ee01-10f5-4261-b4f6-7e4c493c6749}",

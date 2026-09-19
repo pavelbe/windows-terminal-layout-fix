@@ -197,13 +197,24 @@ The candidate is not the daily HCA/shortcut target and has no published ZIP.
 | `windowingBehavior` | `useAnyExisting`: повторное использование окна |
 | Шрифт | Cascadia Code 11, ClearType |
 | История вывода | штатные 9001 строк; старые 50000 не перенесены |
-| Анимации, автоматические URL, bell | отключены |
+| Анимации, bell | отключены |
+| `experimental.detectURLs` | включено: распознавание URL, открытие через Ctrl+клик |
 | Копирование | обычный текст без форматирования |
 | `Ctrl+C`, `Ctrl+V`, `Alt+Shift+D` | прежние привязки копирования, вставки, разделения |
 | `Ctrl+W` | закрыть всю вкладку вместе с её панелями; Terminal перехватывает сочетание у приложения |
 | `Ctrl+N` | новая вкладка профиля по умолчанию (Ubuntu), как кнопка **+** |
 | `Ctrl+Enter`, `Shift+Enter` | `User.AgentNewline`: отправить LF (`\n`) приложению |
 | `Ctrl+Shift+F`, `Ctrl+Shift+P` | стандартные поиск и палитра команд |
+
+Automatic URL detection was restored on 2026-09-19 in the daily portable
+configuration and the running `clipboard-files-test` candidate. It had remained
+disabled after the layout-freeze investigation. Upstream defaults to `true`:
+plain `http://localhost:3002` output is underlined on hover and opens via
+Ctrl+left-click in the system browser. This needs a settings change, not a new
+EXE. On 2026-09-19 the owner confirmed that Ctrl+click opens the URL and RU/EN
+switching stays fast at the usual tab count; the exact tab count was not recorded.
+Historical build/release receipts still describe their original settings and
+must not be restamped.
 
 `Ctrl+Shift+Period` освобождён от подсказок Terminal, как в прежнем Preview.
 Обычный Enter и Delete/Home/End в этом JSON не переназначены. Ctrl/Shift+Enter
@@ -262,8 +273,8 @@ Ctrl+N/Ctrl+W перехватывает Terminal; проверки конфиг
 
 Рабочий файл на этом ПК:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json`.
-На 16.09.2026 сохранена его точная копия, включая перенос строки, Ctrl+N/Ctrl+W
-и отключение Kitty-протокола в профиле Ubuntu.
+The reviewed snapshot was synchronized on 2026-09-19, including automatic URL
+detection, newline bindings, Ctrl+N/Ctrl+W and disabled Kitty mode for Ubuntu.
 После следующих настроек сначала проверить diff только этого JSON: там могут
 появиться личные пути и commandline. Буферы, состояние и авторизация в Git не идут.
 
