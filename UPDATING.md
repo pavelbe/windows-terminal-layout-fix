@@ -1,65 +1,69 @@
-# Обновление Windows Terminal и перенос нашего патча
+# Updating Windows Terminal and porting our patches
 
-Это инструкция для следующего обновления, **не отчёт о выполненной пересборке**.
-Рабочая версия и восстановление описаны в [README.md](README.md).
-Исходники Microsoft нужно получать отдельно: здесь хранится recovery-kit.
+This is a procedure for the next upgrade, **not evidence of a completed rebuild**.
+[README.md](README.md) owns the working build, candidates and recovery status.
+Obtain Microsoft's source separately; this repository is the recovery kit.
 
-## 1. Сначала проверить официальный релиз
+<a id="1-сначала-проверить-официальный-релиз"></a>
+## 1. Check the exact official release
 
-Открыть [релизы Microsoft](https://github.com/microsoft/terminal/releases) и
-[#11522](https://github.com/microsoft/terminal/issues/11522), включая связанные PR.
-Проверить **конкретный release tag**, а не только `main`, закрытый issue или
-надпись «Latest»: GitHub отделяет stable от Preview/prerelease.
-На проверке 15.09.2026 верхние релизы — Preview `v1.25.1912.0` и stable
-`v1.24.11911.0`; #11522 открыт. При будущем обновлении проверить заново.
+Read [Microsoft releases](https://github.com/microsoft/terminal/releases) and
+[#11522](https://github.com/microsoft/terminal/issues/11522), including linked PRs.
+Check the **exact release tag**, not only `main`, a closed issue or "Latest":
+stable and Preview/prereleases are distinct. The historical check on 2026-09-15
+found Preview `v1.25.1912.0`, stable `v1.24.11911.0` and an open #11522.
+Recheck for the actual upgrade; these are not current-version claims.
 
-Read-only проверка через GitHub CLI:
+Read-only discovery:
 
 ```bash
 rtk-run -- gh api 'repos/microsoft/terminal/releases?per_page=10' --jq '.[] | [.tag_name, .prerelease, .published_at] | @tsv'
 rtk-run -- gh issue view 11522 --repo microsoft/terminal --comments
 ```
 
-Сначала испытать **официальный x64 unpackaged ZIP без нашего патча** рядом с
-рабочей сборкой. Распаковать в новую отдельную папку, создать `.portable` рядом
-с EXE **до первого запуска**, перенести только копию нашего `settings.json` в
-`settings/settings.json`. Запускать полный путь к новому `WindowsTerminal.exe`.
-Убедиться по пути процесса, что проверяется нужная версия, а не старое окно.
-Правила portable описаны у [Microsoft](https://learn.microsoft.com/en-us/windows/terminal/distributions).
+First test an **official unpatched x64 unpackaged ZIP** beside the working build.
+Extract to a new directory; create `.portable` beside the EXE **before first
+launch**, then copy only the reviewed JSON to `settings/settings.json`.
+Launch the full `WindowsTerminal.exe` path and verify the actual process path.
+A new window is not proof that a new build/process was launched.
+See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/terminal/distributions).
 
-- Новый официальный Terminal проходит проверки раздела 6: предпочесть его;
-  наш C++-патч больше не нужен. Конфиг и обход Codex проверить отдельно.
-- Лаг остался: перенести патч на выбранный tag по разделам 3–5.
-- Изменился код, а результат неясен: сохранить рабочую сборку и исследовать
-  конкретного кандидата. Не считать применение diff доказательством исправления.
+- If upstream passes section 6, prefer it. Retire only patches whose behavior
+  is now covered; configuration and the HCA Codex workaround need separate checks.
+- If the layout freeze remains, port that patch using sections 3–5.
+- If source or behavior is unclear, keep the working build and investigate the
+  exact candidate. A clean patch application does not prove a fix.
 
-## 2. Сохранить рабочее состояние
+<a id="2-сохранить-рабочее-состояние"></a>
+## 2. Preserve the working installation
 
-Перед тестами сохранить текущий JSON и проверить diff по инструкции README.
-Рабочую папку `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` оставить целой.
-Тестовые копии получают отдельные папки и не используют общий `settings` через ссылку.
+Save the current JSON and review its diff as described in README.
+Keep `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` intact.
+Candidates use separate directories, never a symlink to shared live settings.
 
-Для переноса вкладок/буферов позже, после сохранения работы и обычного выхода
-из старого Terminal, сделать **локальную приватную копию всей папки `settings`**.
-Она содержит тексты сессий: не добавлять её в Git/релизы. Для первого сравнения
-достаточно одного JSON; состояние вкладок переносить отдельным этапом после тестов.
-Старую копию state сохранить: новая версия может изменить формат, обратная
-совместимость не обещана. Живые процессы агентов этим не сохраняются.
+To migrate tabs/buffers later, save work and exit the old Terminal normally,
+then make a **private local copy of its complete settings directory**.
+It contains session text: never commit or release it. Initial comparisons need
+only the JSON; move session state separately after acceptance.
+Keep the old state copy because newer formats may not be backward-compatible.
+This does not preserve live agent processes.
 
-Обновление Terminal не требует `wsl --shutdown`, сброса BIOS или переустановки
-дистрибутива. Закрывать рабочие окна нужно только в согласованное окно перехода.
+An upgrade does not require `wsl --shutdown`, BIOS changes or reinstalling the
+distribution. Close working windows only in the owner-approved transition window.
 
-## 3. Получить исходники и проверить патч
+<a id="3-получить-исходники-и-проверить-патч"></a>
+## 3. Obtain source and check each patch
 
-Наша историческая база: `v1.25.1912.0`, SHA
-`1cea42d433253d95c4487a3037db48197b5e72f4`.
-Патч: [patches/layout-fix.patch](patches/layout-fix.patch), исходный commit
+Historical base: `v1.25.1912.0`,
+SHA `1cea42d433253d95c4487a3037db48197b5e72f4`.
+[patches/layout-fix.patch](patches/layout-fix.patch) comes from source commit
 `a34eea7b524f7516c68014a14bb94e215520e0fc`.
-Это текстовый diff C++, **его нельзя применить к готовому EXE или MSIX**.
+It is a C++ source diff; **it cannot be applied to an EXE or MSIX**.
 
-В WSL выбрать точный tag из Releases. Пример ниже воспроизводит старую базу;
-при обновлении заменить `wt_tag` на уже выбранный новый tag. Исходники для
-Windows/MSBuild разместить на NTFS, например `C:\Users\Pavel\Source`, не в UNC.
+Choose an exact release tag in WSL. This example reproduces the old base;
+replace `wt_tag` with the verified new tag for an upgrade.
+Keep the Windows/MSBuild checkout on NTFS, for example
+`C:\Users\Pavel\Source`, rather than a UNC path.
 
 ```bash
 wt_tag='v1.25.1912.0'
@@ -67,16 +71,16 @@ wt_source="/mnt/c/Users/Pavel/Source/terminal-$wt_tag"
 wt_patch='/home/pavelbe/Projects/windows-terminal-layout-fix/patches/layout-fix.patch'
 ```
 
-Нужен новый отсутствующий каталог. Не выполнять clone поверх старого checkout:
+Use a new, nonexistent destination, not an old checkout:
 
 ```bash
 test ! -e "$wt_source"
 /home/pavelbe/.claude/bin/heavy-lock.sh --wait 600 -- git -c core.autocrlf=false clone --branch "$wt_tag" --single-branch --depth 1 https://github.com/microsoft/terminal.git "$wt_source"
 ```
 
-При ошибке любой команды остановиться. Для агента HCA переменные в командах
-Git/lock заменить проверенными **буквальными путями/tag** и выставить cwd исходников;
-это шаблон для оператора, не способ обхода admission. Далее, отдельными командами:
+Stop on any failed command. These are operator templates, not an admission
+bypass: agents replace Git/lock variables with verified **literal paths/tags**
+and set the source working directory. Continue as separate commands:
 
 ```bash
 rtk proxy git -C "$wt_source" rev-parse HEAD
@@ -86,16 +90,16 @@ rtk proxy git -C "$wt_source" status --short
 rtk proxy git -C "$wt_source" apply --check "$wt_patch"
 ```
 
-Сверить HEAD с commit выбранного tag; `target_commitish: main` из release API
-не является закреплённым SHA. До patch-check дерево должно быть чистым.
+Match HEAD to the selected tag's commit; release API `target_commitish: main`
+is not a pinned SHA. The tree must be clean before patch checking.
 
-| Результат проверки | Следующее действие |
+| Result | Action |
 | --- | --- |
-| `apply --check` успешен | Прочитать контекст трёх файлов, затем применить diff |
-| Прямая проверка не прошла, `apply --reverse --check` прошёл | Такие изменения уже присутствуют; повторно не применять, проверить поведение |
-| Обе проверки не прошли | Возможны рефакторинг, частичное исправление или другая база; вручную проверить каждый участок |
+| `apply --check` passes | Read all three affected contexts, then apply |
+| Forward check fails; `apply --reverse --check` passes | Changes are already present; do not reapply; verify behavior |
+| Both fail | Investigate refactoring, partial fixes or a different base manually |
 
-Команда применения — **только после успешной прямой проверки и чтения контекста**:
+Apply **only after a successful forward check and context review**:
 
 ```bash
 rtk proxy git -C "$wt_source" apply "$wt_patch"
@@ -103,25 +107,24 @@ rtk proxy git -C "$wt_source" diff --check
 rtk proxy git -C "$wt_source" diff --stat
 ```
 
-Не использовать `--reject`, игнорирование пробелов или автоматический `--3way`
-для продавливания несовместимого патча. Сохранить исходные байты patch-файла:
-в нём есть CRLF-контекст `TermControl.cpp`; не прогонять его через форматтер.
+Do not force incompatibility with `--reject`, whitespace ignoring or automatic
+`--3way`. Preserve original patch bytes, including CRLF context in
+`TermControl.cpp`; do not run a formatter on patch files.
 
-При ручном переносе сохранить **смысл**, а не номера строк:
+Preserve semantics when porting:
 
-1. `TerminalPage.h`: состояние `_updatingTerminalSettings` принадлежит странице.
-2. `TerminalPage.cpp`: на время применения настроек всем вкладкам временно
-   отложить `_updateThemeColors`; вернуть предыдущее состояние через scope guard.
-   После цикла должно остаться штатное финальное обновление оформления.
-   Обновления иконок, заголовков, ActionMap и вкладок должны сохраниться.
-3. `TermControl.cpp`: `BackgroundBrush` уведомляет при смене объекта **или цвета**,
-   включая SolidColorBrush и AcrylicBrush; одинаковый фон не создаёт лишних
-   уведомлений. Не потерять изменения `TintColor`/`FallbackColor`.
+1. `TerminalPage.h`: `_updatingTerminalSettings` belongs to the page.
+2. `TerminalPage.cpp`: defer window-wide `_updateThemeColors` while applying
+   settings to tabs; restore previous state with a scope guard. Preserve the
+   existing final refresh and icon/title/ActionMap/tab updates.
+3. `TermControl.cpp`: notify `BackgroundBrush` changes when the object **or
+   color** changes, including SolidColorBrush and AcrylicBrush. Equal backgrounds
+   must not generate redundant notifications; preserve TintColor/FallbackColor changes.
 
-Не переносить этот guard, если новый upstream уже заменил соответствующий путь.
-После переноса сохранить новый diff относительно **нового upstream SHA**, точный
-список файлов и SHA256 патча. Старый патч должен оставаться доступным в Git и
-старом release. Успешный `git apply` проверяет контекст, не семантику и не сборку.
+Do not transplant a guard if upstream replaced its underlying path.
+Record the new diff against the **new upstream SHA**, exact file list and patch
+SHA256. Keep old patches in history/releases. A clean `git apply` proves context,
+not semantics, compilation or behavior.
 
 Clipboard patches have independent acceptance from the layout fix. On the
 original base, apply `layout-fix.patch`, then `clipboard-image-paste.patch`
@@ -136,26 +139,27 @@ and failed-write cleanup. Never inject Enter or replace the system clipboard.
 The owner accepted screenshots/text in the first candidate; multi-file candidate
 acceptance and promotion are tracked in README, not inferred from build success.
 
-## 4. Собрать на Windows
+<a id="4-собрать-на-windows"></a>
+## 4. Build on Windows
 
-Прочитать `README.md`, `doc/building.md`, `.vsconfig` и build scripts **выбранного
-tag**. [Официальная инструкция](https://github.com/microsoft/terminal/blob/main/doc/building.md)
-на `main` — только указатель; требования будущей версии могут отличаться.
-Базовый tag требует PowerShell 7+, VS 2022 с Desktop C++, UWP/v143 tools и
-Windows SDK 22621; тестам нужен .NET Framework Targeting Pack.
-См. [README базы](https://github.com/microsoft/terminal/blob/v1.25.1912.0/README.md).
+Read README, `doc/building.md`, `.vsconfig` and build scripts from the
+**selected tag**. The [main-branch guide](https://github.com/microsoft/terminal/blob/main/doc/building.md)
+is only a pointer; requirements can change. The original base documents
+PowerShell 7+, VS 2022 Desktop C++, UWP/v143 tools and Windows SDK 22621;
+tests need the .NET Framework Targeting Pack. See the
+[base README](https://github.com/microsoft/terminal/blob/v1.25.1912.0/README.md).
 
-Не принимать старые версии MSVC/SDK из receipt за требования нового релиза.
-Для воспроизводимости записать фактические версии VS/MSBuild/MSVC/SDK/NuGet и
-submodule SHA. Не обновлять зависимости сверх требований tag ради прохождения сборки.
+Do not treat old receipt versions as a new release's requirements.
+Record actual VS/MSBuild/MSVC/SDK/NuGet versions and submodule SHAs.
+Do not upgrade dependencies beyond the tag's requirements merely to make it build.
 
-Открыть **PowerShell 7 для Windows (`pwsh.exe`)**, перейти в checkout. Ниже отправная
-точка для базы со `OpenConsole.slnx`; если структура изменилась, сначала адаптировать
-команду по её build scripts. Полный прогон этих команд в этой docs-сессии не выполнялся.
+Open **Windows PowerShell 7 (`pwsh.exe`)** in the checkout.
+This recipe assumes `OpenConsole.slnx`; adapt it from the selected build scripts
+if the layout changes. This documentation edit did not execute a rebuild.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-Set-Location 'C:\Users\Pavel\Source\terminal-v1.25.1912.0' # выбранный checkout
+Set-Location 'C:\Users\Pavel\Source\terminal-v1.25.1912.0' # selected checkout
 Import-Module .\tools\OpenConsole.psm1
 Set-MsBuildDevEnvironment
 & .\dep\nuget\nuget.exe restore .\OpenConsole.slnx
@@ -166,35 +170,38 @@ if ($LASTEXITCODE -ne 0) { throw 'Shared packages restore failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Terminal build failed' }
 ```
 
-Restore шаги разделены: [helper базы](https://github.com/microsoft/terminal/blob/v1.25.1912.0/tools/OpenConsole.psm1)
-вызывает NuGet несколько раз перед MSBuild; важно не потерять раннюю ошибку.
-Сборка `CascadiaPackage` не доказывает запуск unit tests. Построить и выполнить
-подходящие тесты TerminalApp/Control/Settings Model из выбранного tag, фиксируя
-каждый exit; отсутствующие DLL или непройденный запуск обозначать `NOT RUN`.
-UIA-тесты управляют мышью: запускать только в отдельное согласованное окно.
+Restore commands are separate because the
+[base helper](https://github.com/microsoft/terminal/blob/v1.25.1912.0/tools/OpenConsole.psm1)
+calls NuGet multiple times before MSBuild; an early failure must survive.
+Building CascadiaPackage does not execute unit tests. Build/run the appropriate
+TerminalApp/Control/Settings Model tests from the chosen tag and record each exit.
+Missing dependencies or unexecuted tests are `NOT RUN`.
+UIA tests control the mouse; run them only during an agreed test window.
 
-Все clone/submodule/restore/build/test/package команды агента выполняются под
-машинным heavy-lock, последовательно, с сохранением exit/log. Для Windows-фаз
-использовать проверенный `.ps1` через `pwsh.exe -File` под внешним WSL lock;
-не запускать второй build из GUI одновременно. Binlog держать локально: он
-может содержать пути и параметры окружения. GitHub Actions не запускать.
+Agent clone/submodule/restore/build/test/package phases run sequentially under
+the machine-global heavy lock, preserving logs and exits. For Windows phases,
+use a reviewed `.ps1` through `pwsh.exe -File` under an outer WSL lock; do not
+start a second GUI build. Binlogs stay local because they can contain paths and
+environment parameters. Do not run GitHub Actions.
 
-Свой проверенный `.ps1` подготовить в локальной папке Windows и передавать
-полный Windows-путь: действующая RemoteSigned может считать путь
-`\\wsl.localhost\Ubuntu\...` удалённым и отказаться от неподписанного файла.
-Не менять ExecutionPolicy ради запуска. Это не разрешение снимать защиту с
-скачанного скрипта: его происхождение и требования подписи проверяются отдельно.
+Put the reviewed script in a local Windows directory and pass its full Windows
+path. RemoteSigned may treat `\\wsl.localhost\Ubuntu\...` as remote and refuse
+an unsigned script. Do not change ExecutionPolicy to run it. This does not
+authorize unblocking downloaded scripts; verify their provenance/signature
+requirements separately.
 
-## 5. Получить полный portable-кандидат
+<a id="5-получить-полный-portable-кандидат"></a>
+## 5. Package a complete portable candidate
 
-Один собранный EXE недостаточен. Нужны согласованные DLL, XAML/PRI-ресурсы и
-зависимости **той же сборки**. Не копировать старые DLL поверх нового релиза.
-`OpenConsole.exe` — консольный хост, не приложение с вкладками.
+One EXE is insufficient: matching DLLs, XAML/PRI resources and dependencies
+must come from **the same build**. Do not overlay old DLLs on a new release.
+`OpenConsole.exe` is the console host, not the tabbed application.
 
-В базе есть [New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.1912.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).
-Проверить его параметры в новом tag. Для варианта AppX указать точные пути к
-**своему** собранному Terminal MSIX/AppX и соответствующему Microsoft.UI.Xaml
-AppX x64 из зависимостей сборки; не выбирать первый найденный файл.
+The base provides
+[New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.1912.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).
+Recheck parameters in the new tag. For AppX packaging, select exact paths to
+**your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
+x64 AppX dependency; never select the first file found.
 
 ```powershell
 & {
@@ -214,32 +221,32 @@ AppX x64 из зависимостей сборки; не выбирать пе�
 }
 ```
 
-Остановка на native-ошибке здесь обязательна и ограничена этим scriptblock:
-профиль PowerShell не меняется. В исходной цепочке базы `Merge-PriFiles.ps1`
-не проверяет exit `MakePri.exe new`; успешный последующий `tar` может затереть
-ошибку. Один `$LASTEXITCODE` после внешнего `.ps1` проверяет только последний
-native exit, а не все этапы. Поведение описано у Microsoft:
-[`$LASTEXITCODE`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables#lastexitcode),
-[`$PSNativeCommandUseErrorActionPreference`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables#psnativecommanduseerroractionpreference).
-При новом tag проверить всю цепочку helper-скриптов на локальные overrides и
-обработку ошибок; наличие ZIP ещё не доказывает целостность его ресурсов.
+Native-error propagation is mandatory and scoped to this scriptblock, without
+changing the PowerShell profile. In the base chain, `Merge-PriFiles.ps1` does
+not check `MakePri.exe new`; a later successful tar can hide its failure.
+Checking only `$LASTEXITCODE` after the outer script sees the last native exit,
+not every phase. See
+[`$LASTEXITCODE`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables#lastexitcode)
+and [`$PSNativeCommandUseErrorActionPreference`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables#psnativecommanduseerroractionpreference).
+Inspect the new tag's complete helper chain for local overrides/error handling.
+A ZIP's presence does not establish valid resources.
 
-Проверка 15.09.2026 на PowerShell 7.6.6: настоящий `Merge-PriFiles.ps1` базы с
-подставной утилитой, возвращающей 23, продолжал выполнение в старом режиме;
-следующий успешный native шаг давал 0. Новый режим остановил первый отказ;
-контроль с exit 0 прошёл. Это изолированная проверка контракта ошибок, не
-пересборка Terminal и не Windows UI smoke. Исторический ZIP не изменялся.
+Historical proof, 2026-09-15, PowerShell 7.6.6: the actual base
+`Merge-PriFiles.ps1` continued after a stub tool exited 23 in the old mode;
+a subsequent native success yielded 0. The new mode stopped at the first failure;
+the exit-0 control passed. This was an isolated error-contract probe, not a
+Terminal rebuild or Windows UI smoke. The historical ZIP was unchanged.
 
-Если имеется только layout с `AppxManifest.xml`, у базового скрипта есть
-`-TerminalLayout` вместо `-TerminalAppX`: он возвращает каталог во временной
-папке, а не ZIP в `-Destination`. Проверить возвращённый путь и перенести
-результат целиком в новую папку кандидата; не запускать долгоживущую копию из `%TEMP%`.
-Если helper исчез/поменялся, заново определить поддержанный upstream packaging,
-а не собирать неполный набор файлов вручную.
+With only an `AppxManifest.xml` layout, the base helper accepts
+`-TerminalLayout` instead of `-TerminalAppX`; it returns a temporary directory,
+not a ZIP in `-Destination`. Verify the returned path and move the complete
+result to a new candidate folder. Do not run a lasting installation from TEMP.
+If the helper changes/disappears, rederive supported upstream packaging instead
+of assembling an incomplete file set manually.
 
-Распаковать результат отдельно, проверить `.portable`, скопировать только
-актуальный JSON до первого запуска. Имя папки должно отражать новую версию,
-например `WT-Layout-Fix-<version>`; старую папку не переименовывать и не затирать.
+Extract separately, verify `.portable` and copy only the current JSON before
+launch. Name the directory for the new version (`WT-Layout-Fix-<version>`);
+do not rename or overwrite the old installation.
 
 <a id="повторить-текущую-проверку-clipboard-кандидата"></a>
 ### Reproduce the clipboard candidate checks
@@ -274,71 +281,74 @@ and output hashes in a separate receipt. Recheck `_WTPrepareUnpackagedLayoutForR
 when changing tags; never copy its resource list blindly. Agent test/build/package
 commands still run under the machine-global heavy lock.
 
-## 6. Проверить кандидата до переключения
+<a id="6-проверить-кандидата-до-переключения"></a>
+## 6. Accept the candidate before switching
 
-Для старой рабочей, новой официальной и новой патченной (если нужна) версий
-использовать одинаковые копии JSON, одинаковые вкладки и объём вывода. Отличать
-версию продукта от номера FileVersion; записать полный путь/PID фактического EXE.
-Не считать новое окно доказательством нового процесса.
+Compare the old working, new official and new patched (if needed) builds with
+equivalent JSON copies, tabs and output volume. Product version and FileVersion
+are different; record the full EXE path and PID. A new window does not prove a
+separate process.
 
-| Проверка | Критерий |
+| Check | Acceptance |
 | --- | --- |
-| 2 → 10 → 20 пустых CMD/PowerShell вкладок, затем Ubuntu | RU/EN не вызывает многосекундного стопа ввода |
-| 10 одиночных смен с паузами, затем отдельная серия быстрых | Нет накопления зависаний; записать наблюдаемую максимальную паузу |
-| Смена языка в Блокноте → возврат в Terminal; переходы вкладок | Нет прежнего зависания при смене раскладки |
-| Обычная нагрузка и история вывода в рабочих вкладках | Результат сохраняется вне пустых тестовых вкладок |
-| Цвет вкладки, light/dark, фон/acrylic/opacity, reload настроек | Цвета действительно обновляются и при обычном reload, и после смены языка |
-| `+`, Ctrl+N; Ctrl+W на пустой вкладке с панелями | Новая Ubuntu в `~`; закрытие всей выбранной вкладки |
-| Split, resize, drag tab, поиск и палитра | Нет потери панелей/фокуса и новых сбоев |
-| Новый `codex`, `codex resume`, Claude | Набор и вставка `перевари тест`, латиница, Ctrl/Shift+Enter работают |
-| Цифровая десятичная клавиша в Claude/Codex, Num Lock включён | RU — запятая, EN — точка; Ubuntu сохраняет `compatibility.kittyKeyboardMode: false` |
+| 2 → 10 → 20 empty CMD/PowerShell tabs, then Ubuntu | RU/EN causes no multi-second input freeze |
+| Ten isolated layout changes with pauses, then a separate rapid series | No accumulating freezes; record the observed maximum delay |
+| Change language in Notepad → return to Terminal; switch tabs | No former layout-change freeze |
+| Normal workload and scrollback in working tabs | Improvement persists beyond empty test tabs |
+| Tab color, light/dark, background/acrylic/opacity, settings reload | Colors update both on ordinary reload and after language changes |
+| `+`, Ctrl+N; Ctrl+W on an empty split tab | New Ubuntu in `~`; close the entire selected tab |
+| Split, resize, drag tab, search and command palette | No lost panes/focus or new failures |
+| Fresh `codex`, `codex resume`, Claude | Type/paste `перевари тест`, Latin text and Ctrl/Shift+Enter correctly |
+| Numpad decimal in Claude/Codex with Num Lock on | RU comma, EN period; Ubuntu keeps `compatibility.kittyKeyboardMode: false` |
 | Fresh PrintScreen screenshot; 1 and 3 Explorer images (spaces/Cyrillic); text in each TUI | Every image attaches once, in order; text and single-image paste still work |
-| Обычный выход и повторный запуск после сохранения работы | Возвращаются ожидаемые вкладки/панели; агенты запускаются заново |
+| Normal exit/relaunch after saving work | Expected tabs/panes return; agents must be started again |
 
-Обход `CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1` во время сравнения сохранять.
-Его отмена — отдельный эксперимент после прохождения проверки; новая версия
-Terminal не доказывает исправления Codex. Не отправлять тестовый ввод агентам.
-Факт `build=0` не заменяет ни один ручной пункт этой таблицы.
+Keep `CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1` during comparisons.
+Removing it is a separate experiment after acceptance; a newer Terminal does
+not prove a Codex fix. Do not submit test text to agents.
+A zero build exit does not replace any manual acceptance check.
 
-## 7. Переключить запуск и оставить откат
+<a id="7-переключить-запуск-и-оставить-откат"></a>
+## 7. Switch launch routing and retain rollback
 
-Только после проверки кандидата сохранить работу, завершить нужные агенты и
-обычно закрыть старые окна. Переносить копию private state при закрытом кандидате;
-проверить восстановление ещё раз. При несовместимости оставить его чистое состояние
-и исходный backup; не исправлять state вручную. Запустить и закрепить новый EXE.
+Only after acceptance, save work, finish the necessary agents and close old
+windows normally. Copy private state while the candidate is closed; verify
+restoration again. If incompatible, keep the candidate's clean state and the
+original backup; do not hand-edit state. Launch and pin the new EXE.
 
-**HCA требует отдельного обновления маршрута.** Сейчас `_wt_resolve_terminal()` в
-`~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` содержит буквальный
-`Programs/WT-Layout-Fix-1.25.1912.0`. Для нового portable изменить этот путь на
-проверенную новую папку, синхронно обновить ожидаемый путь в
-`tests/test-wt-commands.sh` и HCA runbook. Канал оставить `layout-fix`.
-Не прятать новые бинарники в папке с номером старой версии.
+**HCA routing needs a separate change.** `_wt_resolve_terminal()` in
+`~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` currently selects
+`Programs/WT-Layout-Fix-1.25.1912.0`. Recheck the live implementation.
+For a new portable build, update it to the verified directory together with
+`tests/test-wt-commands.sh` and the HCA runbook; keep channel `layout-fix`.
+Do not hide new binaries in a folder bearing an old version.
 
-Если выбран официальный **установленный** Preview/Stable, вместо portable-маршрута
-задать `settings.windows_terminal_channel: preview` или `stable` в HCA
-`config/workspaces.yaml`. У этих пакетов отдельные JSON: согласовать их настройки
-через UI/проверенный diff. Сам ярлык на панели задач не меняет маршрутизацию HCA.
+For an official **installed** Preview/Stable package, set
+`settings.windows_terminal_channel: preview` or `stable` in HCA
+`config/workspaces.yaml`. These packages have separate JSON files: reconcile
+settings through the UI/reviewed diff. Taskbar pinning does not change HCA routing.
 
-После целевой правки HCA запустить его `tests/test-wt-commands.sh` под heavy-lock,
-затем в новой свободной Zsh `source ~/.zshrc` и `wt-doctor`.
-Проверить `atreno`: одна вкладка, одна панель в выбранном Terminal, без лишних окон.
+After an HCA routing edit, run `tests/test-wt-commands.sh` under the heavy lock,
+then `source ~/.zshrc` and `wt-doctor` in a free Zsh.
+Check `atreno`: one tab and one pane in the selected Terminal, no extra windows.
 
-Откат: завершить только тестовые/новые сессии обычным способом, вернуть прежний
-канал/путь HCA и ярлык на сохранённый EXE; использовать исходную копию settings.
-Не загружать преобразованный новым релизом state в старую версию без проверки.
-Windows/WSL перезагружать ради отката маршрута не требуется.
+Rollback: close only new/test sessions normally, restore the prior HCA channel/
+path and shortcut to the preserved EXE, and use the original settings copy.
+Do not feed state migrated by a new release into the old one without verification.
+Routing rollback requires no Windows/WSL restart.
 
-## 8. Зафиксировать новую резервную копию
+<a id="8-зафиксировать-новую-резервную-копию"></a>
+## 8. Record a new recovery release
 
-Сохранить точный upstream tag/SHA, diff и его SHA256 (либо `patch not needed`),
-версии инструментов, exits сборки/тестов и отдельный результат ручной проверки.
-В private release включить весь runtime, лицензии, актуальный JSON и инструкцию;
-не включать state, экранные буферы, дампы, трассы, credentials и binlog.
-Новый тег/ZIP/SHA256 и manifest должны описывать **фактический новый архив**.
-Перед публикацией проверить извлечение, список файлов, размеры и хеши.
+Record the exact upstream tag/SHA, patch diff/SHA256 (or `patch not needed`),
+tool versions, build/test exits and separate manual acceptance.
+The private release contains the complete runtime, licenses, current JSON and
+instructions. Exclude state, screen buffers, dumps, traces, credentials and binlogs.
+The new tag/ZIP/SHA256/manifest must describe the **actual new archive**.
+Verify extraction, inventory, sizes and hashes before publication.
 
-`build/original-build-receipt.json` и `build/recovery-manifest.json` относятся
-к историческому `layout-fix.1`: не менять их ради нового конфигурационного commit.
-Для нового релиза сохранить отдельный receipt/manifest и обновить ссылки README.
-Не перезаписывать опубликованный старый asset и не выдавать старую ручную проверку
-за проверку нового релиза. Публикация Git-коммита не означает публикацию ZIP.
+`build/original-build-receipt.json` and `build/recovery-manifest.json` belong
+to historical `layout-fix.1`; do not modify them for a configuration commit.
+Use a separate receipt/manifest for a new release and update README links.
+Do not replace an old published asset or reuse old manual acceptance as proof
+for a new release. Pushing a Git commit does not publish a ZIP.
