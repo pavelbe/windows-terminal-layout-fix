@@ -1,24 +1,24 @@
 # Windows Terminal Layout Fix
 
-Приватная резервная копия исправленного **Windows Terminal Preview 1.25.1912.0,
-Windows x64**: готовая portable-сборка, рабочие настройки и исходный патч.
+Private recovery kit for the owner's patched **Windows Terminal Preview
+1.25.1912.0, Windows x64**: portable runtime, reviewed settings and source patches.
 
-**Владелец подтвердил 15.09.2026:** переключение RU/EN работает без прежних
-зависаний с десятью вкладками; после настройки работает восстановление вкладок.
-Это проверка на текущем компьютере, а не подтверждённая установка на чистую Windows.
+**Owner acceptance, 2026-09-15:** no former RU/EN freezes with ten tabs; session
+restoration worked after configuration. This is evidence on the current PC,
+not a clean-Windows installation test.
 
-**19.09.2026:** отдельно собран кандидат с Ctrl+V для снимков из буфера.
-Владелец проверил `WT-PASTE-TEST`: в Codex Ctrl+V вставляет снимок и обычный текст.
-Рабочая сборка и опубликованный `layout-fix.1` пока остаются прежними.
-Путь, поведение и проверки кандидата — ниже, в разделе про снимки.
+**2026-09-19:** the separate screenshot candidate passed the owner's Codex
+Ctrl+V image/text check. The owner subsequently confirmed copied single images,
+but reported multiple Explorer images failing. The new multi-file candidate
+below addresses that separate defect; the owner confirmed it in both Codex and Claude.
+The daily launch route and immutable `layout-fix.1` archive are unchanged.
 
-Текущие настройки: [settings/settings.json](settings/settings.json).
-Переход на следующий официальный релиз, перенос патча, сборка, проверка и откат:
-[UPDATING.md](UPDATING.md). Патч C++, конфиг Terminal и обход ввода Codex в HCA
-обновляются отдельно; новый официальный EXE сам наш патч не подхватит.
+Current configuration: [settings/settings.json](settings/settings.json).
+Official upgrades, patch porting, builds, acceptance and rollback:
+[UPDATING.md](UPDATING.md). Terminal C++ patches, its settings and the HCA Codex
+input workaround have separate owners; an official EXE does not include our patch.
 
-Правила работы агентов: [AGENTS.md](AGENTS.md). `CLAUDE.md` импортирует тот же
-guide; отдельной копии правил для Claude нет.
+Agent rules: [AGENTS.md](AGENTS.md); `CLAUDE.md` imports the same guide.
 
 ## Быстро восстановить на другой Windows
 
@@ -115,70 +115,78 @@ Codex/Terminal повторите проверку кириллицы и Ctrl/Sh
 Сам архив и его SHA256 не изменялись; конфиг в Git новее архивного. При переносе используйте эту
 актуальную инструкцию вместе с [runbook HCA](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md).
 
-## Цифровая десятичная клавиша и снимки из буфера
+<a id="цифровая-десятичная-клавиша-и-снимки-из-буфера"></a>
+## Numpad decimal key and clipboard images
 
-В профиле Ubuntu с 16.09.2026 установлено
-`"compatibility.kittyKeyboardMode": false`. В локальном Claude 2.1.273
-обработчик Kitty-кода `57409` возвращает точку без учёта раскладки. Профиль
-теперь использует обычный ввод; ожидается запятая в RU и точка в EN.
-Это настройка профиля, а не изменение EXE или бинарного файла Claude.
-Привязки Ctrl/Shift+Enter к LF и прежний обход Codex в HCA сохранены.
-Владелец подтвердил: в Claude цифровая клавиша теперь даёт запятую в RU
-и точку в EN.
+Since 2026-09-16 the Ubuntu profile sets
+`"compatibility.kittyKeyboardMode": false`. Local Claude 2.1.273 mapped Kitty
+code `57409` to a period regardless of layout. Ordinary input restores RU comma
+and EN period; the owner confirmed both. This changes the profile, not Claude
+or the EXE. Ctrl/Shift+Enter LF bindings and HCA's Codex workaround remain.
 
-Для снимка через PrintScreen/«Ножницы» в буфере находится изображение; копирование файла
-в Explorer передаёт другой формат. Terminal отправляет пустую bracketed paste,
-если текста/файла нет, после чего приложение может прочитать изображение само.
-На этом ПК восстановлен отсутствовавший обработчик WSLInterop: до исправления
-`powershell.exe` из WSL возвращал `Exec format error`, хотя запуск через `/init`
-работал. После исправления обычный PowerShell и локальные `xclip`/`wl-paste`
-снова читают форматы Windows clipboard. Владелец подтвердил вставку снимка
-в Claude через Ctrl+V. На прежней сборке `layout-fix.1` в Codex 0.154.0 Ctrl+V
-не вставлял снимок: Terminal
-перехватывает сочетание и отправляет пустую вставку, а Codex не обрабатывает
-её как запрос изображения. Его штатный image-paste обрабатывает Ctrl+V/Alt+V
-как клавиатурное событие. Владелец сообщил, что Alt+V тоже не помог.
-При отдельном чтении его снимка 1320×176 из WSL Windows успешно вернула PNG;
-сам PrintScreen и доступ к изображению были подтверждены.
-Перезапуск WSL/Terminal и агентских сессий не выполнялся.
-Повторную диагностику interop вести по
-[runbook HCA](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md#восстановление-interop-windows-11).
+PrintScreen/Snipping Tool provides a bitmap; Explorer file copying provides
+CF_HDROP. The original Terminal sends an empty bracketed paste for image-only
+clipboard data. Claude can then read the bitmap itself, but Codex 0.154.0
+expects an actual image-paste key event or a pasted image path.
 
-### Кандидат с универсальным Ctrl+V
+On 2026-09-16 the missing WSLInterop handler also caused Windows EXEs to fail
+with `Exec format error` while `/init` worked. Restoring that handler made
+PowerShell and local `xclip`/`wl-paste` bridges work; the owner confirmed Claude
+Ctrl+V. A separate read of the owner's 1320×176 screenshot returned PNG, proving
+clipboard access. Alt+V did not solve Codex's input path. No WSL/Terminal/agent
+restart was performed. Repeat interop diagnosis with the
+[HCA runbook](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md#восстановление-interop-windows-11).
 
-Папка: `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-test`.
-Запуск из Windows PowerShell:
+<a id="кандидат-с-универсальным-ctrlv"></a>
+### Clipboard candidates and current test
+
+Previous candidate: `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-test`.
+In `WT-PASTE-TEST`, the owner confirmed PrintScreen → Ctrl+V and ordinary text
+in Codex on 2026-09-19. Its receipt remains historical:
+[clipboard-candidate-20260919.json](build/clipboard-candidate-20260919.json).
+
+The new candidate adds multiple Explorer files:
 
 ```powershell
-& "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-test\WindowsTerminal.exe" -w new new-tab -p Ubuntu --title WT-PASTE-TEST --suppressApplicationTitle
+& "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\WindowsTerminal.exe" -w new new-tab -p Ubuntu --title WT-FILES-TEST --suppressApplicationTitle
 ```
 
-В этой сборке текст и файл из Explorer проходят прежним путём. Если текста/пути
-нет, а в буфере есть bitmap, Terminal копирует пиксели, освобождает буфер,
-сохраняет PNG в `%TEMP%\wt-clipboard-{GUID}.png` и вставляет Windows-путь через
-обычный механизм paste. Codex умеет преобразовывать такой путь в WSL и прикреплять
-изображение. Снимок не заменяет содержимое системного буфера; сохранение выполняется
-в фоне. Новое имя создаётся эксклюзивно, неполный файл при ошибке удаляется.
-PNG остаётся после выхода из Terminal, чтобы приложение успело его прочитать;
-старые снимки можно удалять из Temp после завершения работы с вложениями.
-Это локальные пользовательские файлы, они не входят в Git/релиз.
+Paste precedence is text → Explorer files → bitmap. A file selection is read
+completely, in clipboard order (maximum 256); each quoted Windows path gets its
+own paste event, with a space before subsequent paths. Codex normalizes Windows
+paths to WSL and recognizes **one image per paste**. Joining all paths into one
+paste would turn them into text instead of several attachments. This follows
+Atreno's `src/terminal/paste-paths.ts` protocol without importing its frontend.
+Multi-pane broadcast preserves file boundaries and each receiving pane's
+bracketed-paste mode. The complete selection is checked once for paste warnings
+before any file is sent. No Enter is injected. Windows paths are preserved;
+this does not add Atreno's profile-aware POSIX path conversion to WT clipboard
+paste. Drag/drop remains a separate upstream path.
 
-Патч [clipboard-image-paste.patch](patches/clipboard-image-paste.patch) применяется
-**после** `layout-fix.patch`; исходный commit `2d4c28b013b21280ca5978259ff1313dab716c6c`.
-Сборка Release/x64 прошла: 0 ошибок, 72 предупреждения упаковки/ресурсов.
-Native smoke проверил PNG roundtrip, пиксели/ориентацию, lifetime снимка,
-повторную вставку и отказ записи. Это проверка helper, не автоматический тест
-Ctrl+V в TUI; автоматический regression RED не воспроизведён.
-Состав и хеши: [build/clipboard-candidate-20260919.json](build/clipboard-candidate-20260919.json).
-Процесс и загруженная `TerminalApp.dll` проверены именно в папке кандидата.
+For a bitmap, Terminal copies pixels while the clipboard is open, releases it,
+then encodes `%TEMP%\wt-clipboard-{GUID}.png` in the background and pastes its
+path. The system clipboard is unchanged. Exclusive file creation prevents
+replacement; failed writes remove their incomplete file. PNGs survive Terminal
+exit so agents can read them later. Clean old files after finishing attachments;
+they are private local data, excluded from Git and release archives.
 
-**Ручная проверка 19.09.2026:** владелец запустил обычный `codex` в
-`WT-PASTE-TEST` и подтвердил: «Снимок и текст вставляются» после проверки
-PrintScreen → Ctrl+V и отдельной вставки обычного текста.
-Повторная проверка файла из Explorer, Claude и RU/EN с десятью вкладками
-именно в этом кандидате ещё не подтверждена.
-Кандидат не назначен рабочим: ярлык и команды HCA ведут в прежнюю папку.
-Готовый ZIP нового кандидата пока не опубликован; исторический архив не изменён.
+Apply patches in order:
+1. [layout-fix.patch](patches/layout-fix.patch), source `a34eea7`;
+2. [clipboard-image-paste.patch](patches/clipboard-image-paste.patch), source `2d4c28b`;
+3. [clipboard-files-paste.patch](patches/clipboard-files-paste.patch), the incremental multi-file fix.
+
+Native smoke compiles the production headers and checks all CF_HDROP entries,
+order, separate payloads, Unicode/spaces, empty/single selections, malformed and
+oversized refusal; it retains PNG lifetime, pixel/orientation, uniqueness and
+write-failure tests. That is helper coverage, not a TUI acceptance claim.
+Exact candidate build/runtime evidence:
+[clipboard-files-candidate-20260919.json](build/clipboard-files-candidate-20260919.json).
+
+**Owner acceptance, 2026-09-19:** the owner tested multiple Explorer images
+in `WT-FILES-TEST` and confirmed they attach in both Codex and Claude Code.
+Repeated screenshot/text and ten-tab RU/EN checks in this exact build were not
+separately reported; previous build acceptance and native smoke are distinct evidence.
+The candidate is not the daily HCA/shortcut target and has no published ZIP.
 
 ## Рабочие настройки
 

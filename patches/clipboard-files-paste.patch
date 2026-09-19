@@ -1,0 +1,171 @@
+diff --git a/src/cascadia/TerminalApp/ClipboardFiles.h b/src/cascadia/TerminalApp/ClipboardFiles.h
+new file mode 100644
+index 0000000..6c9f714
+--- /dev/null
++++ b/src/cascadia/TerminalApp/ClipboardFiles.h
+@@ -0,0 +1,40 @@
++// Copyright (c) Microsoft Corporation.
++// Licensed under the MIT license.
++
++#pragma once
++
++#include <Windows.h>
++#include <shellapi.h>
++#include <wil/result.h>
++#include <string>
++#include <vector>
++
++namespace clipboard
++{
++    // Snapshot every Explorer file while the clipboard is open. Each string is
++    // a separate paste: Codex recognizes one image path per bracketed paste.
++    // Windows paths remain Windows paths, as in the existing single-file paste.
++    // The leading spaces also make the result usable as a list of shell words.
++    inline std::vector<std::wstring> readFilePastes(HDROP drop)
++    {
++        std::vector<std::wstring> pastes;
++        const auto count = DragQueryFileW(drop, 0xffffffff, nullptr, 0);
++        THROW_HR_IF(E_INVALIDARG, count > 256);
++        pastes.reserve(count);
++        for (UINT index = 0; index < count; ++index)
++        {
++            const auto length = DragQueryFileW(drop, index, nullptr, 0);
++            THROW_HR_IF(E_INVALIDARG, length == 0 || length > 32767);
++            std::wstring path(length + 1, L'\0');
++            THROW_HR_IF(E_INVALIDARG, DragQueryFileW(drop, index, path.data(), length + 1) != length);
++            path.resize(length);
++            // Explorer paths cannot contain these. Refuse malformed clipboard
++            // payloads rather than putting control sequences into terminal input.
++            THROW_HR_IF(E_INVALIDARG, path.find_first_of(L"\"\r\n\x1b") != std::wstring::npos);
++            auto& paste = pastes.emplace_back(index ? L" \"" : L"\"");
++            paste.append(path);
++            paste.push_back(L'"');
++        }
++        return pastes;
++    }
++}
+diff --git a/src/cascadia/TerminalApp/TerminalAppLib.vcxproj b/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
+index c02d031..e07d6b0 100644
+--- a/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
++++ b/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
+@@ -86,6 +86,7 @@
+     <ClInclude Include="App.base.h" />
+     <ClInclude Include="AppCommandlineArgs.h" />
+     <ClInclude Include="ClipboardImage.h" />
++    <ClInclude Include="ClipboardFiles.h" />
+     <ClInclude Include="Commandline.h" />
+     <ClInclude Include="CommandPaletteItems.h" />
+     <ClInclude Include="Jumplist.h" />
+diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
+index 0066989..ac134ad 100644
+--- a/src/cascadia/TerminalApp/TerminalPage.cpp
++++ b/src/cascadia/TerminalApp/TerminalPage.cpp
+@@ -16,6 +16,7 @@
+ #include "../TerminalSettingsAppAdapterLib/TerminalSettings.h"
+ #include "App.h"
+ #include "ClipboardImage.h"
++#include "ClipboardFiles.h"
+ #include "DebugTapConnection.h"
+ #include "MarkdownPaneContent.h"
+ #include "Remoting.h"
+@@ -184,32 +185,6 @@ namespace clipboard
+             return winrt::hstring{ str, gsl::narrow_cast<uint32_t>(len) };
+         }
+ 
+-        // We get CF_HDROP when a user copied a file with Ctrl+C in Explorer and pastes that into the terminal (among others).
+-        if (const auto handle = GetClipboardData(CF_HDROP))
+-        {
+-            const wil::unique_hglobal_locked lock{ handle };
+-            const auto drop = static_cast<HDROP>(lock.get());
+-            if (!drop)
+-            {
+-                return {};
+-            }
+-
+-            const auto cap = DragQueryFileW(drop, 0, nullptr, 0);
+-            if (cap == 0)
+-            {
+-                return {};
+-            }
+-
+-            auto buffer = winrt::impl::hstring_builder{ cap };
+-            const auto len = DragQueryFileW(drop, 0, buffer.data(), cap + 1);
+-            if (len == 0)
+-            {
+-                return {};
+-            }
+-
+-            return buffer.to_hstring();
+-        }
+-
+         return {};
+     }
+ } // namespace clipboard
+@@ -2965,12 +2940,26 @@ namespace winrt::TerminalApp::implementation
+         co_await winrt::resume_background();
+ 
+         winrt::hstring text;
++        std::vector<std::wstring> filePastes;
+         wil::com_ptr<IWICBitmap> image;
+         if (const auto clipboard = clipboard::open(nullptr))
+         {
+             text = clipboard::read();
+-            // Keep text and Explorer file paste unchanged. Windows synthesizes
+-            // CF_BITMAP from CF_DIB/CF_DIBV5 used by PrintScreen and Snipping Tool.
++            if (text.empty())
++            {
++                if (const auto drop = GetClipboardData(CF_HDROP))
++                {
++                    filePastes = clipboard::readFilePastes(static_cast<HDROP>(drop));
++                    std::wstring allPaths;
++                    for (const auto& paste : filePastes)
++                    {
++                        allPaths.append(paste);
++                    }
++                    // Warn once for the complete selection, before sending any file.
++                    text = winrt::hstring{ allPaths };
++                }
++            }
++            // Windows synthesizes CF_BITMAP from PrintScreen CF_DIB/CF_DIBV5.
+             if (text.empty())
+             {
+                 if (const auto bitmap = GetClipboardData(CF_BITMAP))
+@@ -3077,7 +3066,17 @@ namespace winrt::TerminalApp::implementation
+         // This will end up calling ConptyConnection::WriteInput which calls WriteFile which may block for
+         // an indefinite amount of time. Avoid freezes and deadlocks by running this on a background thread.
+         assert(!dispatcher.HasThreadAccess());
+-        eventArgs.HandleClipboardData(text);
++        if (filePastes.empty())
++        {
++            eventArgs.HandleClipboardData(text);
++        }
++        else
++        {
++            for (const auto& paste : filePastes)
++            {
++                eventArgs.HandleClipboardData(winrt::hstring{ paste });
++            }
++        }
+ 
+         // GH#18821: If broadcast input is active, paste the same text into all other
+         // panes on the tab. We do this here (rather than re-reading the
+@@ -3094,7 +3093,18 @@ namespace winrt::TerminalApp::implementation
+                         {
+                             if (control.ContentId() != sourceId && !control.ReadOnly())
+                             {
+-                                control.RawWriteString(text);
++                                if (filePastes.empty())
++                                {
++                                    control.RawWriteString(text);
++                                }
++                                else
++                                {
++                                    for (const auto& paste : filePastes)
++                                    {
++                                        const auto data = control.BracketedPasteEnabled() ? L"\x1b[200~" + paste + L"\x1b[201~" : paste;
++                                        control.RawWriteString(winrt::hstring{ data });
++                                    }
++                                }
+                             }
+                         }
+                     });

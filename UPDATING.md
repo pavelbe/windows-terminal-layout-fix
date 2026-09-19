@@ -123,18 +123,18 @@ rtk proxy git -C "$wt_source" diff --stat
 список файлов и SHA256 патча. Старый патч должен оставаться доступным в Git и
 старом release. Успешный `git apply` проверяет контекст, не семантику и не сборку.
 
-Отдельный кандидат 19.09.2026 добавляет
-[patches/clipboard-image-paste.patch](patches/clipboard-image-paste.patch).
-Он построен поверх `a34eea7` (уже с layout fix), commit `2d4c28b`.
-На той же базе порядок: `layout-fix.patch`, затем проверка и применение
-`clipboard-image-paste.patch`. При новом upstream сначала проверить его штатную
-вставку снимков: второй патч может оказаться не нужен независимо от первого.
-Clipboard-патч меняет paste handler, добавляет `ClipboardImage.h` и линковку WIC;
-сохранить приоритет текста/CF_HDROP, background encoding после CloseClipboard,
-уникальный CREATE_NEW-файл и удаление частичной записи при ошибке.
-19.09.2026 владелец подтвердил в кандидате Ctrl+V для снимка PrintScreen и текста
-в Codex. Повторные проверки Claude, файла из Explorer и десяти вкладок ещё
-ожидаются; кандидат пока не назначен рабочим и не опубликован новым релизом.
+Clipboard patches have independent acceptance from the layout fix. On the
+original base, apply `layout-fix.patch`, then `clipboard-image-paste.patch`
+(source `2d4c28b`), then `clipboard-files-paste.patch`; check and read each diff
+before applying it. On a new upstream tag, test screenshot **and multi-file**
+paste first: either patch may become unnecessary independently of the others.
+
+Preserve text precedence, complete CF_HDROP enumeration, one paste per file,
+one warning for the whole selection, per-pane bracketed-paste behavior,
+background bitmap encoding after CloseClipboard, exclusive unique PNG creation
+and failed-write cleanup. Never inject Enter or replace the system clipboard.
+The owner accepted screenshots/text in the first candidate; multi-file candidate
+acceptance and promotion are tracked in README, not inferred from build success.
 
 ## 4. Собрать на Windows
 
@@ -241,37 +241,38 @@ native exit, а не все этапы. Поведение описано у Mic
 актуальный JSON до первого запуска. Имя папки должно отражать новую версию,
 например `WT-Layout-Fix-<version>`; старую папку не переименовывать и не затирать.
 
-### Повторить текущую проверку clipboard-кандидата
+<a id="повторить-текущую-проверку-clipboard-кандидата"></a>
+### Reproduce the clipboard candidate checks
 
-Для существующего checkout v1.25.1912.0 с уже собранными зависимостями доступны
-[build/Test-ClipboardImage.ps1](build/Test-ClipboardImage.ps1) и
+For the existing v1.25.1912.0 checkout with restored dependencies, use
+[build/Test-ClipboardImage.ps1](build/Test-ClipboardImage.ps1) and
 [build/Package-ClipboardCandidate.ps1](build/Package-ClipboardCandidate.ps1).
-Скопировать эти проверенные скрипты и `build/clipboard-image-smoke.cpp` в одну
-локальную Windows-папку. Test компилирует **header из переданного SourceRoot**;
-он не меняет буфер обмена. Опциональный `-ReadClipboard` дополнительно читает
-текущий снимок и оставляет его PNG локально; при отсутствии bitmap возвращает ошибку.
+Copy both scripts and `build/clipboard-image-smoke.cpp` to one local Windows
+directory. The test compiles the **production headers from SourceRoot**, including
+CF_HDROP enumeration. It does not change the clipboard. Optional `-ReadClipboard`
+reads the current bitmap and retains a local PNG; no bitmap means failure.
 
 ```powershell
 .\Test-ClipboardImage.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -OutputDirectory 'C:\Users\Pavel\Diagnostics\clipboard-smoke-new'
 ```
 
-После успешного smoke собрать `src\cascadia\WindowsTerminal\WindowsTerminal.vcxproj`
-в VS developer shell: `/t:Build /p:Configuration=Release /p:Platform=x64`
-и `/p:SolutionDir=<полный путь checkout с завершающим \>`; остановиться при
-ненулевом `$LASTEXITCODE`. Для свежего checkout сначала нужны зависимости из
-раздела 4; package helper их не собирает.
+After smoke passes, build `src\cascadia\WindowsTerminal\WindowsTerminal.vcxproj`
+in the VS developer shell with `/t:Build /p:Configuration=Release /p:Platform=x64`
+and `/p:SolutionDir=<absolute checkout path ending in \>`; stop on nonzero
+`$LASTEXITCODE`. A fresh checkout first needs section 4 dependencies. The package
+helper does not build them.
 
 ```powershell
 .\Package-ClipboardCandidate.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -SettingsFile 'C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json' -Destination 'C:\Users\Pavel\AppData\Local\Programs\WT-Clipboard-New'
 ```
 
-OutputDirectory и Destination должны отсутствовать. Package повторно объединяет
-точный список PRI этого tag через upstream helper с остановкой на native-ошибках,
-копирует весь build layout и проверяет хеши копий, добавляет proxy/license/portable
-marker и только JSON. Он не доказывает свежесть предшествующей сборки — её exit,
-исходный diff и хеши нужно связать отдельным receipt. Для другого tag заново проверить
-список ресурсов по `_WTPrepareUnpackagedLayoutForRun`, не переносить его вслепую.
-Все test/build/package вызовы агента по-прежнему выполняются под heavy-lock.
+OutputDirectory and Destination must not exist. Packaging merges this tag's
+exact PRI list through the upstream helper with native-error propagation, copies
+and hashes the complete runtime, adds proxy/license/portable marker and only the
+settings JSON. A package is not proof of a fresh build: bind source, build exit
+and output hashes in a separate receipt. Recheck `_WTPrepareUnpackagedLayoutForRun`
+when changing tags; never copy its resource list blindly. Agent test/build/package
+commands still run under the machine-global heavy lock.
 
 ## 6. Проверить кандидата до переключения
 
@@ -291,7 +292,7 @@ marker и только JSON. Он не доказывает свежесть п�
 | Split, resize, drag tab, поиск и палитра | Нет потери панелей/фокуса и новых сбоев |
 | Новый `codex`, `codex resume`, Claude | Набор и вставка `перевари тест`, латиница, Ctrl/Shift+Enter работают |
 | Цифровая десятичная клавиша в Claude/Codex, Num Lock включён | RU — запятая, EN — точка; Ubuntu сохраняет `compatibility.kittyKeyboardMode: false` |
-| Новый снимок PrintScreen/«Ножницы» → Ctrl+V в каждом TUI; отдельно файл из Explorer | Изображение прикрепляется; текстовая вставка и файловая вставка сохранены |
+| Fresh PrintScreen screenshot; 1 and 3 Explorer images (spaces/Cyrillic); text in each TUI | Every image attaches once, in order; text and single-image paste still work |
 | Обычный выход и повторный запуск после сохранения работы | Возвращаются ожидаемые вкладки/панели; агенты запускаются заново |
 
 Обход `CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1` во время сравнения сохранять.

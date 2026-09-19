@@ -14,7 +14,7 @@ if (Test-Path $OutputDirectory) { throw 'Use a new output directory' }
 New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
 Set-Location $OutputDirectory
 $exe = Join-Path $OutputDirectory 'clipboard-image-smoke.exe'
-& cl.exe /nologo /std:c++20 /EHsc /W4 /WX /utf-8 "/I$headerDirectory" "/I$wil" (Join-Path $PSScriptRoot 'clipboard-image-smoke.cpp') "/Fe:$exe" /link ole32.lib windowscodecs.lib user32.lib gdi32.lib
+& cl.exe /nologo /std:c++20 /EHsc /W4 /WX /utf-8 "/I$headerDirectory" "/I$wil" (Join-Path $PSScriptRoot 'clipboard-image-smoke.cpp') "/Fe:$exe" /link ole32.lib windowscodecs.lib user32.lib gdi32.lib shell32.lib
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($ReadClipboard) { & $exe --clipboard } else { & $exe }
 exit $LASTEXITCODE

@@ -3,12 +3,36 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "ClipboardImage.h"
+#include "ClipboardFiles.h"
+#include <shlobj_core.h>
 #include <array>
 #include <iostream>
 
 static void require(bool value, const char* message)
 {
     if (!value) throw std::runtime_error(message);
+}
+
+static void checkFiles(const std::vector<std::wstring>& paths, const std::vector<std::wstring>& expected, bool rejected = false)
+{
+    std::wstring names;
+    for (const auto& path : paths) { names.append(path); names.push_back(L'\0'); }
+    names.push_back(L'\0');
+    if (paths.empty()) names.push_back(L'\0');
+    wil::unique_hglobal memory{ GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, sizeof(DROPFILES) + names.size() * sizeof(wchar_t)) };
+    require(!!memory, "cannot allocate file fixture");
+    {
+        wil::unique_hglobal_locked lock{ memory.get() };
+        auto* drop = static_cast<DROPFILES*>(lock.get());
+        require(drop != nullptr, "cannot lock file fixture");
+        drop->pFiles = sizeof(DROPFILES);
+        drop->fWide = TRUE;
+        memcpy(reinterpret_cast<BYTE*>(drop) + sizeof(DROPFILES), names.data(), names.size() * sizeof(wchar_t));
+    }
+    bool failed = false;
+    try { require(clipboard::readFilePastes(static_cast<HDROP>(memory.get())) == expected, "lost/reordered file or wrong paste boundary"); }
+    catch (const wil::ResultException&) { failed = true; }
+    require(failed == rejected, "wrong file-list rejection");
 }
 
 static void checkPng(const std::wstring& path)
@@ -36,6 +60,13 @@ int wmain(int argc, wchar_t** argv)
 try
 {
     const auto apartment = wil::CoInitializeEx();
+    checkFiles({}, {});
+    checkFiles({ L"C:\\one.png" }, { L"\"C:\\one.png\"" });
+    checkFiles({ L"C:\\one.png", L"C:\\Снимки экрана\\два.png", L"C:\\three.txt" },
+               { L"\"C:\\one.png\"", L" \"C:\\Снимки экрана\\два.png\"", L" \"C:\\three.txt\"" });
+    checkFiles({ L"C:\\bad\r\nname.png" }, {}, true);
+    checkFiles(std::vector<std::wstring>(257, L"C:\\one.png"), {}, true);
+    std::cout << "PASS all Explorer files; order; individual pastes; Unicode/spaces; empty/single; malformed/oversized list refusal\n";
     BITMAPINFO info{};
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info.bmiHeader.biWidth = 2;
