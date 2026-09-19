@@ -38,7 +38,7 @@
       "unwritable destination throws without changing the first PNG"
     ],
     "automatedRegressionRed": "NOT REPRODUCED: header smoke is added coverage; original TUI failure was owner-observed",
-    "uiPaste": "PENDING owner PrintScreen/Ctrl+V and text/file checks"
+    "uiPaste": "OWNER PASS 2026-09-19: fresh PrintScreen image and ordinary text via Ctrl+V in Codex, WT-PASTE-TEST; Explorer file check still pending"
   },
   "format": "clang-format dry-run Werror passed for ClipboardImage.h and changed paste-handler lines",
   "packaging": {
@@ -64,7 +64,7 @@
       }
     ]
   },
-  "manualAcceptance": "PENDING",
+  "manualAcceptance": "OWNER PASS 2026-09-19 for Codex screenshot and text paste; Claude, Explorer file paste and ten-tab RU/EN regression in this candidate remain unconfirmed; daily route and published release unchanged",
   "runtimeSha256": {
     ".portable": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "LICENSE": "5d177f23ecfeb0ea8e050b6a5a16355e1ae9a0b286436ca8f83ed08b3795be6b",
