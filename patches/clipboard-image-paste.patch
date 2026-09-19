@@ -1,0 +1,147 @@
+diff --git a/src/cascadia/TerminalApp/ClipboardImage.h b/src/cascadia/TerminalApp/ClipboardImage.h
+new file mode 100644
+index 0000000..c3ebae9
+--- /dev/null
++++ b/src/cascadia/TerminalApp/ClipboardImage.h
+@@ -0,0 +1,78 @@
++// Copyright (c) Microsoft Corporation.
++// Licensed under the MIT license.
++
++#pragma once
++
++#include <Windows.h>
++#include <wincodec.h>
++#include <wil/com.h>
++#include <wil/resource.h>
++#include <string>
++
++namespace clipboard
++{
++    // Copy while the clipboard is open. Never retain a clipboard-owned HBITMAP.
++    inline wil::com_ptr<IWICBitmap> copyBitmap(HBITMAP bitmap, HPALETTE palette)
++    {
++        const auto factory = wil::CoCreateInstance<IWICImagingFactory>(CLSID_WICImagingFactory);
++        wil::com_ptr<IWICBitmap> source;
++        THROW_IF_FAILED(factory->CreateBitmapFromHBITMAP(bitmap, palette, WICBitmapIgnoreAlpha, source.put()));
++        wil::com_ptr<IWICBitmap> copy;
++        THROW_IF_FAILED(factory->CreateBitmapFromSource(source.get(), WICBitmapCacheOnLoad, copy.put()));
++        return copy;
++    }
++
++    // This runs after CloseClipboard, on the paste handler's background thread.
++    // The file survives Terminal exit so applications can read it asynchronously.
++    inline std::wstring saveTemporaryPng(IWICBitmapSource* bitmap)
++    {
++        const auto factory = wil::CoCreateInstance<IWICImagingFactory>(CLSID_WICImagingFactory);
++        wil::com_ptr<IStream> stream;
++        THROW_IF_FAILED(CreateStreamOnHGlobal(nullptr, TRUE, stream.put()));
++        wil::com_ptr<IWICBitmapEncoder> encoder;
++        THROW_IF_FAILED(factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, encoder.put()));
++        THROW_IF_FAILED(encoder->Initialize(stream.get(), WICBitmapEncoderNoCache));
++        wil::com_ptr<IWICBitmapFrameEncode> frame;
++        THROW_IF_FAILED(encoder->CreateNewFrame(frame.put(), nullptr));
++        THROW_IF_FAILED(frame->Initialize(nullptr));
++        THROW_IF_FAILED(frame->WriteSource(bitmap, nullptr));
++        THROW_IF_FAILED(frame->Commit());
++        THROW_IF_FAILED(encoder->Commit());
++
++        STATSTG stat{};
++        THROW_IF_FAILED(stream->Stat(&stat, STATFLAG_NONAME));
++        THROW_HR_IF(E_OUTOFMEMORY, stat.cbSize.HighPart != 0);
++        HGLOBAL memory{};
++        THROW_IF_FAILED(GetHGlobalFromStream(stream.get(), &memory));
++        const wil::unique_hglobal_locked bytes{ memory };
++        THROW_LAST_ERROR_IF_NULL(bytes.get());
++
++        std::wstring path(32768, L'\0');
++        const auto length = GetTempPathW(static_cast<DWORD>(path.size()), path.data());
++        THROW_LAST_ERROR_IF(length == 0);
++        THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER), length >= path.size());
++        path.resize(length);
++        GUID id{};
++        THROW_IF_FAILED(CoCreateGuid(&id));
++        wchar_t name[39]{};
++        THROW_HR_IF(E_UNEXPECTED, StringFromGUID2(id, name, ARRAYSIZE(name)) == 0);
++        path += L"wt-clipboard-";
++        path += name;
++        path += L".png";
++
++        // Never replace another file, even if a name already exists.
++        wil::unique_handle file{ CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr) };
++        THROW_LAST_ERROR_IF(!file);
++        auto cleanup = wil::scope_exit([&] {
++            file.reset();
++            DeleteFileW(path.c_str());
++        });
++        DWORD written{};
++        THROW_IF_WIN32_BOOL_FALSE(WriteFile(file.get(), bytes.get(), stat.cbSize.LowPart, &written, nullptr));
++        THROW_HR_IF(HRESULT_FROM_WIN32(ERROR_WRITE_FAULT), written != stat.cbSize.LowPart);
++        THROW_IF_WIN32_BOOL_FALSE(FlushFileBuffers(file.get()));
++        file.reset();
++        cleanup.release();
++        return path;
++    }
++}
+diff --git a/src/cascadia/TerminalApp/TerminalAppLib.vcxproj b/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
+index fe141df..c02d031 100644
+--- a/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
++++ b/src/cascadia/TerminalApp/TerminalAppLib.vcxproj
+@@ -85,6 +85,7 @@
+   <ItemGroup>
+     <ClInclude Include="App.base.h" />
+     <ClInclude Include="AppCommandlineArgs.h" />
++    <ClInclude Include="ClipboardImage.h" />
+     <ClInclude Include="Commandline.h" />
+     <ClInclude Include="CommandPaletteItems.h" />
+     <ClInclude Include="Jumplist.h" />
+diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
+index 279042f..0066989 100644
+--- a/src/cascadia/TerminalApp/TerminalPage.cpp
++++ b/src/cascadia/TerminalApp/TerminalPage.cpp
+@@ -15,6 +15,7 @@
+ #include "../../types/inc/utils.hpp"
+ #include "../TerminalSettingsAppAdapterLib/TerminalSettings.h"
+ #include "App.h"
++#include "ClipboardImage.h"
+ #include "DebugTapConnection.h"
+ #include "MarkdownPaneContent.h"
+ #include "Remoting.h"
+@@ -2964,9 +2965,25 @@ namespace winrt::TerminalApp::implementation
+         co_await winrt::resume_background();
+ 
+         winrt::hstring text;
++        wil::com_ptr<IWICBitmap> image;
+         if (const auto clipboard = clipboard::open(nullptr))
+         {
+             text = clipboard::read();
++            // Keep text and Explorer file paste unchanged. Windows synthesizes
++            // CF_BITMAP from CF_DIB/CF_DIBV5 used by PrintScreen and Snipping Tool.
++            if (text.empty())
++            {
++                if (const auto bitmap = GetClipboardData(CF_BITMAP))
++                {
++                    image = clipboard::copyBitmap(static_cast<HBITMAP>(bitmap), static_cast<HPALETTE>(GetClipboardData(CF_PALETTE)));
++                }
++            }
++        }
++        if (image)
++        {
++            // Use the existing file-path paste contract, including bracketed
++            // paste and warnings. Do not rewrite the user's clipboard.
++            text = winrt::hstring{ clipboard::saveTemporaryPng(image.get()) };
+         }
+ 
+         if (!bracketedPaste && globalSettings.TrimPaste())
+diff --git a/src/cascadia/TerminalApp/dll/TerminalApp.vcxproj b/src/cascadia/TerminalApp/dll/TerminalApp.vcxproj
+index 69ccb92..0b07d0e 100644
+--- a/src/cascadia/TerminalApp/dll/TerminalApp.vcxproj
++++ b/src/cascadia/TerminalApp/dll/TerminalApp.vcxproj
+@@ -98,7 +98,7 @@
+ 
+   <ItemDefinitionGroup>
+     <Link>
+-      <AdditionalDependencies>User32.lib;WindowsApp.lib;shell32.lib;WinMM.Lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalDependencies>User32.lib;WindowsApp.lib;shell32.lib;WinMM.Lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+       <!-- TerminalAppLib contains a DllMain that we need to force the use of. -->
+       <AdditionalOptions Condition="'$(Platform)'=='Win32'">/INCLUDE:_DllMain@12 %(AdditionalOptions)</AdditionalOptions>
+       <AdditionalOptions Condition="'$(Platform)'!='Win32'">/INCLUDE:DllMain %(AdditionalOptions)</AdditionalOptions>

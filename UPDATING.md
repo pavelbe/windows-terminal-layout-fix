@@ -123,6 +123,17 @@ rtk proxy git -C "$wt_source" diff --stat
 список файлов и SHA256 патча. Старый патч должен оставаться доступным в Git и
 старом release. Успешный `git apply` проверяет контекст, не семантику и не сборку.
 
+Отдельный кандидат 19.09.2026 добавляет
+[patches/clipboard-image-paste.patch](patches/clipboard-image-paste.patch).
+Он построен поверх `a34eea7` (уже с layout fix), commit `2d4c28b`.
+На той же базе порядок: `layout-fix.patch`, затем проверка и применение
+`clipboard-image-paste.patch`. При новом upstream сначала проверить его штатную
+вставку снимков: второй патч может оказаться не нужен независимо от первого.
+Clipboard-патч меняет paste handler, добавляет `ClipboardImage.h` и линковку WIC;
+сохранить приоритет текста/CF_HDROP, background encoding после CloseClipboard,
+уникальный CREATE_NEW-файл и удаление частичной записи при ошибке.
+Его ручная приёмка ещё ожидается; не представлять кандидат как новый рабочий релиз.
+
 ## 4. Собрать на Windows
 
 Прочитать `README.md`, `doc/building.md`, `.vsconfig` и build scripts **выбранного
@@ -228,6 +239,38 @@ native exit, а не все этапы. Поведение описано у Mic
 актуальный JSON до первого запуска. Имя папки должно отражать новую версию,
 например `WT-Layout-Fix-<version>`; старую папку не переименовывать и не затирать.
 
+### Повторить текущую проверку clipboard-кандидата
+
+Для существующего checkout v1.25.1912.0 с уже собранными зависимостями доступны
+[build/Test-ClipboardImage.ps1](build/Test-ClipboardImage.ps1) и
+[build/Package-ClipboardCandidate.ps1](build/Package-ClipboardCandidate.ps1).
+Скопировать эти проверенные скрипты и `build/clipboard-image-smoke.cpp` в одну
+локальную Windows-папку. Test компилирует **header из переданного SourceRoot**;
+он не меняет буфер обмена. Опциональный `-ReadClipboard` дополнительно читает
+текущий снимок и оставляет его PNG локально; при отсутствии bitmap возвращает ошибку.
+
+```powershell
+.\Test-ClipboardImage.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -OutputDirectory 'C:\Users\Pavel\Diagnostics\clipboard-smoke-new'
+```
+
+После успешного smoke собрать `src\cascadia\WindowsTerminal\WindowsTerminal.vcxproj`
+в VS developer shell: `/t:Build /p:Configuration=Release /p:Platform=x64`
+и `/p:SolutionDir=<полный путь checkout с завершающим \>`; остановиться при
+ненулевом `$LASTEXITCODE`. Для свежего checkout сначала нужны зависимости из
+раздела 4; package helper их не собирает.
+
+```powershell
+.\Package-ClipboardCandidate.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -SettingsFile 'C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json' -Destination 'C:\Users\Pavel\AppData\Local\Programs\WT-Clipboard-New'
+```
+
+OutputDirectory и Destination должны отсутствовать. Package повторно объединяет
+точный список PRI этого tag через upstream helper с остановкой на native-ошибках,
+копирует весь build layout и проверяет хеши копий, добавляет proxy/license/portable
+marker и только JSON. Он не доказывает свежесть предшествующей сборки — её exit,
+исходный diff и хеши нужно связать отдельным receipt. Для другого tag заново проверить
+список ресурсов по `_WTPrepareUnpackagedLayoutForRun`, не переносить его вслепую.
+Все test/build/package вызовы агента по-прежнему выполняются под heavy-lock.
+
 ## 6. Проверить кандидата до переключения
 
 Для старой рабочей, новой официальной и новой патченной (если нужна) версий
@@ -246,7 +289,7 @@ native exit, а не все этапы. Поведение описано у Mic
 | Split, resize, drag tab, поиск и палитра | Нет потери панелей/фокуса и новых сбоев |
 | Новый `codex`, `codex resume`, Claude | Набор и вставка `перевари тест`, латиница, Ctrl/Shift+Enter работают |
 | Цифровая десятичная клавиша в Claude/Codex, Num Lock включён | RU — запятая, EN — точка; Ubuntu сохраняет `compatibility.kittyKeyboardMode: false` |
-| Новый снимок Win+Shift+S → Ctrl+V в каждом TUI; отдельно файл из Explorer | Изображение прикрепляется; текстовая вставка и файловая вставка сохранены |
+| Новый снимок PrintScreen/«Ножницы» → Ctrl+V в каждом TUI; отдельно файл из Explorer | Изображение прикрепляется; текстовая вставка и файловая вставка сохранены |
 | Обычный выход и повторный запуск после сохранения работы | Возвращаются ожидаемые вкладки/панели; агенты запускаются заново |
 
 Обход `CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1` во время сравнения сохранять.
