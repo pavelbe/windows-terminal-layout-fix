@@ -10,7 +10,7 @@ Obtain Microsoft's source separately; this repository is the recovery kit.
 Read [Microsoft releases](https://github.com/microsoft/terminal/releases) and
 [#11522](https://github.com/microsoft/terminal/issues/11522), including linked PRs.
 Check the **exact release tag**, not only `main`, a closed issue or "Latest":
-stable and Preview/prereleases are distinct. The historical check on 2026-09-15
+stable and Preview/prereleases are distinct. The latest check on 2026-09-20
 found Preview `v1.25.1912.0`, stable `v1.24.11911.0` and an open #11522.
 Recheck for the actual upgrade; these are not current-version claims.
 
@@ -38,7 +38,9 @@ See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/ter
 ## 2. Preserve the working installation
 
 Save the current JSON and review its diff as described in README.
-Keep `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` intact.
+Keep both `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` (still used by HCA)
+and `WT-Layout-Fix-1.25.1912.0-clipboard-files-test` (accepted with 50 terminals)
+intact. The owner deferred switching daily routing on 2026-09-20.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -319,7 +321,10 @@ original backup; do not hand-edit state. Launch and pin the new EXE.
 **HCA routing needs a separate change.** `_wt_resolve_terminal()` in
 `~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` currently selects
 `Programs/WT-Layout-Fix-1.25.1912.0`. Recheck the live implementation.
-For a new portable build, update it to the verified directory together with
+The accepted `clipboard-files-test` shortcut is already pinned, but the owner
+explicitly chose to keep HCA's older path while still working there. Do not
+promote a recovery release into daily routing implicitly.
+When the owner chooses the transition, update it to the verified directory together with
 `tests/test-wt-commands.sh` and the HCA runbook; keep channel `layout-fix`.
 Do not hide new binaries in a folder bearing an old version.
 
@@ -351,4 +356,12 @@ Verify extraction, inventory, sizes and hashes before publication.
 to historical `layout-fix.1`; do not modify them for a configuration commit.
 Use a separate receipt/manifest for a new release and update README links.
 Do not replace an old published asset or reuse old manual acceptance as proof
-for a new release. Pushing a Git commit does not publish a ZIP.
+for changed runtime bytes. An archive of the already accepted build may retain
+that acceptance only with exact runtime identity and an explicit settings diff;
+archive extraction/hash validation still does not prove a clean-Windows launch.
+Pushing a Git commit does not publish a ZIP.
+
+`layout-fix.2` records the accepted multi-file runtime and reviewed URL-enabled
+JSON in `build/release-receipt-layout-fix.2.json`. Its separate
+`build/recovery-manifest-layout-fix.2.json` inventories the exact archive.
+Keep both new receipts immutable after publication, like the older ones.

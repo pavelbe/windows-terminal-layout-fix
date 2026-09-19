@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v1.25.1912.0-layout-fix.2",
+  "recordedDate": "2026-09-20",
+  "runtimeDirectory": "WT-Layout-Fix-1.25.1912.0-clipboard-files-test",
+  "upstreamTag": "v1.25.1912.0",
+  "upstreamCommit": "1cea42d433253d95c4487a3037db48197b5e72f4",
+  "sourceCommit": "299989bfbb704b8ca074ff3f0ca3942077bcbaef",
+  "candidateReceipt": {
+    "path": "build/clipboard-files-candidate-20260919.json",
+    "sha256": "401dfd2395b3d607d85dfac397dba8bf66d8101030de583c8f1be15a3a3853bb"
+  },
+  "patchOrder": [
+    {
+      "path": "patches/layout-fix.patch",
+      "sha256": "1abc24a13d6abca55f92e815d809451c5c9885134c2ccb01edaaa5da75798584"
+    },
+    {
+      "path": "patches/clipboard-image-paste.patch",
+      "sha256": "49c16f1c0d465d1a9ce7aa1a5b065141d8e116a66a73bd2c19cc98f9b9ad9908"
+    },
+    {
+      "path": "patches/clipboard-files-paste.patch",
+      "sha256": "b9eb8b280234cba1350e176ce5446619b2201a71d5153a922e5af27ffe9ea9ea"
+    }
+  ],
+  "runtimeVerification": {
+    "files": 64,
+    "allMatchCandidateReceipt": true,
+    "TerminalApp.dll": "e37d5dcf31af10d14d2aef2bce64c7838c80079806cb17b94517ac5e15bfc12e",
+    "WindowsTerminal.exe": "1ec43a0043d49fd5136e02b2ca21528e03c6ec046c9b48a19febbec991efa82f"
+  },
+  "settings": {
+    "path": "settings/settings.json",
+    "sha256": "20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda",
+    "matchesReviewedGitSnapshot": true,
+    "matchesAcceptedInstallation": true,
+    "changeSinceCandidateReceipt": "Automatic URL detection re-enabled; historical receipt remains unchanged"
+  },
+  "build": {
+    "rebuiltForThisArchive": false,
+    "historicalEvidence": "build/clipboard-files-candidate-20260919.json",
+    "configuration": "Release/x64",
+    "errors": 0,
+    "warnings": 72
+  },
+  "ownerAcceptance": {
+    "confirmedDate": "2026-09-20",
+    "identifiedDirectory": "WT-Layout-Fix-1.25.1912.0-clipboard-files-test",
+    "languageSwitchWith50Terminals": "OWNER PASS; task closed by owner; no instrumented timings",
+    "multiImageCodexAndClaude": "OWNER PASS on 2026-09-19 in this build",
+    "screenshotsAndText": "OWNER PASS in preceding clipboard candidate; final owner reports all working, no new per-feature timing record",
+    "links": "OWNER PASS on 2026-09-19; Ctrl+click opens URL and RU/EN stays fast",
+    "freshWindowsInstallation": "NOT RUN",
+    "fullUpstreamSuite": "NOT RUN",
+    "sameCurrentConfigStockComparison": "NOT RUN"
+  },
+  "dailyRouting": {
+    "changed": false,
+    "hcaDirectory": "WT-Layout-Fix-1.25.1912.0",
+    "ownerDecision": "Keep old daily route while still working there; accepted build already pinned separately"
+  },
+  "officialReleaseCheck": {
+    "date": "2026-09-20",
+    "preview": "v1.25.1912.0",
+    "stable": "v1.24.11911.0",
+    "newerReleaseFound": false,
+    "source": "https://github.com/microsoft/terminal/releases"
+  },
+  "exclusions": [
+    "state and terminal buffers",
+    "screenshots",
+    "traces/dumps/logs/backups",
+    "WSL distributions",
+    "projects",
+    "credentials"
+  ],
+  "boundary": "Private recovery of accepted bytes, not upstream adoption or a new Windows launch smoke"
+}

@@ -3,15 +3,21 @@
 Private recovery kit for the owner's patched **Windows Terminal Preview
 1.25.1912.0, Windows x64**: portable runtime, reviewed settings and source patches.
 
-**Owner acceptance, 2026-09-15:** no former RU/EN freezes with ten tabs; session
-restoration worked after configuration. This is evidence on the current PC,
-not a clean-Windows installation test.
+**Accepted recovery build, confirmed 2026-09-20:** the owner reports no RU/EN
+freezes even with **50 terminals** in `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
+and closes the layout-freeze task. Multiple Explorer images were already accepted
+in both Codex and Claude Code on 2026-09-19. This is owner-observed behavior on
+the current PC, not a timed benchmark or a clean-Windows installation test.
 
-**2026-09-19:** the separate screenshot candidate passed the owner's Codex
-Ctrl+V image/text check. The owner subsequently confirmed copied single images,
-but reported multiple Explorer images failing. The new multi-file candidate
-below addresses that separate defect; the owner confirmed it in both Codex and Claude.
-The daily launch route and immutable `layout-fix.1` archive are unchanged.
+The `-test` directory name is retained to preserve the pinned shortcut. The owner
+still works in the older `WT-Layout-Fix-1.25.1912.0` installation; **HCA routing
+stays there by owner decision**. Recovery acceptance does not switch daily use.
+Both installations and the immutable `layout-fix.1` archive remain intact.
+
+Official release check, 2026-09-20: Preview `v1.25.1912.0` and stable
+`v1.24.11911.0` remain the newest published versions in their channels.
+No new upstream version needs downloading or rebuilding now. Recheck
+[Microsoft releases](https://github.com/microsoft/terminal/releases) before an upgrade.
 
 Current configuration: [settings/settings.json](settings/settings.json).
 Official upgrades, patch porting, builds, acceptance and rollback:
@@ -20,100 +26,110 @@ input workaround have separate owners; an official EXE does not include our patc
 
 Agent rules: [AGENTS.md](AGENTS.md); `CLAUDE.md` imports the same guide.
 
-## Быстро восстановить на другой Windows
+<a id="быстро-восстановить-на-другой-windows"></a>
+## Quick recovery on another Windows installation
 
-1. Войти в GitHub под аккаунтом с доступом к этому приватному репозиторию.
-2. Открыть [релиз layout-fix.1](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.1).
-   Скачать **WT-Layout-Fix-1.25.1912.0-win-x64.zip** и одноимённый **.zip.sha256**
-   в папку «Загрузки». GitHub-файл «Source code (zip)» не содержит готовую программу.
-   Также скачать актуальный [settings/settings.json](settings/settings.json)
-   через **Download raw file** как `Downloads\WT-Layout-Fix-settings.json`.
-   В старом ZIP нет последующих настроек Ctrl+N и Ctrl/Shift+Enter.
-3. В обычном Windows PowerShell выполнить:
+1. Sign in to GitHub with access to this private repository.
+2. Open [release layout-fix.2](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2).
+   Download **WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip** and its **.zip.sha256**
+   to Downloads. GitHub's "Source code (zip)" is not the executable package.
+   This ZIP includes the reviewed configuration, all three source patches and
+   the accepted runtime. The external release manifest records its exact bytes.
+3. Run in ordinary Windows PowerShell:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$zip = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-1.25.1912.0-win-x64.zip'
-$config = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-settings.json'
-$null = Get-Content -LiteralPath $config -Raw -Encoding UTF8 | ConvertFrom-Json
+$zip = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip'
 $expected = ((Get-Content -LiteralPath ($zip + '.sha256') -Raw).Trim() -split '\s+')[0]
 if ($expected -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid checksum file' }
 if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ine $expected) {
     throw 'Archive checksum mismatch'
 }
 $programs = Join-Path $env:LOCALAPPDATA 'Programs'
-$terminal = Join-Path $programs 'WT-Layout-Fix-1.25.1912.0'
+$terminal = Join-Path $programs 'WT-Layout-Fix-1.25.1912.0-clipboard-files-test'
 if (Test-Path -LiteralPath $terminal) {
     throw 'Destination already exists; keep it and extract this archive into a different folder'
 }
 Expand-Archive -LiteralPath $zip -DestinationPath $programs -ErrorAction Stop
-Copy-Item -LiteralPath $config -Destination (Join-Path $terminal 'settings\settings.json')
+$null = Get-Content -LiteralPath (Join-Path $terminal 'settings\settings.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 & (Join-Path $terminal 'WindowsTerminal.exe')
 ```
 
-4. Закрепить **это открытое окно** в панели задач. Запускать его ярлыком, без
-   старого диагностического скрипта с десятью вкладками.
-5. Проверить кнопку **+**, разделение панели, RU/EN с 10 вкладками и восстановление.
+4. Pin **this running window** to the taskbar. Launch its shortcut without
+   the old ten-tab diagnostic script.
+5. On the new machine, check **+**, pane splitting, RU/EN at your normal tab
+   count, clipboard images/text in both TUIs and restoration. Current-PC
+   acceptance does not prove the replacement system.
 
-Распаковка в свой `%LOCALAPPDATA%` не требует регистрации MSIX. Portable-копия
-не заменяет Store/Preview; системный выбор default terminal доступен packaged-версии,
-а portable запускается своим EXE/ярлыком и командами HCA.
-См. [типы поставки Microsoft](https://learn.microsoft.com/en-us/windows/terminal/distributions).
-Это сборка x64; проверенная система — Windows 11, build 22631.6199.
-Перенос на другую версию Windows ещё не проверен.
+Extraction into your `%LOCALAPPDATA%` needs no MSIX registration. The portable
+copy does not replace Store/Preview; the system default-terminal selection is
+available to packaged versions, while portable uses its EXE/shortcut and HCA.
+See [Microsoft distributions](https://learn.microsoft.com/en-us/windows/terminal/distributions).
+This is x64; the tested system is Windows 11 build 22631.6199.
+Migration to another Windows version has not been tested.
 
-Если Windows сообщает об отсутствующем `VCRUNTIME140*.dll` или `MSVCP140*.dll`,
-установить официальный [Microsoft Visual C++ Redistributable x64](https://aka.ms/vs/17/release/vc_redist.x64.exe).
-Не скачивать отдельные DLL со случайных сайтов. Cascadia Code 11 можно установить
-из [официального проекта шрифта](https://github.com/microsoft/cascadia-code), если
-его нет в новой Windows; отсутствие шрифта и отсутствие runtime — разные случаи.
+If Windows reports missing `VCRUNTIME140*.dll` or `MSVCP140*.dll`, install the
+official [Microsoft Visual C++ Redistributable x64](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+Never download individual DLLs from random sites. If absent on the new Windows,
+install Cascadia Code 11 from the [official font project](https://github.com/microsoft/cascadia-code).
+A missing font and a missing runtime are separate problems.
 
-## Что переносится и что нужно отдельно
+<a id="что-переносится-и-что-нужно-отдельно"></a>
+## Included files and separate prerequisites
 
-В архиве есть EXE/DLL, XAML/PRI-ресурсы, `.portable`, лицензия, патч, README,
-исходный build receipt и **только** `settings/settings.json` из пользовательских данных.
-Оригинальные runtime-файлы сверены с хешами receipt; полная ведомость архива находится
-в [build/recovery-manifest.json](build/recovery-manifest.json).
+The archive contains EXE/DLL, XAML/PRI resources, `.portable`, license, all three
+patches, README/UPDATING, historical build evidence and a new release receipt.
+**Only** `settings/settings.json` is included from user data. The 64 runtime
+files match the accepted candidate receipt; settings match the reviewed current
+JSON. The complete archive inventory is
+[build/recovery-manifest-layout-fix.2.json](build/recovery-manifest-layout-fix.2.json).
+Its SHA256 describes this ZIP; the manifest is a separate release asset, avoiding
+a self-referential archive hash. The build/acceptance boundary is recorded in
+[build/release-receipt-layout-fix.2.json](build/release-receipt-layout-fix.2.json).
 
-**Ubuntu/WSL, проекты, HCA, Claude/Codex, авторизация и история сессий не входят.**
-До замены системы их нужно сохранить отдельно. Конфиг ожидает дистрибутив с именем
-`Ubuntu`; проверить его можно командой `wsl --list --verbose`. Если дистрибутива ещё
-нет, временно открыть CMD через меню рядом с **+**. Не запускать `wsl --install`
-поверх ожидаемого восстановления старого дистрибутива без отдельного плана.
+**Ubuntu/WSL, projects, HCA, Claude/Codex, authentication and session history are excluded.**
+Back them up separately before replacing the system. The config expects a distro
+named `Ubuntu`; verify with `wsl --list --verbose`. If absent, temporarily open
+CMD from the menu beside **+**. Do not run `wsl --install` over a planned recovery
+of the existing distro without a separate plan.
 
-На новой системе первая загрузка не восстановит старые вкладки: личный `state.json`
-и экранные буферы намеренно не публикуются. Новые сеансы будут сохраняться после
-обычного выхода. Сам файл настроек не восстанавливает процессы агентов.
+The first launch on another system will not restore old tabs: private `state.json`
+and screen buffers are deliberately unpublished. New sessions persist after
+normal exit. The settings file does not restore live agent processes.
 
-Команды HCA `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` и `wth` поддерживают эту
-portable-копию. После восстановления HCA с коммитом `2b0e916` или новее в `config/workspaces.yaml`
-должно быть `settings.windows_terminal_channel: "layout-fix"`. В свободной Zsh:
+HCA commands `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` and `wth` have a separate
+launch target. As checked on 2026-09-20, channel `layout-fix` still selects
+`Programs/WT-Layout-Fix-1.25.1912.0`, **not this accepted recovery folder**.
+The owner explicitly keeps that daily route for now. Pinning the newer EXE does
+not change HCA. To inspect the live selection in an idle Zsh prompt:
 
 ```zsh
 source ~/.zshrc
 wt-doctor
 ```
 
-Doctor должен показать канал `layout-fix`, EXE в `Programs/WT-Layout-Fix-1.25.1912.0`
-и конфиг `settings/settings.json` рядом с ним. Проект без числа открывает одну
-новую вкладку с одной панелью в последнем активном окне этой сборки. Разделение
-включается явным числом; именованные наборы сохраняют свою раскладку.
-Перезагрузка Windows/WSL не нужна. Если файлы сборки отсутствуют, HCA завершает
-команду с ошибкой, не переключаясь на установленный Preview или Stable.
+Doctor currently shows channel `layout-fix`, the EXE in `Programs/WT-Layout-Fix-1.25.1912.0`
+and adjacent `settings/settings.json`. When the owner chooses to migrate HCA,
+follow [UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат)
+and update the resolver/test/runbook together. Until then launch the accepted
+build directly or through its pinned shortcut. A project without a count opens one new
+single-pane tab in the most recently active window of this build. An explicit
+count enables splitting; named presets retain their layouts.
+No Windows/WSL restart is needed. If the build is missing, HCA fails instead
+of switching silently to installed Preview or Stable.
 
-При дублировании кириллицы в Codex 0.154.0 подтверждён отдельный обход:
-`CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1 codex`. Актуальный HCA применяет его
-автоматически для `codex`/`cxr` внутри Windows Terminal/WSL. Владелец проверил
-обычный запуск после `source ~/.zshrc`: набор, вставка и перенос строки работают.
-Обход действует только на запускаемый Codex, включая `codex resume`; уже
-работающие процессы и Claude он не меняет. Исходник маршрута —
+A separate workaround fixed Cyrillic duplication in Codex 0.154.0:
+`CODEX_TUI_DISABLE_KEYBOARD_ENHANCEMENT=1 codex`. Current HCA applies it to
+`codex`/`cxr` inside Windows Terminal/WSL. After `source ~/.zshrc`, the owner
+confirmed ordinary launch, typing, paste and newlines. It affects newly launched
+Codex, including `codex resume`, not running processes or Claude. Routing source:
 `~/hca-system-v3/modules/zsh/claude/55-ai-ip-guard.zsh`.
-Этот обход находится в HCA, а не в бинарном патче Terminal. На другой версии
-Codex/Terminal повторите проверку кириллицы и Ctrl/Shift+Enter.
+This is an HCA workaround, not a Terminal binary patch. Recheck Cyrillic and
+Ctrl/Shift+Enter when changing Codex/Terminal versions.
 
-Эти уточнения дополняют README внутри первоначального ZIP `layout-fix.1`.
-Сам архив и его SHA256 не изменялись; конфиг в Git новее архивного. При переносе используйте эту
-актуальную инструкцию вместе с [runbook HCA](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md).
+These notes supersede the README in the original `layout-fix.1` ZIP.
+That archive and SHA256 are unchanged. For migration use `layout-fix.2`,
+this current guide and the [HCA runbook](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md).
 
 <a id="цифровая-десятичная-клавиша-и-снимки-из-буфера"></a>
 ## Numpad decimal key and clipboard images
@@ -138,17 +154,17 @@ restart was performed. Repeat interop diagnosis with the
 [HCA runbook](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md#восстановление-interop-windows-11).
 
 <a id="кандидат-с-универсальным-ctrlv"></a>
-### Clipboard candidates and current test
+### Accepted clipboard build and historical candidates
 
 Previous candidate: `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-test`.
 In `WT-PASTE-TEST`, the owner confirmed PrintScreen → Ctrl+V and ordinary text
 in Codex on 2026-09-19. Its receipt remains historical:
 [clipboard-candidate-20260919.json](build/clipboard-candidate-20260919.json).
 
-The new candidate adds multiple Explorer files:
+The accepted build adds multiple Explorer files. Normal launch (no test tabs):
 
 ```powershell
-& "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\WindowsTerminal.exe" -w new new-tab -p Ubuntu --title WT-FILES-TEST --suppressApplicationTitle
+& "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\WindowsTerminal.exe"
 ```
 
 Paste precedence is text → Explorer files → bitmap. A file selection is read
@@ -184,27 +200,32 @@ Exact candidate build/runtime evidence:
 
 **Owner acceptance, 2026-09-19:** the owner tested multiple Explorer images
 in `WT-FILES-TEST` and confirmed they attach in both Codex and Claude Code.
-Repeated screenshot/text and ten-tab RU/EN checks in this exact build were not
-separately reported; previous build acceptance and native smoke are distinct evidence.
-The candidate is not the daily HCA/shortcut target and has no published ZIP.
+**Acceptance extended, confirmed 2026-09-20:** the owner identifies this exact
+folder as the build working without freezes with 50 terminals. The owner also
+reports everything checked and working; the explicit per-feature screenshot/text
+receipt remains from the preceding candidate. No instrumented 50-tab timings or
+full UI regression are claimed. `layout-fix.2` preserves the accepted runtime
+and current JSON without recompilation. Its shortcut is pinned; HCA still
+selects the older installation at the owner's request.
 
-## Рабочие настройки
+<a id="рабочие-настройки"></a>
+## Working settings
 
-| Настройка | Поведение |
+| Setting | Behavior |
 | --- | --- |
-| Профиль по умолчанию | Ubuntu, `wsl.exe -d Ubuntu`, каталог `~` |
-| `firstWindowPreference` | `persistedLayoutAndContent`: раскладка и вывод |
-| `windowingBehavior` | `useAnyExisting`: повторное использование окна |
-| Шрифт | Cascadia Code 11, ClearType |
-| История вывода | штатные 9001 строк; старые 50000 не перенесены |
-| Анимации, bell | отключены |
-| `experimental.detectURLs` | включено: распознавание URL, открытие через Ctrl+клик |
-| Копирование | обычный текст без форматирования |
-| `Ctrl+C`, `Ctrl+V`, `Alt+Shift+D` | прежние привязки копирования, вставки, разделения |
-| `Ctrl+W` | закрыть всю вкладку вместе с её панелями; Terminal перехватывает сочетание у приложения |
-| `Ctrl+N` | новая вкладка профиля по умолчанию (Ubuntu), как кнопка **+** |
-| `Ctrl+Enter`, `Shift+Enter` | `User.AgentNewline`: отправить LF (`\n`) приложению |
-| `Ctrl+Shift+F`, `Ctrl+Shift+P` | стандартные поиск и палитра команд |
+| Default profile | Ubuntu, `wsl.exe -d Ubuntu`, directory `~` |
+| `firstWindowPreference` | `persistedLayoutAndContent`: layout and output |
+| `windowingBehavior` | `useAnyExisting`: reuse a window |
+| Font | Cascadia Code 11, ClearType |
+| Scrollback | Default 9001 lines; old 50000 not carried over |
+| Animations, bell | Disabled |
+| `experimental.detectURLs` | Enabled; detect URLs and open with Ctrl+click |
+| Copy | Plain text without formatting |
+| `Ctrl+C`, `Ctrl+V`, `Alt+Shift+D` | Existing copy, paste and split bindings |
+| `Ctrl+W` | Close the entire tab and its panes; Terminal intercepts the application's shortcut |
+| `Ctrl+N` | New default-profile (Ubuntu) tab, like **+** |
+| `Ctrl+Enter`, `Shift+Enter` | `User.AgentNewline`: send LF (`\n`) to the application |
+| `Ctrl+Shift+F`, `Ctrl+Shift+P` | Standard search and command palette |
 
 Automatic URL detection was restored on 2026-09-19 in the daily portable
 configuration and the running `clipboard-files-test` candidate. It had remained
@@ -216,84 +237,84 @@ switching stays fast at the usual tab count; the exact tab count was not recorde
 Historical build/release receipts still describe their original settings and
 must not be restamped.
 
-`Ctrl+Shift+Period` освобождён от подсказок Terminal, как в прежнем Preview.
-Обычный Enter и Delete/Home/End в этом JSON не переназначены. Ctrl/Shift+Enter
-отправляют LF; реакцию определяет приложение: в обычной оболочке это может
-выполнить команду. Владелец подтвердил новую строку обоими сочетаниями в
-Codex и Claude; это отдельная проверка от обхода дублирования кириллицы.
-Сохранены работающие привязки, а не возвращены прежние defaults.
-Ctrl+N/Ctrl+W перехватывает Terminal; проверки конфига пройдены, отдельного
-подтверждения ручного нажатия этих двух сочетаний пока нет. Проверять на пустой
-вкладке; `warning.confirmCloseAllTabs=false` отключает вопрос при закрытии окна.
-Названия существующих профилей других WSL-дистрибутивов сохранены; их присутствие
-в JSON не означает, что сами дистрибутивы перенесены.
+`Ctrl+Shift+Period` is freed from Terminal suggestions, as in the previous Preview.
+Ordinary Enter and Delete/Home/End are not remapped here. Ctrl/Shift+Enter send
+LF; the receiving application decides its meaning, and a shell may execute a
+command. The owner confirmed newlines from both shortcuts in Codex and Claude;
+that acceptance is separate from the Cyrillic workaround. Working bindings
+were preserved rather than reset to old defaults. Terminal intercepts
+Ctrl+N/Ctrl+W; JSON checks passed, but separate manual acceptance of those two
+shortcuts was not recorded. Test on an empty tab;
+`warning.confirmCloseAllTabs=false` disables the window-close confirmation.
+Other WSL profile names were preserved; their presence in JSON does not mean
+the distros themselves have been migrated.
 
-Для восстановления одного окна закрывать **окно с нужными вкладками**, а не вкладки
-по одной. Для нескольких окон использовать **Quit / Выход** в `Ctrl+Shift+P`.
-Сначала сохранить работу и завершить агентов. Восстанавливаются панели и вывод,
-но не живые программы.
+To restore one window, close **the window containing the desired tabs**, not
+individual tabs. For multiple windows use **Quit / Выход** in `Ctrl+Shift+P`.
+Save work and finish agents first. Panes/output restore; live programs do not.
 
-## Исходный код и границы проверки
+<a id="исходный-код-и-границы-проверки"></a>
+## Source and verification boundaries
 
 - Upstream: [microsoft/terminal, v1.25.1912.0](https://github.com/microsoft/terminal/tree/v1.25.1912.0).
-- База: `1cea42d433253d95c4487a3037db48197b5e72f4`.
-- Исходный локальный commit патча: `a34eea7b524f7516c68014a14bb94e215520e0fc`.
-- [Полный патч](patches/layout-fix.patch) изменяет три файла: `TerminalPage.cpp`,
+- Base: `1cea42d433253d95c4487a3037db48197b5e72f4`.
+- Original local patch commit: `a34eea7b524f7516c68014a14bb94e215520e0fc`.
+- [Full patch](patches/layout-fix.patch) changes three files: `TerminalPage.cpp`,
   `TerminalPage.h`, `TermControl.cpp`.
-- [Сообщение Microsoft с полным diff и результатом проверки](https://github.com/microsoft/terminal/issues/11522#issuecomment-5680525120).
-- При обновлении настроек промежуточные обновления оформления всего окна
-  откладываются до уже существующего финального обновления. Уведомление
-  `BackgroundBrush` посылается при изменении объекта/цвета, включая acrylic.
-  Обработчик смены языка и привязки ввода в исходном коде не менялись.
-- Сборка: Release/x64, VS Build Tools 2022 17.11.1, MSVC 14.41.34120,
-  Windows SDK 10.0.22621.0. Исторический результат сборки: 0 ошибок, 70 предупреждений.
-- Сравнение stock/fix с полностью одинаковым текущим конфигом и полный UI-регресс
-  ещё не выполнены. Удвоение кириллицы в Codex наблюдалось в обеих сборках;
-  проверенный обход в HCA описан выше, бинарный патч Terminal его не исправляет.
+- [Microsoft report with full diff and test result](https://github.com/microsoft/terminal/issues/11522#issuecomment-5680525120).
+- During settings application, intermediate window-wide theme refreshes are
+  deferred to the existing final refresh. `BackgroundBrush` notifies on object/
+  color changes, including acrylic. The source patch changes neither the
+  language-switch handler nor input bindings.
+- Build: Release/x64, VS Build Tools 2022 17.11.1, MSVC 14.41.34120,
+  Windows SDK 10.0.22621.0. Historical result: 0 errors, 70 warnings.
+- Stock/fix comparison with identical current settings and a complete UI
+  regression remain unperformed. Cyrillic duplication occurred in both builds;
+  HCA's accepted workaround above is independent of the Terminal binary patch.
 
-Для восстановления исходников: получить официальный репозиторий, выбрать точную
-базу выше, проверить и применить `patches/layout-fix.patch` через `git apply --check`
-и `git apply`. Затем следовать инструкции сборки именно этого upstream-тега.
-В HCA все clone/build/dependency-команды выполнять через machine-global heavy lock.
-Чистая пересборка по этому recovery-репозиторию не выполнялась; для быстрого
-восстановления предназначен проверенный бинарный ZIP из релиза.
+To recover source, obtain the official repository at the exact base above;
+check/apply `patches/layout-fix.patch` using `git apply --check` and `git apply`.
+Follow that upstream tag's build guide. HCA clone/build/dependency commands
+require the machine-global heavy lock. A clean rebuild from this recovery kit
+has not been performed; use the tested binary release ZIP for quick recovery.
 
-Существующий upstream checkout на этом ПК: `C:\Users\Pavel\Projects\terminal-layout-fix`
-(`/mnt/c/Users/Pavel/Projects/terminal-layout-fix` из WSL). Он содержит C++-исходники;
-этот recovery-репозиторий находится отдельно в `~/Projects/windows-terminal-layout-fix`.
-Перед новой работой проверить Git именно выбранного checkout, не считать
-сохранённый здесь build receipt доказательством его текущей чистоты.
+Existing native checkout: `C:\Users\Pavel\Projects\terminal-layout-fix`
+(`/mnt/c/Users/Pavel/Projects/terminal-layout-fix` from WSL), containing C++ source.
+This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
+Inspect Git in the selected checkout before work; the saved build receipt does
+not prove that checkout is currently clean.
 
-`build/original-build-receipt.json` сохранён без изменений. Его хеш настроек
-относится к тестовому конфигу **до** настройки повседневной работы.
-`build/recovery-manifest.json` описывает только неизменённый архив `layout-fix.1`,
-включая его тогдашний конфиг. Это не хеш текущего `settings/settings.json` из Git.
+`build/original-build-receipt.json` is unchanged; its settings hash belongs to
+the test configuration **before** daily-use setup. `build/recovery-manifest.json`
+describes only the immutable `layout-fix.1` archive and its original settings,
+not the current Git `settings/settings.json`.
 
-## Обновление резервной копии
+<a id="обновление-резервной-копии"></a>
+## Updating the recovery copy
 
-Рабочий файл на этом ПК:
+Accepted recovery configuration on this PC:
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\settings\settings.json`.
+The still-used older installation has an identical JSON at:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json`.
 The reviewed snapshot was synchronized on 2026-09-19, including automatic URL
 detection, newline bindings, Ctrl+N/Ctrl+W and disabled Kitty mode for Ubuntu.
-После следующих настроек сначала проверить diff только этого JSON: там могут
-появиться личные пути и commandline. Буферы, состояние и авторизация в Git не идут.
+After later changes review only this JSON first: it may contain personal paths
+and command lines. Buffers, runtime state and authentication stay out of Git.
 
-В WSL, из корня этого репозитория, после просмотра изменений:
+In WSL, from this repository root, after reviewing the changes:
 
 ```bash
-cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0/settings/settings.json settings/settings.json
+cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test/settings/settings.json settings/settings.json
 python3 -m json.tool settings/settings.json > /dev/null
-cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0/settings/settings.json
+cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test/settings/settings.json
 rtk proxy git diff -- settings/settings.json
 ```
 
-Снимок JSON можно сохранять отдельным коммитом без пересборки EXE и нового ZIP.
-Если рабочий JSON уже совпадает с сохранённым, повторное копирование и коммит
-конфига не нужны. Изменение инструкции также не требует нового manifest архива.
-При создании нового бинарного архива нужен отдельный приватный релиз, SHA256,
-ведомость фактических файлов и проверка кандидата. Старый релиз и его receipts
-не перезаписывать. Полный порядок — [UPDATING.md](UPDATING.md).
+A settings snapshot needs no EXE rebuild or new ZIP. If live JSON already
+matches, do not copy or commit it again. Editing instructions also needs no new
+archive manifest. A new binary archive needs a separate private release,
+SHA256, an actual file inventory and candidate acceptance. Never overwrite old
+releases or receipts. Full procedure: [UPDATING.md](UPDATING.md).
 
-Portable-сборка сама не получает обновления Store. Перед переходом на новый
-upstream сначала проверить, исправлена ли проблема официально. GitHub Actions
-в этом репозитории отключены.
+The portable build does not receive Store updates. Before changing upstream,
+check whether the official version fixes the problem. GitHub Actions is disabled.
