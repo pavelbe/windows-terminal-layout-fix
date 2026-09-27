@@ -1,12 +1,13 @@
 # Windows Terminal Layout Fix — recovery repository
 
-Private backup of the owner's tested Windows Terminal portable build and settings.
+Public downstream patches and recovery kit for a tested Windows Terminal build.
 Read README.md before changing this repository. This is not the upstream source
 checkout and not the Atreno application.
 Read UPDATING.md before porting, building, packaging or changing recovery steps.
 
-- Preserve private visibility. Do not enable GitHub Actions.
-- Keep executable archives in private GitHub Releases, not Git history.
+- Repository is public by owner decision. Do not change visibility or enable Actions.
+- Keep executable archives in reviewed GitHub Releases, not Git history;
+  creating/replacing release assets still requires explicit owner authorization.
 - Runtime is based on upstream v1.25.1912.0. Read README.md for the ordered
   layout/clipboard patch chain and the distinction between release and candidates.
   Source identity and original file hashes are in build/original-build-receipt.json.
@@ -26,7 +27,11 @@ Read UPDATING.md before porting, building, packaging or changing recovery steps.
 - Run packaging/build/validation through the owner's machine-global heavy lock.
   Use literal path-scoped Git writes and keep unrelated work untouched.
 - Changes to source or dependencies need new build and manual acceptance evidence.
-  A private recovery release does not mean Microsoft accepted or shipped the patch.
+  A downstream recovery release does not mean Microsoft accepted or shipped the patch.
+- Before a Microsoft submission, read its current CONTRIBUTING.md and AGENTS.md
+  AI policy plus our CONTRIBUTING.md. Publication needs separate authority.
+- Packaging must reject a build layout containing a settings directory before
+  any writes; read CONTRIBUTING.md for the offline regression. It is not build/UI proof.
 
 ## Agent documentation language
 

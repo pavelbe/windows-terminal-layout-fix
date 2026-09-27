@@ -347,7 +347,7 @@ Routing rollback requires no Windows/WSL restart.
 
 Record the exact upstream tag/SHA, patch diff/SHA256 (or `patch not needed`),
 tool versions, build/test exits and separate manual acceptance.
-The private release contains the complete runtime, licenses, current JSON and
+The reviewed release contains the complete runtime, licenses, current JSON and
 instructions. Exclude state, screen buffers, dumps, traces, credentials and binlogs.
 The new tag/ZIP/SHA256/manifest must describe the **actual new archive**.
 Verify extraction, inventory, sizes and hashes before publication.
@@ -365,3 +365,16 @@ Pushing a Git commit does not publish a ZIP.
 JSON in `build/release-receipt-layout-fix.2.json`. Its separate
 `build/recovery-manifest-layout-fix.2.json` inventories the exact archive.
 Keep both new receipts immutable after publication, like the older ones.
+
+Before using `build/Package-ClipboardCandidate.ps1`, use a clean build layout.
+The script refuses an existing `WindowsTerminal/settings` directory before
+merging resources or creating a candidate: a previously launched portable tree
+can contain private tabs and buffers. Do not delete live state to satisfy this
+check; select a clean build output instead. Only the explicitly reviewed
+`SettingsFile` belongs in the candidate.
+
+Offline regression (PowerShell 7.4+, synthetic files, no build or app launch):
+
+```powershell
+pwsh -NoProfile -File .\build\Test-PackageClipboardCandidate.ps1
+```

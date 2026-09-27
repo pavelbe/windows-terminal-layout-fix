@@ -12,6 +12,11 @@ if (Test-Path -LiteralPath $Destination) { throw 'Destination must not exist' }
 $null = Get-Content -LiteralPath $SettingsFile -Raw -Encoding UTF8 | ConvertFrom-Json
 $release = Join-Path $SourceRoot 'bin\x64\Release'
 $layout = Join-Path $release 'WindowsTerminal'
+# A previously launched portable layout may contain private tabs and buffers.
+# Refuse before PRI merging or candidate writes; only SettingsFile is reviewed.
+if (Test-Path -LiteralPath (Join-Path $layout 'settings')) {
+    throw 'Build layout contains a settings directory. Use a clean build layout; private session state must not be packaged.'
+}
 $required = @(
     'WindowsTerminal.exe', 'OpenConsole.exe', 'TerminalApp.dll',
     'Microsoft.Terminal.Control.dll', 'Microsoft.Terminal.Settings.Model.dll',

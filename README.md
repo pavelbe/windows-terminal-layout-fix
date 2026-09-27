@@ -1,7 +1,37 @@
 # Windows Terminal Layout Fix
 
-Private recovery kit for the owner's patched **Windows Terminal Preview
-1.25.1912.0, Windows x64**: portable runtime, reviewed settings and source patches.
+Community patches and a portable recovery build for **Windows Terminal Preview
+1.25.1912.0, Windows x64**. Addresses slow input-language switching with many
+tabs and adds clipboard image/file paste for terminal applications.
+
+[Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
+
+This is an unofficial downstream project based on
+[Microsoft Terminal](https://github.com/microsoft/terminal), not a Microsoft
+release. The patches have been posted for discussion; they are **not claimed
+to be accepted or merged upstream**.
+
+| Problem | Change | Evidence and limits |
+| --- | --- | --- |
+| RU/EN switching stalls with many tabs | Coalesce repeated theme updates during settings reload | Owner tested 10, then 50 terminals on one PC; no instrumented benchmark |
+| Bitmap-only clipboard cannot be pasted as an image path | Snapshot bitmap, encode a temporary PNG, paste its quoted path | Owner-tested screenshot/text flow; temporary files remain local |
+| Several Explorer images attach incompletely | Read the full file selection and preserve per-file paste events | Owner-tested multi-image paste in Codex and Claude Code |
+
+Public upstream evidence: [layout reproduction](https://github.com/microsoft/terminal/issues/11522#issuecomment-5677254631),
+[layout patch](https://github.com/microsoft/terminal/issues/11522#issuecomment-5680525120),
+[50-terminal follow-up](https://github.com/microsoft/terminal/issues/11522#issuecomment-5745315978),
+[clipboard patches](https://github.com/microsoft/terminal/issues/19517#issuecomment-5745327476).
+Both discussions were open when checked on 2026-09-27. The maintainer
+[requested compliance with the upstream AI policy](https://github.com/microsoft/terminal/issues/11522#issuecomment-5747036212);
+read [contribution guidance](CONTRIBUTING.md) before contacting upstream.
+
+**New users:** read the recovery steps below, verify the archive checksum and
+test in a separate directory. Included settings are the maintainer's example,
+including an `Ubuntu` profile; review paths, profiles and keybindings for your
+machine. HCA commands in the later maintenance notes are optional local tooling,
+not a prerequisite for running the portable EXE.
+
+## Tested build and maintainer recovery notes
 
 **Accepted recovery build, confirmed 2026-09-20:** the owner reports no RU/EN
 freezes even with **50 terminals** in `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
@@ -14,9 +44,9 @@ still works in the older `WT-Layout-Fix-1.25.1912.0` installation; **HCA routing
 stays there by owner decision**. Recovery acceptance does not switch daily use.
 Both installations and the immutable `layout-fix.1` archive remain intact.
 
-Official release check, 2026-09-20: Preview `v1.25.1912.0` and stable
-`v1.24.11911.0` remain the newest published versions in their channels.
-No new upstream version needs downloading or rebuilding now. Recheck
+Historical release check, 2026-09-20: Preview `v1.25.1912.0` and stable
+`v1.24.11911.0` were the newest published versions in their channels.
+This is not a current-version claim. Recheck
 [Microsoft releases](https://github.com/microsoft/terminal/releases) before an upgrade.
 
 Current configuration: [settings/settings.json](settings/settings.json).
@@ -29,7 +59,8 @@ Agent rules: [AGENTS.md](AGENTS.md); `CLAUDE.md` imports the same guide.
 <a id="быстро-восстановить-на-другой-windows"></a>
 ## Quick recovery on another Windows installation
 
-1. Sign in to GitHub with access to this private repository.
+1. This repository and its release downloads are public. Review the tested
+   platform and configuration notes above before installing.
 2. Open [release layout-fix.2](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2).
    Download **WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip** and its **.zip.sha256**
    to Downloads. GitHub's "Source code (zip)" is not the executable package.
@@ -312,7 +343,7 @@ rtk proxy git diff -- settings/settings.json
 
 A settings snapshot needs no EXE rebuild or new ZIP. If live JSON already
 matches, do not copy or commit it again. Editing instructions also needs no new
-archive manifest. A new binary archive needs a separate private release,
+archive manifest. A new binary archive needs a separate reviewed release,
 SHA256, an actual file inventory and candidate acceptance. Never overwrite old
 releases or receipts. Full procedure: [UPDATING.md](UPDATING.md).
 
