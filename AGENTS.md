@@ -24,8 +24,7 @@ Read UPDATING.md before porting, building, packaging or changing recovery steps.
   do not create a copy or commit merely to record another check.
 - Preserve profile GUIDs, command lines and native input bindings unless requested.
 - Do not close Terminal/WSL or restart agents to test restoration without permission.
-- Run packaging/build/validation through the owner's machine-global heavy lock.
-  Use literal path-scoped Git writes and keep unrelated work untouched.
+- Use literal path-scoped Git writes and keep unrelated work untouched.
 - Changes to source or dependencies need new build and manual acceptance evidence.
   A downstream recovery release does not mean Microsoft accepted or shipped the patch.
 - Before a Microsoft submission, read its current CONTRIBUTING.md and AGENTS.md

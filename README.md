@@ -327,8 +327,7 @@ Save work and finish agents first. Panes/output restore; live programs do not.
 
 To recover source, obtain the official repository at the exact base above;
 check/apply `patches/layout-fix.patch` using `git apply --check` and `git apply`.
-Follow that upstream tag's build guide. HCA clone/build/dependency commands
-require the machine-global heavy lock. A clean rebuild from this recovery kit
+Follow that upstream tag's build guide. A clean rebuild from this recovery kit
 has not been performed; use the tested binary release ZIP for quick recovery.
 
 Existing native checkout: `C:\Users\Pavel\Projects\terminal-layout-fix`
