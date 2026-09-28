@@ -21,7 +21,7 @@ Public upstream evidence: [layout reproduction](https://github.com/microsoft/ter
 [layout patch](https://github.com/microsoft/terminal/issues/11522#issuecomment-5680525120),
 [50-terminal follow-up](https://github.com/microsoft/terminal/issues/11522#issuecomment-5745315978),
 [clipboard patches](https://github.com/microsoft/terminal/issues/19517#issuecomment-5745327476).
-Both discussions were open when checked on 2026-09-27. The maintainer
+Both discussions were open when checked on 2026-09-28. The maintainer
 [requested compliance with the upstream AI policy](https://github.com/microsoft/terminal/issues/11522#issuecomment-5747036212);
 read [contribution guidance](CONTRIBUTING.md) before contacting upstream.
 
@@ -32,6 +32,28 @@ machine. HCA commands in the later maintenance notes are optional local tooling,
 not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
+
+**Tab-color candidate, 2026-09-28:**
+`WT-Layout-Fix-1.25.1912.0-tab-color-test` adds
+[runtime tab-color preservation](patches/preserve-runtime-tab-color.patch)
+after the three released patches. The owner reports that RU/EN retains the tab
+color in this candidate. TerminalCore: 56/56 tests passed, including an unchanged
+regression that failed before the fix. Release/x64 build and packaging passed;
+existing resource/XAML warnings remain. This is not a new published release or
+a repeat of the 50-terminal/clipboard acceptance suite. Existing shortcuts and
+HCA routing remain unchanged. [Candidate receipt](build/tab-color-candidate-20260928.json).
+
+Launch `WindowsTerminal.exe` from that separate folder. `WTColorTest.exe` is a
+byte-identical local test copy used to isolate the `WT-COLOR-TEST` window from
+running installations. Do not replace a live installation until its processes
+are closed intentionally; keep the accepted clipboard-files build for rollback.
+
+Codex 0.158 mouse selection is separate: local `~/.codex/config.toml` now sets
+`[tui] fullscreen_transcript = false`. Native terminal selection/scrollback replaces
+Codex-owned transcript selection/search; the owner confirmed plain mouse selection
+and Ctrl+C work. Restart Codex to consume this setting, not Windows/WSL. It is
+not embedded in Terminal or its recovery ZIP. Remove that key to restore Codex's
+default mode. The keyboard-enhancement workaround remains independently required.
 
 **Accepted recovery build, confirmed 2026-09-20:** the owner reports no RU/EN
 freezes even with **50 terminals** in `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
@@ -44,7 +66,7 @@ still works in the older `WT-Layout-Fix-1.25.1912.0` installation; **HCA routing
 stays there by owner decision**. Recovery acceptance does not switch daily use.
 Both installations and the immutable `layout-fix.1` archive remain intact.
 
-Historical release check, 2026-09-20: Preview `v1.25.1912.0` and stable
+Release check, 2026-09-28: Preview `v1.25.1912.0` and stable
 `v1.24.11911.0` were the newest published versions in their channels.
 This is not a current-version claim. Recheck
 [Microsoft releases](https://github.com/microsoft/terminal/releases) before an upgrade.

@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-28",
+  "source_commit": "b50c7efb7d8eb4c92c3eca6d0b59a830548037ef",
+  "base_commit": "299989bfbb704b8ca074ff3f0ca3942077bcbaef",
+  "incremental_patch": "patches/preserve-runtime-tab-color.patch",
+  "patch_sha256": "b24492f94e6dd9f7e7e7e05ccbd1e723a935f05a3b924927c27bdb4daa9a845d",
+  "candidate_directory": "WT-Layout-Fix-1.25.1912.0-tab-color-test",
+  "checks": {
+    "regression_before_fix": "FAIL: IsTrue(term.GetTabColor() == runtimeColor)",
+    "terminal_core_suite": "56 passed; 0 failed, blocked or skipped",
+    "clang_format": "passed for three changed C++ files",
+    "release_x64_build": "exit 0; resource/XAML warnings remain",
+    "packaging": "exit 0; reviewed settings only"
+  },
+  "owner_acceptance": [
+    "RU/EN retains orange tab color in WT-COLOR-TEST",
+    "Mouse selection without Shift and Ctrl+C works with Codex fullscreen_transcript=false"
+  ],
+  "not_retested": [
+    "50-terminal latency",
+    "all clipboard cases",
+    "native split/focus and UI color picker"
+  ],
+  "tab_drop_crash": "unresolved; separate diagnosis",
+  "files": {
+    "WindowsTerminal.exe": "1ec43a0043d49fd5136e02b2ca21528e03c6ec046c9b48a19febbec991efa82f",
+    "WTColorTest.exe": "1ec43a0043d49fd5136e02b2ca21528e03c6ec046c9b48a19febbec991efa82f",
+    "Microsoft.Terminal.Control.dll": "eeb26bb6529c93a0059f7ca8f6c5ec9bf167e22bed42ef723a21c907088fd85a",
+    "TerminalApp.dll": "e37d5dcf31af10d14d2aef2bce64c7838c80079806cb17b94517ac5e15bfc12e",
+    "resources.pri": "5b1248d58265edde15e30ee67fd6760f3aec4e76c8328f78fc105e42006b8dbb",
+    "settings/settings.json": "20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda"
+  }
+}

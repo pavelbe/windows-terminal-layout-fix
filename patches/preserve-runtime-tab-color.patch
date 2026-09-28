@@ -1,0 +1,123 @@
+diff --git a/src/cascadia/TerminalCore/Terminal.cpp b/src/cascadia/TerminalCore/Terminal.cpp
+index 756ca2c..d816e6a 100644
+--- a/src/cascadia/TerminalCore/Terminal.cpp
++++ b/src/cascadia/TerminalCore/Terminal.cpp
+@@ -111,18 +111,23 @@ void Terminal::UpdateSettings(ICoreSettings settings)
+     _getTerminalInput().ForceDisableWin32InputMode(settings.ForceVTInput());
+     _getTerminalInput().ForceDisableKittyKeyboardProtocol(!settings.AllowKittyKeyboardMode());
+ 
+-    if (settings.TabColor() == nullptr)
+-    {
+-        GetRenderSettings().SetColorTableEntry(TextColor::FRAME_BACKGROUND, INVALID_COLOR);
+-    }
+-    else
+-    {
+-        GetRenderSettings().SetColorTableEntry(TextColor::FRAME_BACKGROUND, til::color{ settings.TabColor().Value() });
+-    }
++    auto& renderSettings = GetRenderSettings();
++    const auto runtimeTabColor = renderSettings.GetColorTableEntry(TextColor::FRAME_BACKGROUND);
++    const COLORREF configuredTabColor = settings.TabColor() ? static_cast<COLORREF>(til::color{ settings.TabColor().Value() }) : INVALID_COLOR;
++    const auto tabColorChanged = configuredTabColor != _configuredTabColor;
++    _configuredTabColor = configuredTabColor;
++    renderSettings.SetColorTableEntry(TextColor::FRAME_BACKGROUND, configuredTabColor);
+ 
+     // Save the changes made above and in UpdateAppearance as the new default render settings.
+     GetRenderSettings().SaveDefaultSettings();
+ 
++    // Reapplying unchanged settings must preserve OSC 4;264 overrides. Save the
++    // profile color first so OSC 104/RIS still restores the configured default.
++    if (!tabColorChanged)
++    {
++        renderSettings.SetColorTableEntry(TextColor::FRAME_BACKGROUND, runtimeTabColor);
++    }
++
+     if (!_startingTitle)
+     {
+         _startingTitle = settings.StartingTitle();
+diff --git a/src/cascadia/TerminalCore/Terminal.hpp b/src/cascadia/TerminalCore/Terminal.hpp
+index f333054..20496ee 100644
+--- a/src/cascadia/TerminalCore/Terminal.hpp
++++ b/src/cascadia/TerminalCore/Terminal.hpp
+@@ -351,6 +351,7 @@ private:
+     std::optional<std::wstring> _title;
+     std::optional<std::wstring> _startingTitle;
+     std::optional<til::color> _startingTabColor;
++    COLORREF _configuredTabColor{ INVALID_COLOR };
+ 
+     std::vector<til::point_span> _searchHighlights;
+     size_t _searchHighlightFocused = 0;
+diff --git a/src/cascadia/UnitTests_TerminalCore/TerminalApiTest.cpp b/src/cascadia/UnitTests_TerminalCore/TerminalApiTest.cpp
+index 51e53f1..9c5c919 100644
+--- a/src/cascadia/UnitTests_TerminalCore/TerminalApiTest.cpp
++++ b/src/cascadia/UnitTests_TerminalCore/TerminalApiTest.cpp
+@@ -25,6 +25,8 @@ namespace TerminalCoreUnitTests
+         TEST_CLASS(TerminalApiTest);
+ 
+         TEST_METHOD(SetColorTableEntry);
++        TEST_METHOD(TabColorSurvivesUnchangedSettings);
++        TEST_METHOD(TabColorSettingsChangesAndReset);
+ 
+         TEST_METHOD(CursorVisibilityViaStateMachine);
+ 
+@@ -44,6 +46,61 @@ namespace TerminalCoreUnitTests
+ 
+ using namespace TerminalCoreUnitTests;
+ 
++void TerminalApiTest::TabColorSurvivesUnchangedSettings()
++{
++    Terminal term{ Terminal::TestDummyMarker{} };
++    DummyRenderer renderer{ &term };
++    term.Create({ 100, 100 }, 0, renderer);
++    auto settings = winrt::make<MockTermSettings>(100, 100, 100);
++    term.UpdateSettings(settings);
++
++    term._stateMachine->ProcessString(L"\x1b]4;264;#ff5722\x1b\\");
++    const auto runtimeColor = term.GetTabColor();
++    VERIFY_IS_TRUE(runtimeColor.has_value());
++    term.UpdateSettings(settings);
++    VERIFY_IS_TRUE(term.GetTabColor() == runtimeColor);
++
++    // An unchanged reload must not make the runtime override the reset default.
++    term._stateMachine->ProcessString(L"\x1b]104;264\x1b\\");
++    VERIFY_IS_FALSE(term.GetTabColor().has_value());
++}
++
++void TerminalApiTest::TabColorSettingsChangesAndReset()
++{
++    Terminal term{ Terminal::TestDummyMarker{} };
++    DummyRenderer renderer{ &term };
++    term.Create({ 100, 100 }, 0, renderer);
++    auto mock = winrt::make_self<MockTermSettings>(100, 100, 100);
++    const auto settings = mock.as<ICoreSettings>();
++    const winrt::Microsoft::Terminal::Core::Color blue{ 0, 0, 255, 255 };
++    mock->TabColor(winrt::box_value(blue).as<winrt::Windows::Foundation::IReference<winrt::Microsoft::Terminal::Core::Color>>());
++    term.UpdateSettings(settings);
++    const auto profileColor = term.GetTabColor();
++    VERIFY_IS_TRUE(profileColor.has_value());
++    term._stateMachine->ProcessString(L"\x1b]4;264;#ff5722\x1b\\");
++    const auto runtimeColor = term.GetTabColor();
++    VERIFY_IS_TRUE(runtimeColor != profileColor);
++    term.UpdateSettings(settings);
++    VERIFY_IS_TRUE(term.GetTabColor() == runtimeColor);
++    term._stateMachine->ProcessString(L"\x1b]104;264\x1b\\");
++    VERIFY_IS_TRUE(term.GetTabColor() == profileColor);
++
++    term._stateMachine->ProcessString(L"\x1b]4;264;#ff5722\x1b\\");
++    mock->TabColor(nullptr);
++    term.UpdateSettings(settings);
++    VERIFY_IS_FALSE(term.GetTabColor().has_value());
++    mock->TabColor(winrt::box_value(blue).as<winrt::Windows::Foundation::IReference<winrt::Microsoft::Terminal::Core::Color>>());
++    term.UpdateSettings(settings);
++    VERIFY_IS_TRUE(term.GetTabColor() == profileColor);
++
++    mock->StartingTabColor(winrt::box_value(blue).as<winrt::Windows::Foundation::IReference<winrt::Microsoft::Terminal::Core::Color>>());
++    term.UpdateSettings(settings);
++    term._stateMachine->ProcessString(L"\x1b]4;264;#ff5722\x1b\\");
++    mock->TabColor(nullptr);
++    term.UpdateSettings(settings);
++    VERIFY_IS_TRUE(term.GetTabColor() == profileColor);
++}
++
+ void TerminalApiTest::SetColorTableEntry()
+ {
+     Terminal term{ Terminal::TestDummyMarker{} };

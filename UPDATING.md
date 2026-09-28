@@ -134,6 +134,15 @@ original base, apply `layout-fix.patch`, then `clipboard-image-paste.patch`
 before applying it. On a new upstream tag, test screenshot **and multi-file**
 paste first: either patch may become unnecessary independently of the others.
 
+The separate 2026-09-28 candidate adds `preserve-runtime-tab-color.patch` after
+the clipboard patches. It retains OSC 4;264 color on unchanged settings reload,
+applies actual profile color changes/removal, and preserves configured reset
+defaults and StartingTabColor precedence. Run `Terminal.Core.Unit.Tests.dll`
+through TAEF (including both TabColor tests), then build the application. Test
+RU/EN with an OSC-colored pane while Codex runs, pane focus/split, explicit color
+reset and actual settings changes. The owner's color/copy smoke is recorded in
+README; it does not certify every native interaction or the rare tab-drop crash.
+
 Preserve text precedence, complete CF_HDROP enumeration, one paste per file,
 one warning for the whole selection, per-pane bracketed-paste behavior,
 background bitmap encoding after CloseClipboard, exclusive unique PNG creation
