@@ -1,8 +1,10 @@
 # Updating Windows Terminal and porting our patches
 
-This is a procedure for the next upgrade, **not evidence of a completed rebuild**.
-[README.md](README.md) owns the working build, candidates and recovery status.
-Obtain Microsoft's source separately; this repository is the recovery kit.
+This is the procedure for the next upgrade. The prepared Stable
+`v1.25.2733.0` candidate's build and package evidence is in
+[the dated report](docs/upgrade-20261026.md). [README.md](README.md) owns the
+current runtime and recovery status. Obtain Microsoft's source separately;
+this repository is the recovery kit.
 
 <a id="1-сначала-проверить-официальный-релиз"></a>
 ## 1. Check the exact official release
@@ -40,7 +42,11 @@ See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/ter
 Save the current JSON and review its diff as described in README.
 Keep both `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` (still used by HCA)
 and `WT-Layout-Fix-1.25.1912.0-clipboard-files-test` (accepted with 50 terminals)
-intact. The owner deferred switching daily routing on 2026-09-20.
+intact. The owner confirmed that `WT-Layout-Fix-1.25.1912.0-tab-color-test`
+is the current live test runtime; its receipt is
+[`build/tab-color-candidate-20260928.json`](build/tab-color-candidate-20260928.json).
+Do not overwrite or delete it during candidate preparation. HCA daily routing
+is a separate decision; the owner deferred that switch on 2026-09-20.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -77,18 +83,18 @@ Use a new, nonexistent destination, not an old checkout:
 
 ```bash
 test ! -e "$wt_source"
-/home/pavelbe/.claude/bin/heavy-lock.sh --wait 600 -- git -c core.autocrlf=false clone --branch "$wt_tag" --single-branch --depth 1 https://github.com/microsoft/terminal.git "$wt_source"
+git -c core.autocrlf=false clone --branch "$wt_tag" --single-branch --depth 1 https://github.com/microsoft/terminal.git "$wt_source"
 ```
 
-Stop on any failed command. These are operator templates, not an admission
-bypass: agents replace Git/lock variables with verified **literal paths/tags**
+Stop on any failed command. These are operator templates: agents replace
+source/tag variables with verified **literal paths/tags**
 and set the source working directory. Continue as separate commands:
 
 ```bash
 rtk proxy git -C "$wt_source" rev-parse HEAD
 rtk proxy git -C "$wt_source" describe --tags --exact-match
 rtk proxy git -C "$wt_source" status --short
-/home/pavelbe/.claude/bin/heavy-lock.sh --wait 600 -- git -C "$wt_source" submodule update --init --recursive
+git -C "$wt_source" submodule update --init --recursive
 rtk proxy git -C "$wt_source" apply --check "$wt_patch"
 ```
 
@@ -159,6 +165,8 @@ is only a pointer; requirements can change. The original base documents
 PowerShell 7+, VS 2022 Desktop C++, UWP/v143 tools and Windows SDK 22621;
 tests need the .NET Framework Targeting Pack. See the
 [base README](https://github.com/microsoft/terminal/blob/v1.25.1912.0/README.md).
+For the pinned Stable `v1.25.2733.0` candidate, see the dated report for the
+selected VS 2026 Build Tools installation and its receipt.
 
 Do not treat old receipt versions as a new release's requirements.
 Record actual VS/MSBuild/MSVC/SDK/NuGet versions and submodule SHAs.
@@ -189,11 +197,18 @@ TerminalApp/Control/Settings Model tests from the chosen tag and record each exi
 Missing dependencies or unexecuted tests are `NOT RUN`.
 UIA tests control the mouse; run them only during an agreed test window.
 
-Agent clone/submodule/restore/build/test/package phases run sequentially under
-the machine-global heavy lock, preserving logs and exits. For Windows phases,
-use a reviewed `.ps1` through `pwsh.exe -File` under an outer WSL lock; do not
-start a second GUI build. Binlogs stay local because they can contain paths and
-environment parameters. Do not run GitHub Actions.
+Keep dependent phases sequential: clone, submodule update, tag verification and
+patch checks; then the two NuGet restores, package build, selected test-project
+build, tests and any packaging. There is no machine-global heavy lock. Preserve
+each phase exit and do not run concurrent MSBuild commands that write to the
+same checkout's `bin` or `obj` directories. For the pinned Stable
+`v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
+checks the prepared source by tag, patch status and hashes; its default is a
+read-only plan. `-Run` performs the two restores, Release/x64 CascadiaPackage
+build, Terminal Core test-project build and tagged `terminalCore` unit tests,
+with `/m:2` and separate local logs/exit codes. It does not launch, register or
+install Terminal or replace the live runtime. Binlogs stay local because they
+can contain paths and environment parameters. Do not run GitHub Actions.
 
 Put the reviewed script in a local Windows directory and pass its full Windows
 path. RemoteSigned may treat `\\wsl.localhost\Ubuntu\...` as remote and refuse
@@ -262,7 +277,7 @@ do not rename or overwrite the old installation.
 <a id="повторить-текущую-проверку-clipboard-кандидата"></a>
 ### Reproduce the clipboard candidate checks
 
-For the existing v1.25.1912.0 checkout with restored dependencies, use
+For a checkout with restored dependencies, use
 [build/Test-ClipboardImage.ps1](build/Test-ClipboardImage.ps1) and
 [build/Package-ClipboardCandidate.ps1](build/Package-ClipboardCandidate.ps1).
 Copy both scripts and `build/clipboard-image-smoke.cpp` to one local Windows
@@ -270,9 +285,30 @@ directory. The test compiles the **production headers from SourceRoot**, includi
 CF_HDROP enumeration. It does not change the clipboard. Optional `-ReadClipboard`
 reads the current bitmap and retains a local PNG; no bitmap means failure.
 
+`Test-ClipboardImage.ps1` defaults `-VsInstallPath` to the VS 2022 Build Tools
+directory. Pass the installed path when using another Visual Studio version.
+Use a new output directory on local NTFS; the helper sets both PowerShell's
+location and the process working directory there before entering the VS shell.
+This also prevents `cmd.exe` from inheriting a WSL UNC working directory.
+
 ```powershell
 .\Test-ClipboardImage.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -OutputDirectory 'C:\Users\Pavel\Diagnostics\clipboard-smoke-new'
 ```
+
+For the Stable `v1.25.2733.0` source with VS 2026 Build Tools, pass its install
+path explicitly:
+
+```powershell
+.\Test-ClipboardImage.ps1 -SourceRoot 'C:\Users\Pavel\Source\terminal-v1.25.2733.0' -OutputDirectory 'C:\Users\Pavel\AppData\Local\TerminalLayoutFix\ClipboardSmoke\WT-v1.25.2733.0-new' -VsInstallPath 'C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools'
+```
+
+The 2026-10-27 header smoke passed against this source without `-ReadClipboard`;
+the exact log and result are in the [dated report](docs/upgrade-20261026.md).
+
+For that Stable candidate, package the fresh MSIX through the official helper
+in section 5. The older `Package-ClipboardCandidate.ps1` recipe below consumes
+an F5 layout prepared by `_WTPrepareUnpackagedLayoutForRun`; the CLI package
+build alone does not produce its `_xaml` directory and merged resources.
 
 After smoke passes, build `src\cascadia\WindowsTerminal\WindowsTerminal.vcxproj`
 in the VS developer shell with `/t:Build /p:Configuration=Release /p:Platform=x64`
@@ -289,8 +325,7 @@ exact PRI list through the upstream helper with native-error propagation, copies
 and hashes the complete runtime, adds proxy/license/portable marker and only the
 settings JSON. A package is not proof of a fresh build: bind source, build exit
 and output hashes in a separate receipt. Recheck `_WTPrepareUnpackagedLayoutForRun`
-when changing tags; never copy its resource list blindly. Agent test/build/package
-commands still run under the machine-global heavy lock.
+when changing tags; never copy its resource list blindly.
 
 <a id="6-проверить-кандидата-до-переключения"></a>
 ## 6. Accept the candidate before switching
@@ -342,8 +377,8 @@ For an official **installed** Preview/Stable package, set
 `config/workspaces.yaml`. These packages have separate JSON files: reconcile
 settings through the UI/reviewed diff. Taskbar pinning does not change HCA routing.
 
-After an HCA routing edit, run `tests/test-wt-commands.sh` under the heavy lock,
-then `source ~/.zshrc` and `wt-doctor` in a free Zsh.
+After an HCA routing edit, run `tests/test-wt-commands.sh`, then
+`source ~/.zshrc` and `wt-doctor` in a free Zsh.
 Check `atreno`: one tab and one pane in the selected Terminal, no extra windows.
 
 Rollback: close only new/test sessions normally, restore the prior HCA channel/

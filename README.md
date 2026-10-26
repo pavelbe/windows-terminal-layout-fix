@@ -33,6 +33,16 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
+**Stable candidate, 2026-10-27:** upstream `v1.25.2733.0` with all four existing
+patches built successfully using VS2026 Build Tools. TerminalCore passed 56/56;
+the production-header clipboard smoke passed without reading the clipboard.
+EXE and TerminalApp DLL report `1.25.2733.0-local-layoutfix`. This is a local
+candidate, not a new public release or manual UI acceptance. See the
+[dated build record and reproduction steps](docs/upgrade-20261026.md).
+The owner-current runtime remains
+`WT-Layout-Fix-1.25.1912.0-tab-color-test`; its processes, settings and launch
+routing were preserved. Side-by-side UI checks precede any switch.
+
 **Tab-color candidate, 2026-09-28:**
 `WT-Layout-Fix-1.25.1912.0-tab-color-test` adds
 [runtime tab-color preservation](patches/preserve-runtime-tab-color.patch)
@@ -61,9 +71,10 @@ and closes the layout-freeze task. Multiple Explorer images were already accepte
 in both Codex and Claude Code on 2026-09-19. This is owner-observed behavior on
 the current PC, not a timed benchmark or a clean-Windows installation test.
 
-The `-test` directory name is retained to preserve the pinned shortcut. The owner
-still works in the older `WT-Layout-Fix-1.25.1912.0` installation; **HCA routing
-stays there by owner decision**. Recovery acceptance does not switch daily use.
+The `-test` directory name is retained to preserve the pinned shortcut. At that
+September check, **HCA routing stayed on `WT-Layout-Fix-1.25.1912.0` by owner
+decision**. The later owner-current runtime is identified above; recovery
+acceptance alone does not switch HCA routing.
 Both installations and the immutable `layout-fix.1` archive remain intact.
 
 Release check, 2026-09-28: Preview `v1.25.1912.0` and stable
