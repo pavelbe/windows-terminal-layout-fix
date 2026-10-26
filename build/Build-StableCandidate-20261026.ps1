@@ -50,6 +50,7 @@ $TestDll = 'bin\x64\Release\UnitTests_TerminalCore\Terminal.Core.Unit.Tests.dll'
 $TaefExe = 'packages\Microsoft.Taef.10.100.251104001\build\Binaries\x64\te.exe'
 
 $ExpectedStatus = [ordered]@{
+    'res/terminal.ico' = ' M'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = ' M'
     'src/cascadia/TerminalApp/TerminalPage.cpp' = ' M'
     'src/cascadia/TerminalApp/TerminalPage.h' = ' M'
@@ -63,6 +64,7 @@ $ExpectedStatus = [ordered]@{
 }
 
 $ExpectedSourceHashes = [ordered]@{
+    'res/terminal.ico' = '421af3d08b1377bb391a08bd7dc285a69cae3b4217d4febf6a8a35af37bf0979'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = '4a0e19b3cecfa5b3918f71b01bb496757a009138e81d17d29d22a50224001611'
     'src/cascadia/TerminalApp/TerminalPage.cpp' = '1244f5459fc180ca6e53759af58b04b0c0d5177b3227604900af864190b6edf9'
     'src/cascadia/TerminalApp/TerminalPage.h' = 'be74cd1284822fe784dd81607d3777646ca810fa6d916d87c594629a2e64c417'

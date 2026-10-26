@@ -204,7 +204,9 @@ each phase exit and do not run concurrent MSBuild commands that write to the
 same checkout's `bin` or `obj` directories. For the pinned Stable
 `v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
 checks the prepared source by tag, patch status and hashes; its default is a
-read-only plan. `-Run` performs the two restores, Release/x64 CascadiaPackage
+read-only plan. The current recipe also requires the [LF icon overlay](assets/README.md)
+at `res/terminal.ico`; the first unbranded build's frozen recipe and receipts
+remain historical evidence. `-Run` performs the two restores, Release/x64 CascadiaPackage
 build, Terminal Core test-project build and tagged `terminalCore` unit tests,
 with `/m:2` and separate local logs/exit codes. It does not launch, register or
 install Terminal or replace the live runtime. Binlogs stay local because they
