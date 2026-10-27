@@ -30,3 +30,22 @@ exact `WindowsTerminal.exe` and use the same EXE as `IconLocation`, index 0.
 Do not set an unrelated shortcut-only AppUserModelID, replace a running EXE,
 restart Explorer, clear the icon cache, or copy live session state for branding.
 Existing processes retain their loaded icon until the owner closes them.
+
+Use `build/New-PortableShortcut.ps1` with explicit `-TerminalExe` and
+`-ShortcutPath` paths. It requires the adjacent `.portable` marker, creates a
+new `.lnk` without overwriting an existing path, and verifies the saved target,
+icon and empty arguments. It neither launches nor pins the application.
+After copying the helper to a local Windows folder, for this candidate:
+
+```powershell
+.\New-PortableShortcut.ps1 -TerminalExe "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.2733.0-lf\terminal-1.25.2733.0\WindowsTerminal.exe" -ShortcutPath (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Terminal LF 1.25.lnk')
+```
+
+For taskbar use, open this shortcut and pin that running window manually;
+an older pinned shortcut continues to select its old executable.
+
+The 2026-10-27 LF candidate passed an embedded-resource comparison for all nine
+frames and a live `WM_GETICON` pixel comparison at 16px and 32px. The new blank
+window rendered successfully. These checks establish executable/window branding;
+taskbar grouping and owner visual acceptance remain separate checks. Exact
+artifacts and the live receipt are in the [dated record](../docs/upgrade-20261026.md).

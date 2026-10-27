@@ -231,6 +231,17 @@ Recheck parameters in the new tag. For AppX packaging, select exact paths to
 **your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
 x64 AppX dependency; never select the first file found.
 
+For the exact 2026-10-27 LF build,
+[`build/Package-LFStableCandidate-20261027.ps1`](build/Package-LFStableCandidate-20261027.ps1)
+pins the build receipt, MSIX, XAML dependency and three upstream packaging
+helpers. Its default verifies inputs and prints a plan; `-Run` packages into
+the supplied new `-Destination` and records the ZIP hash. It refuses an existing
+destination, including one appearing after preflight. These pins describe one
+build, not arbitrary future rebuilds: verify and rebind new artifacts before
+changing them. Package validation/extraction and copying reviewed settings are
+separate steps below. For the new direct-EXE shortcut, follow
+[the LF icon guide](assets/README.md); pinning does not change HCA routing.
+
 ```powershell
 & {
     if ($PSVersionTable.PSVersion -lt [version]'7.4') { throw 'Use PowerShell 7.4+ for this packaging recipe' }

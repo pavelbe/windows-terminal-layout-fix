@@ -1,4 +1,5 @@
 /dist/
+/private-results/
 **/state.json
 **/buffer_*.txt
 **/elevated_*.txt

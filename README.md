@@ -33,12 +33,13 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
-**LF icon checkpoint, 2026-10-27:** the Stable source now embeds our
-[teal LF icon](assets/README.md). Rebuild and all 56 Terminal Core tests passed.
-The owner requested a pause for a Terminal restart: packaging into a separate
-`-lf` folder, shortcut creation and live icon/grouping checks are pending.
-Neither running installation was replaced. The dated record below contains
-the exact build receipt for continuation.
+**LF candidate, 2026-10-27:** Stable now embeds our [teal LF icon](assets/README.md).
+Rebuild and all 56 Terminal Core tests passed. The separate
+`WT-Layout-Fix-1.25.2733.0-lf` portable copy launched successfully; its live
+16px/32px window icons match the reviewed artwork pixel-for-pixel. Desktop
+shortcut **Terminal LF 1.25** targets that exact copy. Taskbar pinning/grouping
+and the full manual acceptance suite remain unverified. Existing installations
+and launch routing are preserved. See the dated record below for artifact hashes.
 
 **Stable candidate, 2026-10-27:** upstream `v1.25.2733.0` with all four existing
 patches built successfully using VS2026 Build Tools. TerminalCore passed 56/56;
