@@ -37,8 +37,9 @@ not a prerequisite for running the portable EXE.
 its icon canvas, matching Claude's 24x24/32x32 taskbar occupancy. Stable
 `1.25.2733.0` was rebuilt; all 56 Terminal Core tests and all nine embedded
 icon comparisons passed. Use the separate **Terminal LF Square 1.25** shortcut.
-Existing LF windows still return their old 26x26 artwork; changing a shortcut
-alone does not update a running window. See the [square artifact record](docs/upgrade-20261026.md#square-lf-candidate-2026-10-28).
+The owner confirmed the square taskbar icon's appearance and size against Claude.
+Deliver future local builds as a ready runtime directory/EXE and shortcut,
+without a ZIP. See the [square artifact record](docs/upgrade-20261026.md#square-lf-candidate-2026-10-28).
 
 **Historical wide LF candidate, 2026-10-28:** rebuilt Stable `1.25.2733.0` embeds the
 wider LF artwork. All 56 Terminal Core tests passed; all nine embedded icon

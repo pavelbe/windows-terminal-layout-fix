@@ -27,6 +27,9 @@ description, hotkey and window style were verified unchanged. The native
 receipt is `Downloads\WT-Square-20261028\pinned-square-receipt.json`. Explorer and running terminals were not restarted. Loaded
 window icons can remain old until the owner opens the new executable. Resource
 byte parity, live window appearance and taskbar visual acceptance are separate.
+The owner subsequently confirmed the displayed square icon and its size against
+Claude on 2026-10-28. This accepts the artwork/taskbar size, not every Terminal
+behavior or a change to HCA routing.
 
 ## Historical wide taskbar variant
 

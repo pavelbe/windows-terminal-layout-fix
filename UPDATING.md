@@ -225,6 +225,12 @@ One EXE is insufficient: matching DLLs, XAML/PRI resources and dependencies
 must come from **the same build**. Do not overlay old DLLs on a new release.
 `OpenConsole.exe` is the console host, not the tabbed application.
 
+Owner delivery preference (2026-10-28): provide the complete ready runtime
+directory, direct EXE link and shortcut. Do not create ZIP deliverables for
+ordinary local builds. The archive recipe below documents the previous build;
+future local packaging must use a verified directory output. Creating a public
+release archive remains a separate explicitly requested task.
+
 The base provides
 [New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.1912.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).
 Recheck parameters in the new tag. For AppX packaging, select exact paths to
