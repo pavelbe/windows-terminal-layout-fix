@@ -3,7 +3,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$SourcePng,
-    [Parameter(Mandatory)][string]$OutputIco
+    [Parameter(Mandatory)][string]$OutputIco,
+    [switch]$TrimTransparentPadding
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,6 +22,23 @@ try {
     if ($source.Width -ne $source.Height -or $source.Width -lt 256) {
         throw 'Use a square PNG of at least 256 pixels.'
     }
+    $sourceBounds = [System.Drawing.Rectangle]::new(0, 0, $source.Width, $source.Height)
+    if ($TrimTransparentPadding) {
+        # Ignore nearly transparent edge noise; preserve aspect ratio with a square crop.
+        $left = $source.Width; $top = $source.Height; $right = -1; $bottom = -1
+        for ($y = 0; $y -lt $source.Height; $y++) {
+            for ($x = 0; $x -lt $source.Width; $x++) {
+                if ($source.GetPixel($x, $y).A -lt 128) { continue }
+                $left = [Math]::Min($left, $x); $right = [Math]::Max($right, $x)
+                $top = [Math]::Min($top, $y); $bottom = [Math]::Max($bottom, $y)
+            }
+        }
+        if ($right -lt 0) { throw 'No visible artwork at alpha >= 128.' }
+        $side = [Math]::Max($right - $left + 1, $bottom - $top + 1)
+        $cropX = [Math]::Clamp([int][Math]::Floor(($left + $right + 1 - $side) / 2), 0, $source.Width - $side)
+        $cropY = [Math]::Clamp([int][Math]::Floor(($top + $bottom + 1 - $side) / 2), 0, $source.Height - $side)
+        $sourceBounds = [System.Drawing.Rectangle]::new($cropX, $cropY, $side, $side)
+    }
     foreach ($size in $sizes) {
         $bitmap = [System.Drawing.Bitmap]::new($size, $size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
@@ -30,7 +48,7 @@ try {
             $graphics.CompositingMode = [System.Drawing.Drawing2D.CompositingMode]::SourceCopy
             $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
             $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-            $graphics.DrawImage($source, [System.Drawing.Rectangle]::new(0, 0, $size, $size))
+            $graphics.DrawImage($source, [System.Drawing.Rectangle]::new(0, 0, $size, $size), $sourceBounds, [System.Drawing.GraphicsUnit]::Pixel)
             $bitmap.Save($stream, [System.Drawing.Imaging.ImageFormat]::Png)
             $frames.Add($stream.ToArray())
         }

@@ -33,6 +33,19 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
+**Square LF candidate, 2026-10-28:** the original square artwork now fills
+its icon canvas, matching Claude's 24x24/32x32 taskbar occupancy. Stable
+`1.25.2733.0` was rebuilt; all 56 Terminal Core tests and all nine embedded
+icon comparisons passed. Use the separate **Terminal LF Square 1.25** shortcut.
+Existing LF windows still return their old 26x26 artwork; changing a shortcut
+alone does not update a running window. See the [square artifact record](docs/upgrade-20261026.md#square-lf-candidate-2026-10-28).
+
+**Historical wide LF candidate, 2026-10-28:** rebuilt Stable `1.25.2733.0` embeds the
+wider LF artwork. All 56 Terminal Core tests passed; all nine embedded icon
+frames match the reviewed ICO. A separate portable ZIP/copy is prepared;
+window launch/taskbar appearance and a daily-route switch are not accepted.
+See the [dated artifact record](docs/upgrade-20261026.md#wide-lf-candidate-2026-10-28).
+
 **LF candidate, 2026-10-27:** Stable now embeds our [teal LF icon](assets/README.md).
 Rebuild and all 56 Terminal Core tests passed. The separate
 `WT-Layout-Fix-1.25.2733.0-lf` portable copy launched successfully; its live
@@ -47,8 +60,8 @@ the production-header clipboard smoke passed without reading the clipboard.
 EXE and TerminalApp DLL report `1.25.2733.0-local-layoutfix`. This is a local
 candidate, not a new public release or manual UI acceptance. See the
 [dated build record and reproduction steps](docs/upgrade-20261026.md).
-The owner-current runtime remains
-`WT-Layout-Fix-1.25.1912.0-tab-color-test`; its processes, settings and launch
+At the start of the 2026-10-26 audit, the owner identified
+`WT-Layout-Fix-1.25.1912.0-tab-color-test` as the current runtime; its processes, settings and launch
 routing were preserved. Side-by-side UI checks precede any switch.
 
 **Tab-color candidate, 2026-09-28:**

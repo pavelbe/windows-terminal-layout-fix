@@ -204,7 +204,7 @@ each phase exit and do not run concurrent MSBuild commands that write to the
 same checkout's `bin` or `obj` directories. For the pinned Stable
 `v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
 checks the prepared source by tag, patch status and hashes; its default is a
-read-only plan. The current recipe also requires the [LF icon overlay](assets/README.md)
+read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
 at `res/terminal.ico`; the first unbranded build's frozen recipe and receipts
 remain historical evidence. `-Run` performs the two restores, Release/x64 CascadiaPackage
 build, Terminal Core test-project build and tagged `terminalCore` unit tests,
@@ -231,7 +231,7 @@ Recheck parameters in the new tag. For AppX packaging, select exact paths to
 **your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
 x64 AppX dependency; never select the first file found.
 
-For the exact 2026-10-27 LF build,
+For the exact 2026-10-28 square LF build,
 [`build/Package-LFStableCandidate-20261027.ps1`](build/Package-LFStableCandidate-20261027.ps1)
 pins the build receipt, MSIX, XAML dependency and three upstream packaging
 helpers. Its default verifies inputs and prints a plan; `-Run` packages into
