@@ -1,5 +1,23 @@
 # Layout Fix icon
 
+## Wide taskbar variant
+
+`terminal-lf-wide.png` and `terminal-lf-wide.ico` are the 2026-10-28
+owner-requested wide artwork. The icon uses nearly the full canvas width;
+Windows still allocates a square icon slot. The existing generator produces
+the same nine sizes. ICO SHA-256:
+`cc32784f46b47b335fe34d0161ca04e36190de0426f7b91bad5b99ad86dc1996`.
+
+The owner's pinned LF shortcut now uses this external ICO, with its executable,
+arguments and working directory preserved and verified. The original shortcut
+was backed up privately before modification. A targeted shell update notification
+was sent; Explorer and active terminals were not restarted. Taskbar appearance
+still needs owner visual acceptance. This changes the pinned shortcut only:
+the executable/window resource remains the original square LF artwork. No
+rebuild, embedded-resource replacement or new release is claimed.
+
+## Original embedded artwork
+
 `terminal-lf.png` is the original generated artwork: a dark terminal with a teal
 LF badge. `terminal-lf.ico` contains transparent 32-bit PNG frames at 16, 20, 24,
 32, 40, 48, 64, 128 and 256 pixels. ICO SHA-256:
