@@ -149,6 +149,13 @@ RU/EN with an OSC-colored pane while Codex runs, pane focus/split, explicit colo
 reset and actual settings changes. The owner's color/copy smoke is recorded in
 README; it does not certify every native interaction or the rare tab-drop crash.
 
+The 2026-10-29 diagnostic candidate then adds
+`patches/connection-lifecycle-diagnostics.patch` on Stable `v1.25.2733.0`.
+It records only lifecycle metadata, before notifications can close the pane.
+It leaves shell exit codes and `closeOnExit` decisions unchanged. Reproduction,
+bounded log behavior and the isolated native smoke are documented in
+[connection diagnostics](docs/connection-diagnostics-20261029.md).
+
 Preserve text precedence, complete CF_HDROP enumeration, one paste per file,
 one warning for the whole selection, per-pane bracketed-paste behavior,
 background bitmap encoding after CloseClipboard, exclusive unique PNG creation
@@ -205,7 +212,8 @@ same checkout's `bin` or `obj` directories. For the pinned Stable
 `v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
 checks the prepared source by tag, patch status and hashes; its default is a
 read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
-at `res/terminal.ico`; the first unbranded build's frozen recipe and receipts
+at `res/terminal.ico` and the lifecycle diagnostic patch; the first unbranded
+build's frozen recipe and receipts
 remain historical evidence. `-Run` performs the two restores, Release/x64 CascadiaPackage
 build, Terminal Core test-project build and tagged `terminalCore` unit tests,
 with `/m:2` and separate local logs/exit codes. It does not launch, register or

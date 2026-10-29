@@ -33,6 +33,15 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
+**Diagnostics candidate, 2026-10-29:** Stable `1.25.2733.0-local-layoutfix-diag1`
+adds bounded local records of ConPTY process starts, launch failures and exits.
+The square LF icon is unchanged. Build, 56 Terminal Core tests and four isolated
+native split/exit scenarios passed. The same lifecycle test failed on the old
+binary because its events were not persisted. Local delivery is a runtime folder
+and **Terminal LF Diagnostics 1.25** shortcut, without a ZIP. This does not change
+`closeOnExit` or establish the cause of the owner's intermittent split failure.
+See [diagnosis, log location, limits and build evidence](docs/connection-diagnostics-20261029.md).
+
 **Square LF candidate, 2026-10-28:** the original square artwork now fills
 its icon canvas, matching Claude's 24x24/32x32 taskbar occupancy. Stable
 `1.25.2733.0` was rebuilt; all 56 Terminal Core tests and all nine embedded

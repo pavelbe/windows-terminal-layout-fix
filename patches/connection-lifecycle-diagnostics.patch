@@ -1,0 +1,109 @@
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.cpp b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+index 4ee3ae0..627f4ca 100644
+--- a/src/cascadia/TerminalConnection/ConptyConnection.cpp
++++ b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+@@ -6,6 +6,7 @@
+ 
+ #include <conpty-static.h>
+ #include <winmeta.h>
++#include <ShlObj.h>
+ 
+ #include "CTerminalHandoff.h"
+ #include "../../types/inc/utils.hpp"
+@@ -27,6 +28,68 @@ using namespace ::Microsoft::Console;
+ 
+ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+ {
++    // Local, bounded lifecycle evidence. Never record command lines, directories,
++    // environment variables or terminal input/output. Logging must not affect a
++    // connection's outcome. Keep this before UI notifications that may close it.
++    static void logConnectionEvent(const char* event, const guid& session, const guid& profile, DWORD code, DWORD childPid) noexcept
++    try
++    {
++        static std::mutex lock;
++        const std::lock_guard guard{ lock };
++        wil::unique_cotaskmem_string local;
++        if (FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &local)))
++        {
++            return;
++        }
++        std::wstring path{ local.get() };
++        for (const auto component : { L"\\TerminalLayoutFix", L"\\Diagnostics" })
++        {
++            path.append(component);
++            if (!CreateDirectoryW(path.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
++            {
++                return;
++            }
++            const auto attributes = GetFileAttributesW(path.c_str());
++            if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY) || (attributes & FILE_ATTRIBUTE_REPARSE_POINT))
++            {
++                return;
++            }
++        }
++        path.append(L"\\connection-events.log");
++        const wil::unique_hfile file{ CreateFileW(path.c_str(), FILE_APPEND_DATA | FILE_READ_ATTRIBUTES,
++                                                FILE_SHARE_READ, nullptr, OPEN_ALWAYS,
++                                                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr) };
++        if (!file)
++        {
++            return;
++        }
++        BY_HANDLE_FILE_INFORMATION info{};
++        if (!GetFileInformationByHandle(file.get(), &info) || info.nNumberOfLinks != 1 ||
++            (info.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)))
++        {
++            return;
++        }
++        SYSTEMTIME time{};
++        GetSystemTime(&time);
++        const auto record = fmt::format(FMT_COMPILE("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z build=lf-diag-20261029 pid={} child={} session={} profile={} event={} code={} hex={:#010x}\r\n"),
++                                        time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds,
++                                        GetCurrentProcessId(), childPid, winrt::to_string(winrt::to_hstring(session)),
++                                        winrt::to_string(winrt::to_hstring(profile)), event, code, code);
++        // No rotation/deletion: preserve earlier evidence and cap total storage.
++        // A full, locked or unwritable log is best-effort only; sessions still work.
++        constexpr DWORD limit = 8 * 1024 * 1024;
++        if (info.nFileSizeHigh || info.nFileSizeLow > limit || record.size() > limit - info.nFileSizeLow)
++        {
++            return;
++        }
++        DWORD written{};
++        WriteFile(file.get(), record.data(), static_cast<DWORD>(record.size()), &written, nullptr);
++    }
++    catch (...)
++    {
++        // Do not recurse through another logger or change the shell's exit code.
++    }
++
+     // Function Description:
+     // - launches the client application attached to the new pseudoconsole
+     void ConptyConnection::_LaunchAttachedClient()
+@@ -451,6 +514,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         THROW_IF_FAILED(ConptyReleasePseudoConsole(_hPC.get()));
+ 
+         _startTime = std::chrono::high_resolution_clock::now();
++        logConnectionEvent("started", _sessionId, _profileGuid, 0, _piClient.dwProcessId);
+ 
+         // Create our own output handling thread
+         // This must be done after the pipes are populated.
+@@ -480,6 +544,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+     {
+         // EXIT POINT
+         const auto hr = wil::ResultFromCaughtException();
++        logConnectionEvent("launch-failed", _sessionId, _profileGuid, static_cast<DWORD>(hr), _piClient.dwProcessId);
+ 
+         // GH#11556 - make sure to format the error code to this string as an UNSIGNED int
+         auto failureText = RS_fmt(L"ProcessFailedToLaunch", _formatStatus(hr), _commandline);
+@@ -538,7 +603,10 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+     try
+     {
+         DWORD exitCode{ 0 };
+-        GetExitCodeProcess(_piClient.hProcess, &exitCode);
++        const auto gotExitCode = GetExitCodeProcess(_piClient.hProcess, &exitCode);
++        const auto queryError = gotExitCode ? ERROR_SUCCESS : GetLastError();
++        logConnectionEvent(gotExitCode ? "exited" : "exit-query-failed", _sessionId, _profileGuid,
++                           gotExitCode ? exitCode : queryError, _piClient.dwProcessId);
+ 
+         _piClient.reset();
+ 
