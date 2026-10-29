@@ -2,7 +2,8 @@ diff --git a/src/cascadia/TerminalConnection/ConptyConnection.cpp b/src/cascadia
 index 4ee3ae0..627f4ca 100644
 --- a/src/cascadia/TerminalConnection/ConptyConnection.cpp
 +++ b/src/cascadia/TerminalConnection/ConptyConnection.cpp
-@@ -6,6 +6,7 @@
+@@ -5,8 +5,9 @@
+ #include "ConptyConnection.h"
  
  #include <conpty-static.h>
  #include <winmeta.h>
@@ -10,7 +11,9 @@ index 4ee3ae0..627f4ca 100644
  
  #include "CTerminalHandoff.h"
  #include "../../types/inc/utils.hpp"
-@@ -27,6 +28,68 @@ using namespace ::Microsoft::Console;
+ 
+@@ -26,8 +27,70 @@ using namespace ::Microsoft::Console;
+ // To figure out where we handle these, search for comments containing "EXIT POINT"
  
  namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
  {
@@ -79,7 +82,9 @@ index 4ee3ae0..627f4ca 100644
      // Function Description:
      // - launches the client application attached to the new pseudoconsole
      void ConptyConnection::_LaunchAttachedClient()
-@@ -451,6 +514,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+     {
+@@ -450,8 +513,9 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+ 
          THROW_IF_FAILED(ConptyReleasePseudoConsole(_hPC.get()));
  
          _startTime = std::chrono::high_resolution_clock::now();
@@ -87,7 +92,9 @@ index 4ee3ae0..627f4ca 100644
  
          // Create our own output handling thread
          // This must be done after the pipes are populated.
-@@ -480,6 +544,7 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         // Each connection needs to make sure to drain the output from its backing host.
+@@ -479,8 +543,9 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+     catch (...)
      {
          // EXIT POINT
          const auto hr = wil::ResultFromCaughtException();
@@ -95,7 +102,9 @@ index 4ee3ae0..627f4ca 100644
  
          // GH#11556 - make sure to format the error code to this string as an UNSIGNED int
          auto failureText = RS_fmt(L"ProcessFailedToLaunch", _formatStatus(hr), _commandline);
-@@ -538,7 +603,10 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+ 
+@@ -537,9 +602,12 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+     void ConptyConnection::_LastConPtyClientDisconnected() noexcept
      try
      {
          DWORD exitCode{ 0 };
@@ -107,3 +116,4 @@ index 4ee3ae0..627f4ca 100644
  
          _piClient.reset();
  
+         // Signal the closing or failure of the process.
