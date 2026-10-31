@@ -227,10 +227,11 @@ checks the prepared source by tag, patch status and hashes; its default is a
 read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
 at `res/terminal.ico`, the lifecycle diagnostic patch and the exit-notice
 suppression patch; the first unbranded build's frozen recipe and receipts remain
-historical evidence. Its `$ExpectedStatus`/`$ExpectedSourceHashes` still describe
-the pre-fix tree: re-pin them from the exact patched tree before `-Run`, adding
-`ConptyConnection.h`, `ConptyConnection.idl`, `TerminalPaneContent.h` and
-`TerminalPaneContent.cpp`, and refresh the `ConptyConnection.cpp` hash. `-Run`
+historical evidence. `$ExpectedStatus`/`$ExpectedSourceHashes` describe the diag2
+source state (`ca3d5d4`) and include `ConptyConnection.h/.idl` and
+`TerminalPaneContent.h/.cpp`; re-pin them from the exact tree after any further
+source change. The diag2 run `20261101-013312…` passed the package build and
+Terminal Core tests. `-Run`
 performs the two restores, Release/x64 CascadiaPackage
 build, Terminal Core test-project build and tagged `terminalCore` unit tests,
 with `/m:2` and separate local logs/exit codes. It does not launch, register or
@@ -255,6 +256,9 @@ directory, direct EXE link and shortcut. Do not create ZIP deliverables for
 ordinary local builds. The archive recipe below documents the previous build;
 future local packaging must use a verified directory output. Creating a public
 release archive remains a separate explicitly requested task.
+`build/Package-LFStableCandidate-20261027.ps1` is rebound to the diag2 build
+receipt and MSIX hashes; rebind its pins from the exact build before packaging a
+different run.
 
 The base provides
 [New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.1912.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).

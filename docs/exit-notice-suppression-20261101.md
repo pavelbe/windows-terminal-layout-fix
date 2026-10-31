@@ -87,15 +87,20 @@ unchanged. Exit codes and the existing `closeOnExit` decisions are unchanged.
   `C:\Users\Pavel\Source\terminal-v1.25.2733.0`.
 - Live and fixture traces plus the UIA poller scripts:
   `%USERPROFILE%\Downloads\WT-ExitFlash-20261101`; private, not committed.
-- Not built and not smoke-tested yet; the owner schedules a later combined build.
-- Before that build, refresh `$ExpectedStatus` and `$ExpectedSourceHashes` in
-  `build/Build-StableCandidate-20261026.ps1` from the exact patched tree, after
-  all pending source fixes are applied. The status map gains
-  `ConptyConnection.h`, `ConptyConnection.idl`, `TerminalPaneContent.h` and
-  `TerminalPaneContent.cpp`; the `ConptyConnection.cpp` hash changes.
-- Planned acceptance: full Release/x64 build, Terminal Core tests, isolated
-  `build/Test-ConnectionLifecycle.ps1` run, then a manual split `exit` check with
-  the connection log. Build success alone is not UI acceptance.
+- Build `20261101-013312-5924332ac2f84c6dadc803f1dfc3a449`:
+  `BUILT_AND_TESTED`, every phase exit 0, Terminal Core 56/56.
+- Packaged runtime:
+  `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-diag2\terminal-1.25.2733.0`
+  (55 files, `PACKAGED_NOT_LAUNCHED`), product
+  `1.25.2733.0-local-layoutfix-diag2`, EXE SHA256 `4c6bf3b7…`,
+  `TerminalConnection.dll` SHA256 `3e7aee83…`, reviewed settings SHA256
+  `20426242…`, shortcut **Terminal LF Diag2 1.25**.
+- Isolated `build/Test-ConnectionLifecycle.ps1` on the diag2 runtime: all four
+  cases passed and lifecycle records persisted in order. The fixture closes
+  successful panes too quickly to prove notice suppression, so it does not
+  replace the manual check.
+- Not launched, registered, installed or switched; the live diag1 runtime and
+  HCA routing are untouched. Manual split `exit` acceptance remains pending.
 
 ## Residual risks
 
