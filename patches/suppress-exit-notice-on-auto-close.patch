@@ -1,0 +1,170 @@
+diff --git a/src/cascadia/TerminalApp/TerminalPaneContent.cpp b/src/cascadia/TerminalApp/TerminalPaneContent.cpp
+index b7000d9..109dc0e 100644
+--- a/src/cascadia/TerminalApp/TerminalPaneContent.cpp
++++ b/src/cascadia/TerminalApp/TerminalPaneContent.cpp
+@@ -28,6 +28,7 @@ namespace winrt::TerminalApp::implementation
+         _profile{ profile }
+     {
+         _setupControlEvents();
++        _applyExitNoticePolicy();
+     }
+ 
+     void TerminalPaneContent::_setupControlEvents()
+@@ -202,6 +203,10 @@ namespace winrt::TerminalApp::implementation
+             newConnectionState = coreState.ConnectionState();
+         }
+ 
++        // A pane can receive a fresh connection after Enter-restart; keep the
++        // connection's exit-notice policy current for every state change.
++        _applyExitNoticePolicy();
++
+         const auto previousConnectionState = std::exchange(_connectionState, newConnectionState);
+         if (newConnectionState < ConnectionState::Closed)
+         {
+@@ -343,6 +348,9 @@ namespace winrt::TerminalApp::implementation
+         const auto profile{ settings.FindProfile(_profile.Guid()) };
+         _profile = profile ? profile : settings.ProfileDefaults();
+ 
++        // Keep the exit-notice policy in sync after a settings reload.
++        _applyExitNoticePolicy();
++
+         if (const auto settings{ _cache->TryLookup(_profile) })
+         {
+             _control.UpdateControlSettings(settings->DefaultSettings(), settings->UnfocusedSettings());
+@@ -356,6 +364,34 @@ namespace winrt::TerminalApp::implementation
+     void TerminalPaneContent::MarkAsDefterm()
+     {
+         _isDefTermSession = true;
++        _applyExitNoticePolicy();
++    }
++
++    // Method Description:
++    // - Mirrors the closeOnExit decision into the connection. When this pane will
++    //   close by itself, the connection skips the "process exited" notice so the
++    //   text cannot flash between the exit and the asynchronous pane removal.
++    void TerminalPaneContent::_applyExitNoticePolicy()
++    {
++        if (!_profile)
++        {
++            return;
++        }
++
++        const auto mode = _profile.CloseOnExit();
++        const auto suppressOnClosed = mode != CloseOnExitMode::Never;
++        const auto suppressOnFailed = mode == CloseOnExitMode::Always || (mode == CloseOnExitMode::Automatic && _isDefTermSession);
++
++        const auto connection{ _control.Connection() };
++        if (!connection)
++        {
++            return;
++        }
++
++        if (const auto conpty{ connection.try_as<ConptyConnection>() })
++        {
++            conpty.SetExitNoticeSuppression(suppressOnClosed, suppressOnFailed);
++        }
+     }
+ 
+     winrt::Windows::UI::Xaml::Media::Brush TerminalPaneContent::BackgroundBrush()
+diff --git a/src/cascadia/TerminalApp/TerminalPaneContent.h b/src/cascadia/TerminalApp/TerminalPaneContent.h
+index 0e828cd..5fbe424 100644
+--- a/src/cascadia/TerminalApp/TerminalPaneContent.h
++++ b/src/cascadia/TerminalApp/TerminalPaneContent.h
+@@ -84,6 +84,8 @@ namespace winrt::TerminalApp::implementation
+         void _setupControlEvents();
+         void _removeControlEvents();
+ 
++        void _applyExitNoticePolicy();
++
+         safe_void_coroutine _playBellSound(winrt::Windows::Foundation::Uri uri);
+ 
+         safe_void_coroutine _controlConnectionStateChangedHandler(const winrt::Windows::Foundation::IInspectable& sender, const winrt::Windows::Foundation::IInspectable& /*args*/);
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.cpp b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+index 627f4ca..0d5833e 100644
+--- a/src/cascadia/TerminalConnection/ConptyConnection.cpp
++++ b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+@@ -575,6 +575,20 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         _hPC.reset();
+     }
+ 
++    // Method Description:
++    // - Records whether the owning pane will close by itself after this exit.
++    //   The "process exited" notice is skipped in that case, because otherwise
++    //   it is written into the buffer and stays visible until the asynchronous
++    //   pane close completes.
++    // Arguments:
++    // - suppressOnClosed: the pane closes after a successful/handled exit.
++    // - suppressOnFailed: the pane closes after a failed exit.
++    void ConptyConnection::SetExitNoticeSuppression(const bool suppressOnClosed, const bool suppressOnFailed) noexcept
++    {
++        _suppressExitNoticeOnClosed.store(suppressOnClosed, std::memory_order_relaxed);
++        _suppressExitNoticeOnFailed.store(suppressOnFailed, std::memory_order_relaxed);
++    }
++
+     // Method Description:
+     // - prints out the "process exited" message formatted with the exit code
+     // Arguments:
+@@ -613,8 +627,14 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         // Signal the closing or failure of the process.
+         // exitCode might be STILL_ACTIVE if a client has called FreeConsole() and
+         // thus caused the tab to close, even though the CLI app is still running.
+-        _transitionToState(exitCode == 0 || exitCode == STILL_ACTIVE ? ConnectionState::Closed : ConnectionState::Failed);
+-        _indicateExitWithStatus(exitCode);
++        const auto closed = exitCode == 0 || exitCode == STILL_ACTIVE;
++        _transitionToState(closed ? ConnectionState::Closed : ConnectionState::Failed);
++        const auto suppressNotice = closed ? _suppressExitNoticeOnClosed.load(std::memory_order_relaxed)
++                                           : _suppressExitNoticeOnFailed.load(std::memory_order_relaxed);
++        if (!suppressNotice)
++        {
++            _indicateExitWithStatus(exitCode);
++        }
+     }
+     CATCH_LOG()
+ 
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.h b/src/cascadia/TerminalConnection/ConptyConnection.h
+index f54c92e..d12a069 100644
+--- a/src/cascadia/TerminalConnection/ConptyConnection.h
++++ b/src/cascadia/TerminalConnection/ConptyConnection.h
+@@ -9,6 +9,7 @@
+ 
+ #include <til/env.h>
+ #include <til/ticket_lock.h>
++#include <atomic>
+ 
+ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+ {
+@@ -36,6 +37,8 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         winrt::hstring StartingTitle() const;
+         WORD ShowWindow() const noexcept;
+ 
++        void SetExitNoticeSuppression(bool suppressOnClosed, bool suppressOnFailed) noexcept;
++
+         static void StartInboundListener();
+ 
+         static winrt::event_token NewConnection(const NewConnectionHandler& handler);
+@@ -93,6 +96,10 @@ namespace winrt::Microsoft::Terminal::TerminalConnection::implementation
+         til::env _initialEnv{};
+         guid _profileGuid{};
+ 
++        // App-provided closeOnExit policy: skip the exit notice before the pane closes.
++        std::atomic<bool> _suppressExitNoticeOnClosed{ false };
++        std::atomic<bool> _suppressExitNoticeOnFailed{ false };
++
+         struct StartupInfoFromDefTerm
+         {
+             winrt::hstring title{};
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.idl b/src/cascadia/TerminalConnection/ConptyConnection.idl
+index f0f074b..66c1da6 100644
+--- a/src/cascadia/TerminalConnection/ConptyConnection.idl
++++ b/src/cascadia/TerminalConnection/ConptyConnection.idl
+@@ -21,6 +21,10 @@ namespace Microsoft.Terminal.TerminalConnection
+ 
+         void ReparentWindow(UInt64 newParent);
+ 
++        // Local downstream: the owning pane tells the connection when its
++        // closeOnExit policy will close the pane, so the exit notice is skipped.
++        void SetExitNoticeSuppression(Boolean suppressOnClosed, Boolean suppressOnFailed);
++
+         UInt64 RootProcessHandle();
+ 
+         static event NewConnectionHandler NewConnection;

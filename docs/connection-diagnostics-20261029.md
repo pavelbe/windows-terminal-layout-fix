@@ -95,3 +95,8 @@ baseline/candidate acceptance logs and the frozen build/package recipes remain
 there. Raw session data and logs are not committed. Longer daily-use behavior,
 the owner's exact intermittent split failure, full restoration/clipboard smoke
 and migration of active sessions remain unverified.
+
+Follow-up: the 2026-11-01
+[exit-notice suppression](exit-notice-suppression-20261101.md) patch removes the
+brief `ProcessExited` text flash measured on this build; it is not part of the
+diagnostic candidate.

@@ -33,6 +33,13 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
+**Exit-notice suppression patch, 2026-11-01 — patch only, build not run:**
+`patches/suppress-exit-notice-on-auto-close.patch` skips the informational
+`ProcessExited` text when `closeOnExit` will close the pane anyway, removing the
+brief text flash before pane removal. It applies after the diagnostics patch on
+Stable `v1.25.2733.0`. Measured pane-removal delay, design, behavior matrix and
+residual risks: [exit-notice suppression](docs/exit-notice-suppression-20261101.md).
+
 **Diagnostics candidate, 2026-10-29:** Stable `1.25.2733.0-local-layoutfix-diag1`
 adds bounded local records of ConPTY process starts, launch failures and exits.
 The square LF icon is unchanged. Build, 56 Terminal Core tests and four isolated
@@ -372,8 +379,11 @@ check/apply `patches/layout-fix.patch` using `git apply --check` and `git apply`
 Follow that upstream tag's build guide. A clean rebuild from this recovery kit
 has not been performed; use the tested binary release ZIP for quick recovery.
 
-Existing native checkout: `C:\Users\Pavel\Projects\terminal-layout-fix`
-(`/mnt/c/Users/Pavel/Projects/terminal-layout-fix` from WSL), containing C++ source.
+Current native checkout for Stable `v1.25.2733.0`:
+`C:\Users\Pavel\Source\terminal-v1.25.2733.0`
+(`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
+source used by the diagnostic build receipt. The older
+`C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
 Inspect Git in the selected checkout before work; the saved build receipt does
 not prove that checkout is currently clean.

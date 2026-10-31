@@ -156,6 +156,19 @@ It leaves shell exit codes and `closeOnExit` decisions unchanged. Reproduction,
 bounded log behavior and the isolated native smoke are documented in
 [connection diagnostics](docs/connection-diagnostics-20261029.md).
 
+The 2026-11-01 exit-notice suppression patch,
+`patches/suppress-exit-notice-on-auto-close.patch`, applies after the diagnostics
+patch on the same base. It skips the informational `ProcessExited` text when the
+pane's `closeOnExit` policy will close that pane anyway, so the text cannot flash
+before the asynchronous pane removal. Exit codes, `closeOnExit` decisions and
+launch-failure text are unchanged; the notice stays for panes that remain open.
+It touches `ConptyConnection.idl/.h/.cpp` and `TerminalPaneContent.h/.cpp`;
+`TerminalPaneContent` pushes the policy through `TermControl::Connection()`.
+Policy is re-applied on settings reload, `MarkAsDefterm()` and every control
+state change (Enter-restart). Rationale, behavior matrix, rejected alternatives
+and residual risks:
+[exit-notice suppression](docs/exit-notice-suppression-20261101.md).
+
 Preserve text precedence, complete CF_HDROP enumeration, one paste per file,
 one warning for the whole selection, per-pane bracketed-paste behavior,
 background bitmap encoding after CloseClipboard, exclusive unique PNG creation
@@ -212,9 +225,13 @@ same checkout's `bin` or `obj` directories. For the pinned Stable
 `v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
 checks the prepared source by tag, patch status and hashes; its default is a
 read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
-at `res/terminal.ico` and the lifecycle diagnostic patch; the first unbranded
-build's frozen recipe and receipts
-remain historical evidence. `-Run` performs the two restores, Release/x64 CascadiaPackage
+at `res/terminal.ico`, the lifecycle diagnostic patch and the exit-notice
+suppression patch; the first unbranded build's frozen recipe and receipts remain
+historical evidence. Its `$ExpectedStatus`/`$ExpectedSourceHashes` still describe
+the pre-fix tree: re-pin them from the exact patched tree before `-Run`, adding
+`ConptyConnection.h`, `ConptyConnection.idl`, `TerminalPaneContent.h` and
+`TerminalPaneContent.cpp`, and refresh the `ConptyConnection.cpp` hash. `-Run`
+performs the two restores, Release/x64 CascadiaPackage
 build, Terminal Core test-project build and tagged `terminalCore` unit tests,
 with `/m:2` and separate local logs/exit codes. It does not launch, register or
 install Terminal or replace the live runtime. Binlogs stay local because they
@@ -371,6 +388,7 @@ separate process.
 | Tab color, light/dark, background/acrylic/opacity, settings reload | Colors update both on ordinary reload and after language changes |
 | `+`, Ctrl+N; Ctrl+W on an empty split tab | New Ubuntu in `~`; close the entire selected tab |
 | Split, resize, drag tab, search and command palette | No lost panes/focus or new failures |
+| Split one pane, run `exit` | The exited pane closes with no visible `ProcessExited` flash; the notice still appears when `closeOnExit: never` keeps the pane |
 | Fresh `codex`, `codex resume`, Claude | Type/paste `перевари тест`, Latin text and Ctrl/Shift+Enter correctly |
 | Numpad decimal in Claude/Codex with Num Lock on | RU comma, EN period; Ubuntu keeps `compatibility.kittyKeyboardMode: false` |
 | Fresh PrintScreen screenshot; 1 and 3 Explorer images (spaces/Cyrillic); text in each TUI | Every image attaches once, in order; text and single-image paste still work |
