@@ -33,6 +33,22 @@ not a prerequisite for running the portable EXE.
 
 ## Tested build and maintainer recovery notes
 
+**Right-button paste candidate, 2026-11-01 — accepted by the owner:**
+Stable `1.25.2733.0-local-layoutfix-rmb3` adds
+`patches/terminal-owned-right-button.patch`. Build receipt
+`20261101-112434-9e0ea9d6f2ff43aa85d1aec277ce8bd5` reports
+`BUILT_AND_TESTED`: the package build and all Terminal Core tests passed. The
+portable layout is
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0`
+with shortcut **Terminal LF RMB3 1.25** and the reviewed settings.
+
+The owner ran the earlier `-rmb` build of the same patch and confirmed that a
+screenshot pasted with the right button now attaches in Claude Code. `-rmb3`
+keeps the same behaviour with the drag guard added, and the owner has it open.
+A `-rmb2` variant that also took the primary button was built and rejected: it
+made every TUI widget unclickable. `-rmb` and `-rmb2` were removed together
+with their shortcuts; `-lf-diag2` stays as the pre-patch fallback.
+
 **Exit-notice suppression candidate, 2026-11-01 — built, not launched:** Stable
 `1.25.2733.0-local-layoutfix-diag2` adds
 `patches/suppress-exit-notice-on-auto-close.patch`, which skips the informational
@@ -296,7 +312,78 @@ they are private local data, excluded from Git and release archives.
 Apply patches in order:
 1. [layout-fix.patch](patches/layout-fix.patch), source `a34eea7`;
 2. [clipboard-image-paste.patch](patches/clipboard-image-paste.patch), source `2d4c28b`;
-3. [clipboard-files-paste.patch](patches/clipboard-files-paste.patch), the incremental multi-file fix.
+3. [clipboard-files-paste.patch](patches/clipboard-files-paste.patch), the incremental multi-file fix;
+4. [terminal-owned-right-button.patch](patches/terminal-owned-right-button.patch),
+   the secondary button stays with Terminal when the application tracks the
+   mouse; the primary button keeps reaching the application.
+
+### Why the right-button patch exists
+
+Application-level switches do not solve this. Tried and rejected on 2026-11-01
+with Claude Code 2.1.316 in the `-lf-diag2` build:
+
+- `CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1` stopped Claude Code handling the click,
+  but the terminal still did not receive it: both text and image paste stopped.
+- `CLAUDE_CODE_DISABLE_MOUSE=1` restored text paste on the right button but a
+  screenshot still did not attach, so the click was still consumed by the
+  application's own clipboard reader.
+
+Neither variable fixed the screenshot, because the cause is in Terminal:
+`ControlInteractivity::PointerPressed` sends every button to an application
+that enables mouse tracking, so `_canSendVTMouseInput()` is true and the
+right-click paste branch never runs. The patch excludes **only the secondary
+button** from that check in press, drag and release. Keyboard `Ctrl+V` was never
+affected because it is a Terminal keybinding.
+
+The primary button deliberately keeps reaching the application: Claude Code in
+`/tui fullscreen` renders its dialogs inside the terminal, and a left click must
+still activate them, as it must for `htop`, `mc` or `vim` with `mouse`. A
+left-button variant was built, tested and rejected on 2026-11-01 — it made every
+TUI widget unclickable. The known cost of keeping it: a stray click can select
+an option in a Claude Code question dialog, and text selection in fullscreen
+mode needs `Shift`+drag.
+
+### Claude Code loses lines — not a Terminal bug
+
+Recorded here so a future session does not rebuild the terminal looking for a
+cause that is not in it.
+
+- **Symptom:** while Claude Code streams the next answer, a few lines of the
+  previous one vanish from the terminal buffer — the opening paragraph
+  disappears while the list below it stays, or a whole message is missing. Not
+  reproducible on demand; more likely in short panes (3-pane tabs).
+- **Diagnosis, 2026-10-31:** the tab buffer was captured through UIA and compared
+  with the session JSONL. The session was complete; the screen had lost text —
+  five confirmed cases with neighbouring lines intact. The classic Claude Code
+  renderer lets the streaming live frame grow past the viewport, and the repaint
+  stops addressing rows that scrolled out. Codex is unaffected because it draws
+  in the alternate screen.
+- **Upstream** (checked 2026-11-01):
+  [#92678](https://github.com/anthropics/claude-code/issues/92678) **open** —
+  live frame outgrows the viewport and repaints reset the screen; the same
+  mechanism, reported to reproduce on bare ConPTY/Windows.
+  [#100566](https://github.com/anthropics/claude-code/issues/100566) **open** —
+  stale or missing rows in the live viewport.
+  [#10239](https://github.com/anthropics/claude-code/issues/10239) closed as not
+  planned — typing makes a line of history disappear.
+  [#28750](https://github.com/anthropics/claude-code/issues/28750) closed as not
+  planned — second statusline row vanishes on narrow terminals.
+- **What was tried:** `"tui": "fullscreen"` in `~/.claude/settings.json`
+  (`/tui fullscreen`). It stopped the loss and was the owner's setting until
+  2026-11-01, when he returned to `"tui": "default"` and is checking whether the
+  loss returns.
+
+Full write-up, evidence and the way back to fullscreen live in the HCA runbook,
+which is the single source of truth for this problem:
+<https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md>
+(section «Пропадают строки ответа в Claude Code — настройка `/tui`»).
+
+Both variables stay rejected, including on this patched build:
+`CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1` keeps the application in mouse-tracking
+mode while ignoring clicks, so the terminal forwards every press and ordinary
+text selection stops working (owner-observed 2026-11-01, `-lf-rmb`). Accidental
+option clicks in a question dialog are accepted instead. The terminal-side fix
+for the right button does not need either variable.
 
 Native smoke compiles the production headers and checks all CF_HDROP entries,
 order, separate payloads, Unicode/spaces, empty/single selections, malformed and

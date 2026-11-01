@@ -1,0 +1,50 @@
+diff --git a/src/cascadia/TerminalControl/ControlInteractivity.cpp b/src/cascadia/TerminalControl/ControlInteractivity.cpp
+index 065cc70..3dd2b87 100644
+--- a/src/cascadia/TerminalControl/ControlInteractivity.cpp
++++ b/src/cascadia/TerminalControl/ControlInteractivity.cpp
+@@ -274,7 +274,13 @@ namespace winrt::Microsoft::Terminal::Control::implementation
+                 _hyperlinkHandler(hyperlink);
+             }
+         }
+-        else if (_canSendVTMouseInput(modifiers))
++        // Owner patch: the terminal keeps the secondary button so its clipboard
++        // image paste can run. An application with mouse tracking otherwise
++        // receives the click and handles it with its own clipboard reader,
++        // which drops bitmap-only screenshots. The primary button stays with
++        // the application: dialogs and TUI widgets must remain clickable.
++        else if (_canSendVTMouseInput(modifiers) &&
++                 !WI_IsFlagSet(buttonState, MouseButtonState::IsRightButtonDown))
+         {
+             _sendMouseEventHelper(terminalPosition, pointerUpdateKind, modifiers, 0, buttonState);
+         }
+@@ -373,8 +379,13 @@ namespace winrt::Microsoft::Terminal::Control::implementation
+         // Returning true from this function indicates that the caller should do no further processing of this movement.
+         bool handledCompletely = false;
+ 
+-        // Short-circuit isReadOnly check to avoid warning dialog
+-        if (focused && !_core->IsInReadOnlyMode() && _canSendVTMouseInput(modifiers))
++        // Short-circuit isReadOnly check to avoid warning dialog.
++        // Owner patch: a drag with the terminal-owned button stays local so it
++        // is not reported to the application without its press.
++        if (focused &&
++            !_core->IsInReadOnlyMode() &&
++            _canSendVTMouseInput(modifiers) &&
++            !WI_IsFlagSet(buttonState, MouseButtonState::IsRightButtonDown))
+         {
+             _sendMouseEventHelper(terminalPosition, pointerUpdateKind, modifiers, 0, buttonState);
+             handledCompletely = true;
+@@ -472,8 +483,12 @@ namespace winrt::Microsoft::Terminal::Control::implementation
+                                                const Core::Point pixelPosition)
+     {
+         const auto terminalPosition = _getTerminalPosition(til::point{ pixelPosition }, false);
+-        // Short-circuit isReadOnly check to avoid warning dialog
+-        if (!_core->IsInReadOnlyMode() && _canSendVTMouseInput(modifiers))
++        // Short-circuit isReadOnly check to avoid warning dialog.
++        // Owner patch: the secondary button is handled by the terminal (paste),
++        // so its release must not reach the application as an unmatched event.
++        if (!_core->IsInReadOnlyMode() &&
++            _canSendVTMouseInput(modifiers) &&
++            pointerUpdateKind != WM_RBUTTONUP)
+         {
+             _sendMouseEventHelper(terminalPosition, pointerUpdateKind, modifiers, 0, buttonState);
+             return;
