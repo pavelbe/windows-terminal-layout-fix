@@ -369,6 +369,12 @@ Patch order depends on the base:
      build that carries it, put `{ "type": "separator" }` before the utility
      profile in `newTabMenu`; without the patch that separator only adds a
      second divider.
+  9. [explorer-profile-opens-folder.patch](patches/explorer-profile-opens-folder.patch),
+     which makes a profile whose command is exactly `explorer.exe` open this
+     Terminal's own folder through `ShellExecute` instead of creating a pane.
+     Prepared 2026-11-03; not built yet. Patches 8 and 9 together serve a bare
+     `explorer.exe` profile placed after a separator entry, so the menu item
+     opens the running build's folder without a terminal flash.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
