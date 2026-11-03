@@ -7,7 +7,8 @@ The archive was produced from the accepted `rmb3` build with the pinned packager
 passes the repository verifier. The owner ran the packaged runtime on
 2026-11-03: the exit-notice flash is gone and the remaining checks carry over
 from the `rmb3` acceptance. A fresh extraction smoke of the ZIP itself has not
-been run.
+been run. This archive does not include the three menu patches; the local
+`lf-menu2` candidate does ([record](menu-candidate-20261103.md)).
 
 ## Recorded artifact (2026-11-03)
 

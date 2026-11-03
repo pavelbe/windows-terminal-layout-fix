@@ -8,14 +8,13 @@ Read UPDATING.md before porting, building, packaging or changing recovery steps.
 - Repository is public by owner decision. Do not change visibility or enable Actions.
 - Keep executable archives in reviewed GitHub Releases, not Git history;
   creating/replacing release assets still requires explicit owner authorization.
-- Published `layout-fix.2` is based on upstream Preview `v1.25.1912.0`; current
-  local candidates use Stable `v1.25.2733.0` (`rmb3`). Read README.md for the
-  current runtime and ordered patch chain. Source identity and original hashes
-  in build/original-build-receipt.json are historical; do not overwrite them.
-- Inside a Windows Terminal session HCA follows the current portable runtime;
-  outside Terminal, `wt` still resolves the absent 1.25.1912.0 clipboard-files
-  folder and fails closed. Do not switch routing implicitly; update resolver,
-  tests and runbook together only on owner request.
+- Published `layout-fix.3` uses Stable `v1.25.2733.0` (the `rmb3` build); the
+  daily candidate is `lf-menu2` with the three menu patches. Read README.md for
+  the runtime and patch order. Source identity and original hashes in
+  build/original-build-receipt.json are historical; do not overwrite them.
+- Inside Terminal HCA follows the current portable runtime; outside, channel
+  `layout-fix` selects the accepted `lf-menu2` runtime (resolver, test and
+  runbook updated 2026-11-03). Switch routing only on owner request.
 - build/recovery-manifest.json belongs to the immutable layout-fix.1 archive.
   Keep both historical receipts and published assets unchanged. A new archive
   needs its own versioned manifest measured from the exact packaged bytes;

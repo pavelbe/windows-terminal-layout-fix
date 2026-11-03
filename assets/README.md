@@ -81,7 +81,7 @@ current patch chain. Keep that reviewed chain unchanged. Release
 including after theme changes. High-contrast resources remain upstream.
 
 Package into a fresh candidate directory. The `-lf-square` example below is the
-2026-10-28 square candidate; the current `rmb3` runtime already embeds this icon.
+2026-10-28 square candidate; the current `lf-menu2` runtime already embeds this icon.
 A shortcut should target that exact `WindowsTerminal.exe` and use the same EXE as `IconLocation`, index 0.
 Do not set an unrelated shortcut-only AppUserModelID, replace a running EXE,
 restart Explorer, clear the icon cache, or copy live session state for branding.

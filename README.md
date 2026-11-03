@@ -367,22 +367,21 @@ Patch order depends on the base:
      tracks the mouse; the primary button keeps reaching the application.
   8. [utility-menu-below-separator.patch](patches/utility-menu-below-separator.patch),
      which renders new-tab-menu entries placed after a separator below
-     Terminal's own separator, next to the settings group. Prepared
-     2026-11-03; not included in any published archive and not built yet. In a
-     build that carries it, put `{ "type": "separator" }` before the utility
-     profile in `newTabMenu`; without the patch that separator only adds a
-     second divider.
+     Terminal's own separator, next to the settings group. In the daily
+     `lf-menu2` candidate; not in any published archive. In a build that
+     carries it, put `{ "type": "separator" }` before the utility profile in
+     `newTabMenu`; without the patch that separator only adds a second divider.
   9. [explorer-profile-opens-folder.patch](patches/explorer-profile-opens-folder.patch),
      which makes a profile whose command is exactly `explorer.exe` open this
      Terminal's own folder through `ShellExecute` instead of creating a pane.
-     Prepared 2026-11-03; not built yet. Patches 8 and 9 together serve a bare
+     In the daily `lf-menu2` candidate. Patches 8 and 9 together serve a bare
      `explorer.exe` profile placed after a separator entry, so the menu item
      opens the running build's folder without a terminal flash.
  10. [explorer-profile-shortcut.patch](patches/explorer-profile-shortcut.patch),
      which applies the same behaviour to the generated
      `Terminal.OpenNewTabProfileN` action, so Ctrl+Shift+9 opens the folder
-     without creating a tab either. Prepared 2026-11-03; not built into any
-     published archive.
+     without creating a tab either. In the daily `lf-menu2` candidate; not in
+     any published archive.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
@@ -545,7 +544,7 @@ Save work and finish agents first. Panes/output restore; live programs do not.
 
 To recover the published archive source, obtain `v1.25.1912.0` at the exact base
 above and apply the first three patches. For the current candidate, use
-`v1.25.2733.0` (`dc8ae365…`) and the ordered seven-patch chain above. Check and
+`v1.25.2733.0` (`dc8ae365…`) and the ordered ten-patch chain above. Check and
 apply patches with `git apply --check` / `git apply`, then follow that tag's
 build guide. A clean rebuild from this recovery kit has not been performed; use
 the tested binary release ZIP for quick recovery.

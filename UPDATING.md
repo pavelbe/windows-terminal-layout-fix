@@ -280,9 +280,10 @@ directory, direct EXE link and shortcut. Do not create ZIP deliverables for
 ordinary local builds. The archive recipe below documents the previous build;
 future local packaging must use a verified directory output. Creating a public
 release archive remains a separate explicitly requested task.
-`build/Package-Rmb3Candidate-20261101.ps1` is the current right-button candidate
-packager and pins its rmb3 build receipt, MSIX, XAML dependency and upstream
-helpers. The older `build/Package-LFStableCandidate-20261027.ps1` is the diag2
+`build/Package-MenuCandidate2-20261103.ps1` is the current `lf-menu2` packager
+and pins that build receipt, MSIX, XAML dependency and upstream helpers. The
+earlier `build/Package-Rmb3Candidate-20261101.ps1` is the pre-menu fallback, and
+`build/Package-LFStableCandidate-20261027.ps1` is the diag2
 pre-right-button fallback. Rebind pins from the exact build before packaging a
 different run.
 
@@ -292,8 +293,8 @@ Recheck parameters in the new tag. For AppX packaging, select exact paths to
 **your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
 x64 AppX dependency; never select the first file found.
 
-For the current rmb3 build,
-[`build/Package-Rmb3Candidate-20261101.ps1`](build/Package-Rmb3Candidate-20261101.ps1)
+For the current lf-menu2 build,
+[`build/Package-MenuCandidate2-20261103.ps1`](build/Package-MenuCandidate2-20261103.ps1)
 pins the build receipt, MSIX, XAML dependency and three upstream packaging
 helpers. Its default verifies inputs and prints a plan; `-Run` packages into
 the supplied new `-Destination` and records a package receipt. It refuses an
@@ -387,8 +388,8 @@ and `/p:SolutionDir=<absolute checkout path ending in \>`; stop on nonzero
 helper does not build them.
 
 This historical example targets the old `v1.25.1912.0` checkout; those
-source/settings paths are not present on this PC. For the current `rmb3`
-candidate, use `build/Package-Rmb3Candidate-20261101.ps1`.
+source/settings paths are not present on this PC. For the current `lf-menu2`
+candidate, use `build/Package-MenuCandidate2-20261103.ps1`.
 
 ```powershell
 .\Package-ClipboardCandidate.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -SettingsFile 'C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json' -Destination 'C:\Users\Pavel\AppData\Local\Programs\WT-Clipboard-New'

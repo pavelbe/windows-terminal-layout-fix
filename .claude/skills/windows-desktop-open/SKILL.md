@@ -1,6 +1,6 @@
 ---
 name: windows-desktop-open
-version: 1.0.0
+version: 1.1.0
 description: Show a folder or file from this project on the Windows desktop - Explorer window, file selection, or a short open-in-Notepad++ request; includes the verified cmd-start recipe and the Explorer Home failure mode.
 ---
 
@@ -18,6 +18,15 @@ in Notepad++ from a WSL session on this host.
   so CMD never receives a WSL UNC working directory.
 - A successful launch request proves only that Windows accepted it. Do not
   report "opened" without owner confirmation or window evidence.
+
+## Open the Terminal build's own folder
+
+In the patched build used on this PC (`lf-menu2`) the new-tab menu has
+`Explorer: Terminal folder` under the divider, and its generated shortcut
+(Ctrl+Shift+9) opens the folder of the running Terminal without creating a
+pane. That path works only in a build carrying the three menu patches; on an
+unpatched build the same profile opens a pane around `explorer.exe`. For an
+arbitrary folder or an older build, use the Explorer recipe below.
 
 ## Open a folder in Explorer
 
