@@ -1,5 +1,10 @@
 # Exit-notice suppression — 2026-11-01
 
+> Historical candidate record. The current accepted runtime is `rmb3`; the
+> exit-notice build is a historical, unlaunched pre-right-button fallback; its
+> recorded `%LOCALAPPDATA%\Programs` runtime folder is not present on this PC.
+> See [README](../README.md) for current status.
+
 ## Symptom and measured evidence
 
 In a split layout, typing `exit` closes the pane correctly, but the
@@ -99,8 +104,8 @@ unchanged. Exit codes and the existing `closeOnExit` decisions are unchanged.
   cases passed and lifecycle records persisted in order. The fixture closes
   successful panes too quickly to prove notice suppression, so it does not
   replace the manual check.
-- Not launched, registered, installed or switched; the live diag1 runtime and
-  HCA routing are untouched. Manual split `exit` acceptance remains pending.
+- Not launched, registered, installed or switched; the then-live diag1 runtime
+  and HCA routing were untouched. Manual split `exit` acceptance remains pending.
 
 ## Residual risks
 

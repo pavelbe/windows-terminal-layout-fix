@@ -1,5 +1,9 @@
 # Connection lifecycle diagnostics — 2026-10-29
 
+> Historical candidate record. The current accepted runtime is `rmb3`; see
+> [README](../README.md) for current status. This file preserves the dated
+> diagnostic evidence and does not describe the live runtime.
+
 ## Diagnosis and limits
 
 The owner reported a pane displaying exit code `1`, including after `exit` or
@@ -52,8 +56,8 @@ It does not add a crash dump collector or promise to capture every UI exception.
 - EXE SHA256: `424b8f87068bc1d5c6e9434f52ef83f00bb7b92c3556895e071ce5931b313a26`.
 - TerminalConnection DLL SHA256: `09391c3be942c868b145b292e07dff20bc72d00cd346782cbfe49306c9c147e7`.
 
-The pinned packaging recipe now uses upstream `-TerminalLayout`, returning a
-directory, and records all 55 runtime files. No ZIP was created. Only the reviewed
+The pinned packaging recipe used upstream `-TerminalLayout`, returning a
+directory, and recorded all 55 runtime files. No ZIP was created. Only the reviewed
 daily `settings.json` was copied afterward; its SHA256 remains
 `20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda`.
 Session state/buffers were not transferred. Working Terminal PID 7380, previous

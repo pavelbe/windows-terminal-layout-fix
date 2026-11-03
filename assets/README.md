@@ -20,7 +20,7 @@ reference occupies 32x24; the rejected wide LF only about 31x17. Inspect the
 interior alpha as well: generated edits introduced transparent holes and were
 rejected. The owner explicitly selected deterministic cropping of the original.
 
-The pinned LF shortcut now references `terminal-lf-square-trimmed.ico`, a
+The 2026-10-28 LF shortcut used `terminal-lf-square-trimmed.ico`, a
 byte-identical copy of this square asset, following the owner's size correction.
 The prior shortcut was backed up and its target, arguments, working directory,
 description, hotkey and window style were verified unchanged. The native
@@ -73,14 +73,16 @@ checked, and native `LoadImageW` loaded all nine sizes. Use that Windows API
 when verifying the 256px frame: the .NET Icon size constructor selected a
 smaller frame in our check despite successful native loading.
 
-For the current pinned Stable source, overlay `terminal-lf-square.ico` only at
-`res/terminal.ico`, after preserving the previous asset. The build recipe checks its exact hash along with the ten
-existing patch files. Keep the four source patches unchanged. Release
+For the pinned Stable source, overlay `terminal-lf-square.ico` only at
+`res/terminal.ico`, after preserving the previous asset. The build recipe checks
+its exact hash together with the expected source status and hashes for the
+current patch chain. Keep that reviewed chain unchanged. Release
 `WindowsTerminal.rc` embeds this resource; `icon.cpp` loads it for window icons,
 including after theme changes. High-contrast resources remain upstream.
 
-Package into a fresh `-lf-square` candidate directory. A shortcut should target that
-exact `WindowsTerminal.exe` and use the same EXE as `IconLocation`, index 0.
+Package into a fresh candidate directory. The `-lf-square` example below is the
+2026-10-28 square candidate; the current `rmb3` runtime already embeds this icon.
+A shortcut should target that exact `WindowsTerminal.exe` and use the same EXE as `IconLocation`, index 0.
 Do not set an unrelated shortcut-only AppUserModelID, replace a running EXE,
 restart Explorer, clear the icon cache, or copy live session state for branding.
 Existing processes retain their loaded icon until the owner closes them.

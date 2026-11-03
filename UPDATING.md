@@ -12,9 +12,11 @@ this repository is the recovery kit.
 Read [Microsoft releases](https://github.com/microsoft/terminal/releases) and
 [#11522](https://github.com/microsoft/terminal/issues/11522), including linked PRs.
 Check the **exact release tag**, not only `main`, a closed issue or "Latest":
-stable and Preview/prereleases are distinct. The latest check on 2026-09-20
-found Preview `v1.25.1912.0`, stable `v1.24.11911.0` and an open #11522.
-Recheck for the actual upgrade; these are not current-version claims.
+stable and Preview/prereleases are distinct. Latest check, 2026-10-27: Stable
+`v1.25.2733.0` and Preview `v1.26.2734.0` were the newest published versions in
+their channels, and #11522 was open.
+Recheck for the actual upgrade; these are dated observations, not
+current-version claims. See the [dated candidate report](docs/upgrade-20261026.md).
 
 Read-only discovery:
 
@@ -40,13 +42,17 @@ See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/ter
 ## 2. Preserve the working installation
 
 Save the current JSON and review its diff as described in README.
-Keep both `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0` (still used by HCA)
-and `WT-Layout-Fix-1.25.1912.0-clipboard-files-test` (accepted with 50 terminals)
-intact. The owner confirmed that `WT-Layout-Fix-1.25.1912.0-tab-color-test`
-is the current live test runtime; its receipt is
-[`build/tab-color-candidate-20260928.json`](build/tab-color-candidate-20260928.json).
-Do not overwrite or delete it during candidate preparation. HCA daily routing
-is a separate decision; the owner deferred that switch on 2026-09-20.
+On 2026-11-03 the installed runtime on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-rmb3`; its `settings/settings.json` matches the
+repository snapshot. The earlier `WT-Layout-Fix-1.25.1912.0`,
+`WT-Layout-Fix-1.25.1912.0-clipboard-files-test`,
+`WT-Layout-Fix-1.25.1912.0-tab-color-test` and
+`WT-Layout-Fix-1.25.2733.0-lf-diag2` folders are not installed; their
+receipts and the published `layout-fix.2` archive remain historical evidence.
+Do not overwrite or delete the accepted `rmb3` runtime during candidate
+preparation. Inside a Windows Terminal session, HCA follows the current portable
+runtime. Outside Terminal, the `layout-fix` fallback is still stale: it points
+at the absent 1.25.1912.0 clipboard-files folder and fails closed.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -62,19 +68,22 @@ distribution. Close working windows only in the owner-approved transition window
 <a id="3-получить-исходники-и-проверить-патч"></a>
 ## 3. Obtain source and check each patch
 
-Historical base: `v1.25.1912.0`,
+Published archive base: `v1.25.1912.0`,
 SHA `1cea42d433253d95c4487a3037db48197b5e72f4`.
+Current candidate base: Stable `v1.25.2733.0`, commit
+`dc8ae365847d41f62d1ebca93815bb00959bc12f`.
 [patches/layout-fix.patch](patches/layout-fix.patch) comes from source commit
 `a34eea7b524f7516c68014a14bb94e215520e0fc`.
-It is a C++ source diff; **it cannot be applied to an EXE or MSIX**.
+It is a C++ source diff; **it cannot be applied to an EXE or MSIX**. Port and
+re-check it against the selected tag; a clean apply does not prove semantics.
 
-Choose an exact release tag in WSL. This example reproduces the old base;
-replace `wt_tag` with the verified new tag for an upgrade.
-Keep the Windows/MSBuild checkout on NTFS, for example
+Choose an exact release tag in WSL. This example uses the current candidate;
+for the published archive use the historical 1.25.1912.0 tag and only the first
+three patches. Keep the Windows/MSBuild checkout on NTFS, for example
 `C:\Users\Pavel\Source`, rather than a UNC path.
 
 ```bash
-wt_tag='v1.25.1912.0'
+wt_tag='v1.25.2733.0'
 wt_source="/mnt/c/Users/Pavel/Source/terminal-$wt_tag"
 wt_patch='/home/pavelbe/Projects/windows-terminal-layout-fix/patches/layout-fix.patch'
 ```
@@ -198,7 +207,7 @@ if the layout changes. This documentation edit did not execute a rebuild.
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-Set-Location 'C:\Users\Pavel\Source\terminal-v1.25.1912.0' # selected checkout
+Set-Location 'C:\Users\Pavel\Source\terminal-v1.25.2733.0' # selected checkout
 Import-Module .\tools\OpenConsole.psm1
 Set-MsBuildDevEnvironment
 & .\dep\nuget\nuget.exe restore .\OpenConsole.slnx
@@ -210,7 +219,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Terminal build failed' }
 ```
 
 Restore commands are separate because the
-[base helper](https://github.com/microsoft/terminal/blob/v1.25.1912.0/tools/OpenConsole.psm1)
+[selected tag's helper](https://github.com/microsoft/terminal/blob/v1.25.2733.0/tools/OpenConsole.psm1)
 calls NuGet multiple times before MSBuild; an early failure must survive.
 Building CascadiaPackage does not execute unit tests. Build/run the appropriate
 TerminalApp/Control/Settings Model tests from the chosen tag and record each exit.
@@ -225,18 +234,19 @@ same checkout's `bin` or `obj` directories. For the pinned Stable
 `v1.25.2733.0` candidate, [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
 checks the prepared source by tag, patch status and hashes; its default is a
 read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
-at `res/terminal.ico`, the lifecycle diagnostic patch and the exit-notice
-suppression patch; the first unbranded build's frozen recipe and receipts remain
-historical evidence. `$ExpectedStatus`/`$ExpectedSourceHashes` describe the diag2
-source state (`ca3d5d4`) and include `ConptyConnection.h/.idl` and
-`TerminalPaneContent.h/.cpp`; re-pin them from the exact tree after any further
-source change. The diag2 run `20261101-013312…` passed the package build and
-Terminal Core tests. `-Run`
-performs the two restores, Release/x64 CascadiaPackage
-build, Terminal Core test-project build and tagged `terminalCore` unit tests,
-with `/m:2` and separate local logs/exit codes. It does not launch, register or
-install Terminal or replace the live runtime. Binlogs stay local because they
-can contain paths and environment parameters. Do not run GitHub Actions.
+at `res/terminal.ico`, the lifecycle diagnostic patch, the exit-notice
+suppression patch and the terminal-owned right-button patch; the first
+unbranded build's frozen recipe and receipts remain historical evidence.
+`$ExpectedStatus`/`$ExpectedSourceHashes` describe the `rmb3` source state and
+include `ConptyConnection.h/.idl`, `TerminalPaneContent.h/.cpp` and
+`ControlInteractivity.cpp`; re-pin them from the exact tree after any further
+source change. The `rmb3` run `20261101-112434…` passed the package build and
+Terminal Core tests; the earlier diag2 run is the pre-right-button fallback.
+`-Run` performs the two restores, Release/x64 CascadiaPackage build, Terminal
+Core test-project build and tagged `terminalCore` unit tests, with `/m:2` and
+separate local logs/exit codes. It does not launch, register or install Terminal
+or replace the live runtime. Binlogs stay local because they can contain paths
+and environment parameters. Do not run GitHub Actions.
 
 Put the reviewed script in a local Windows directory and pass its full Windows
 path. RemoteSigned may treat `\\wsl.localhost\Ubuntu\...` as remote and refuse
@@ -256,26 +266,28 @@ directory, direct EXE link and shortcut. Do not create ZIP deliverables for
 ordinary local builds. The archive recipe below documents the previous build;
 future local packaging must use a verified directory output. Creating a public
 release archive remains a separate explicitly requested task.
-`build/Package-LFStableCandidate-20261027.ps1` is rebound to the diag2 build
-receipt and MSIX hashes; rebind its pins from the exact build before packaging a
+`build/Package-Rmb3Candidate-20261101.ps1` is the current right-button candidate
+packager and pins its rmb3 build receipt, MSIX, XAML dependency and upstream
+helpers. The older `build/Package-LFStableCandidate-20261027.ps1` is the diag2
+pre-right-button fallback. Rebind pins from the exact build before packaging a
 different run.
 
 The base provides
-[New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.1912.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).
+[New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.2733.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).
 Recheck parameters in the new tag. For AppX packaging, select exact paths to
 **your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
 x64 AppX dependency; never select the first file found.
 
-For the exact 2026-10-28 square LF build,
-[`build/Package-LFStableCandidate-20261027.ps1`](build/Package-LFStableCandidate-20261027.ps1)
+For the current rmb3 build,
+[`build/Package-Rmb3Candidate-20261101.ps1`](build/Package-Rmb3Candidate-20261101.ps1)
 pins the build receipt, MSIX, XAML dependency and three upstream packaging
 helpers. Its default verifies inputs and prints a plan; `-Run` packages into
-the supplied new `-Destination` and records the ZIP hash. It refuses an existing
-destination, including one appearing after preflight. These pins describe one
-build, not arbitrary future rebuilds: verify and rebind new artifacts before
-changing them. Package validation/extraction and copying reviewed settings are
-separate steps below. For the new direct-EXE shortcut, follow
-[the LF icon guide](assets/README.md); pinning does not change HCA routing.
+the supplied new `-Destination` and records a package receipt. It refuses an
+existing destination, including one appearing after preflight. These pins
+describe one build, not arbitrary future rebuilds: verify and rebind new
+artifacts before changing them. Package validation/extraction and copying
+reviewed settings are separate steps below. For the new direct-EXE shortcut,
+follow [the LF icon guide](assets/README.md); pinning does not change HCA routing.
 
 ```powershell
 & {
@@ -339,10 +351,6 @@ Use a new output directory on local NTFS; the helper sets both PowerShell's
 location and the process working directory there before entering the VS shell.
 This also prevents `cmd.exe` from inheriting a WSL UNC working directory.
 
-```powershell
-.\Test-ClipboardImage.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -OutputDirectory 'C:\Users\Pavel\Diagnostics\clipboard-smoke-new'
-```
-
 For the Stable `v1.25.2733.0` source with VS 2026 Build Tools, pass its install
 path explicitly:
 
@@ -363,6 +371,10 @@ in the VS developer shell with `/t:Build /p:Configuration=Release /p:Platform=x6
 and `/p:SolutionDir=<absolute checkout path ending in \>`; stop on nonzero
 `$LASTEXITCODE`. A fresh checkout first needs section 4 dependencies. The package
 helper does not build them.
+
+This historical example targets the old `v1.25.1912.0` checkout; those
+source/settings paths are not present on this PC. For the current `rmb3`
+candidate, use `build/Package-Rmb3Candidate-20261101.ps1`.
 
 ```powershell
 .\Package-ClipboardCandidate.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -SettingsFile 'C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json' -Destination 'C:\Users\Pavel\AppData\Local\Programs\WT-Clipboard-New'
@@ -411,15 +423,19 @@ windows normally. Copy private state while the candidate is closed; verify
 restoration again. If incompatible, keep the candidate's clean state and the
 original backup; do not hand-edit state. Launch and pin the new EXE.
 
-**HCA routing needs a separate change.** `_wt_resolve_terminal()` in
-`~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` currently selects
-`Programs/WT-Layout-Fix-1.25.1912.0`. Recheck the live implementation.
-The accepted `clipboard-files-test` shortcut is already pinned, but the owner
-explicitly chose to keep HCA's older path while still working there. Do not
-promote a recovery release into daily routing implicitly.
-When the owner chooses the transition, update it to the verified directory together with
-`tests/test-wt-commands.sh` and the HCA runbook; keep channel `layout-fix`.
-Do not hide new binaries in a folder bearing an old version.
+**HCA routing needs a separate change.** As checked on 2026-11-03,
+`_wt_resolve_terminal()` in
+`~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` follows the current
+portable runtime inside a Windows Terminal session. Outside Terminal, channel
+`layout-fix` selects
+`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, which is not
+installed on this PC. The accepted `rmb3` runtime is not wired into that outside
+fallback, so `wt` fails closed there. Recheck the live implementation before
+acting. Do not promote a recovery release into daily routing implicitly.
+When the owner chooses the transition, update the outside fallback to the
+verified directory together with `tests/test-wt-commands.sh` and the HCA
+runbook; keep
+channel `layout-fix`. Do not hide new binaries in a folder bearing an old version.
 
 For an official **installed** Preview/Stable package, set
 `settings.windows_terminal_channel: preview` or `stable` in HCA

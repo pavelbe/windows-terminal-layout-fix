@@ -1,8 +1,11 @@
 # Windows Terminal Layout Fix
 
-Community patches and a portable recovery build for **Windows Terminal Preview
-1.25.1912.0, Windows x64**. Addresses slow input-language switching with many
-tabs and adds clipboard image/file paste for terminal applications.
+Community patches and recovery builds for **Windows Terminal, Windows x64**.
+The published `layout-fix.2` archive is based on Preview **1.25.1912.0**; the
+current maintainer candidate is Stable **1.25.2733.0-local-layoutfix-rmb3**.
+The project addresses slow input-language switching with many tabs, clipboard
+image/file paste for terminal applications, and application-owned right-button
+paste behavior.
 
 [Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
 
@@ -16,6 +19,7 @@ to be accepted or merged upstream**.
 | RU/EN switching stalls with many tabs | Coalesce repeated theme updates during settings reload | Owner tested 10, then 50 terminals on one PC; no instrumented benchmark |
 | Bitmap-only clipboard cannot be pasted as an image path | Snapshot bitmap, encode a temporary PNG, paste its quoted path | Owner-tested screenshot/text flow; temporary files remain local |
 | Several Explorer images attach incompletely | Read the full file selection and preserve per-file paste events | Owner-tested multi-image paste in Codex and Claude Code |
+| Right-button image paste is consumed by an application with mouse tracking | Keep only the secondary button with Terminal for paste; primary stays with the TUI | Owner-tested in Claude Code; left-button variant rejected because it broke TUI controls |
 
 Public upstream evidence: [layout reproduction](https://github.com/microsoft/terminal/issues/11522#issuecomment-5677254631),
 [layout patch](https://github.com/microsoft/terminal/issues/11522#issuecomment-5680525120),
@@ -30,6 +34,15 @@ test in a separate directory. Included settings are the maintainer's example,
 including an `Ubuntu` profile; review paths, profiles and keybindings for your
 machine. HCA commands in the later maintenance notes are optional local tooling,
 not a prerequisite for running the portable EXE.
+
+**Current runtime check (2026-11-03):** the installed candidate on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-rmb3`; the 1.25.1912.0 recovery folders are not
+present. Inside a Windows Terminal session, HCA follows the current portable
+runtime (`rmb3`). Outside Terminal, channel `layout-fix` still points at
+`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, so that fallback
+fails closed until the owner updates routing. The public `layout-fix.2` archive
+remains the released recovery artifact and is independent of this local
+candidate.
 
 ## Tested build and maintainer recovery notes
 
@@ -47,26 +60,29 @@ screenshot pasted with the right button now attaches in Claude Code. `-rmb3`
 keeps the same behaviour with the drag guard added, and the owner has it open.
 A `-rmb2` variant that also took the primary button was built and rejected: it
 made every TUI widget unclickable. `-rmb` and `-rmb2` were removed together
-with their shortcuts; `-lf-diag2` stays as the pre-patch fallback.
+with their shortcuts. The `-lf-diag2` runtime folder is no longer installed; its
+shortcut and build record are historical pre-patch fallback evidence.
 
 **Exit-notice suppression candidate, 2026-11-01 — built, not launched:** Stable
 `1.25.2733.0-local-layoutfix-diag2` adds
 `patches/suppress-exit-notice-on-auto-close.patch`, which skips the informational
 `ProcessExited` text when `closeOnExit` will close the pane anyway, removing the
 brief text flash before pane removal. Build and Terminal Core tests passed
-(56/56); the packaged runtime is
-`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-diag2\terminal-1.25.2733.0`
-with shortcut **Terminal LF Diag2 1.25** and the reviewed settings. No app was
-launched, registered, installed or switched; manual split/exit acceptance is
-pending. Measured pane-removal delay, design, behavior matrix and residual risks:
+(56/56); the build record lists package path
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-diag2\terminal-1.25.2733.0`,
+shortcut **Terminal LF Diag2 1.25**, and the reviewed settings, but that folder
+is not installed on this PC. No app was launched, registered, installed or
+switched; manual split/exit acceptance is pending. Measured pane-removal delay,
+design, behavior matrix and residual risks:
 [exit-notice suppression](docs/exit-notice-suppression-20261101.md).
 
 **Diagnostics candidate, 2026-10-29:** Stable `1.25.2733.0-local-layoutfix-diag1`
 adds bounded local records of ConPTY process starts, launch failures and exits.
 The square LF icon is unchanged. Build, 56 Terminal Core tests and four isolated
 native split/exit scenarios passed. The same lifecycle test failed on the old
-binary because its events were not persisted. Local delivery is a runtime folder
-and **Terminal LF Diagnostics 1.25** shortcut, without a ZIP. This does not change
+binary because its events were not persisted. The recorded local delivery was a
+runtime folder and **Terminal LF Diagnostics 1.25** shortcut, without a ZIP; see
+the current runtime check for the later state. This does not change
 `closeOnExit` or establish the cause of the owner's intermittent split failure.
 See [diagnosis, log location, limits and build evidence](docs/connection-diagnostics-20261029.md).
 
@@ -89,18 +105,21 @@ Rebuild and all 56 Terminal Core tests passed. The separate
 `WT-Layout-Fix-1.25.2733.0-lf` portable copy launched successfully; its live
 16px/32px window icons match the reviewed artwork pixel-for-pixel. Desktop
 shortcut **Terminal LF 1.25** targets that exact copy. Taskbar pinning/grouping
-and the full manual acceptance suite remain unverified. Existing installations
-and launch routing are preserved. See the dated record below for artifact hashes.
+and the full manual acceptance suite remain unverified at that stage. Existing
+installations and launch routing were preserved at that time. See the dated
+record below for artifact hashes.
 
-**Stable candidate, 2026-10-27:** upstream `v1.25.2733.0` with all four existing
-patches built successfully using VS2026 Build Tools. TerminalCore passed 56/56;
-the production-header clipboard smoke passed without reading the clipboard.
-EXE and TerminalApp DLL report `1.25.2733.0-local-layoutfix`. This is a local
-candidate, not a new public release or manual UI acceptance. See the
+**Stable candidate, 2026-10-27:** upstream `v1.25.2733.0` with the four-patch
+chain used at that date built successfully using VS2026 Build Tools.
+TerminalCore passed 56/56; the production-header clipboard smoke passed without
+reading the clipboard. EXE and TerminalApp DLL report
+`1.25.2733.0-local-layoutfix`. This is a local candidate, not a new public
+release or manual UI acceptance. See the
 [dated build record and reproduction steps](docs/upgrade-20261026.md).
 At the start of the 2026-10-26 audit, the owner identified
-`WT-Layout-Fix-1.25.1912.0-tab-color-test` as the current runtime; its processes, settings and launch
-routing were preserved. Side-by-side UI checks precede any switch.
+`WT-Layout-Fix-1.25.1912.0-tab-color-test` as the then-current runtime; its
+processes, settings and launch routing were preserved. Side-by-side UI checks
+precede any switch.
 
 **Tab-color candidate, 2026-09-28:**
 `WT-Layout-Fix-1.25.1912.0-tab-color-test` adds
@@ -109,13 +128,16 @@ after the three released patches. The owner reports that RU/EN retains the tab
 color in this candidate. TerminalCore: 56/56 tests passed, including an unchanged
 regression that failed before the fix. Release/x64 build and packaging passed;
 existing resource/XAML warnings remain. This is not a new published release or
-a repeat of the 50-terminal/clipboard acceptance suite. Existing shortcuts and
-HCA routing remain unchanged. [Candidate receipt](build/tab-color-candidate-20260928.json).
+a repeat of the 50-terminal/clipboard acceptance suite. At that time, existing
+shortcuts and HCA routing remained unchanged.
+[Candidate receipt](build/tab-color-candidate-20260928.json).
 
 Launch `WindowsTerminal.exe` from that separate folder. `WTColorTest.exe` is a
 byte-identical local test copy used to isolate the `WT-COLOR-TEST` window from
 running installations. Do not replace a live installation until its processes
-are closed intentionally; keep the accepted clipboard-files build for rollback.
+are closed intentionally. At that time the accepted clipboard-files build was
+retained for rollback; it is no longer installed on this PC (see current
+runtime check).
 
 Codex 0.158 mouse selection is separate: local `~/.codex/config.toml` now sets
 `[tui] fullscreen_transcript = false`. Native terminal selection/scrollback replaces
@@ -130,15 +152,18 @@ and closes the layout-freeze task. Multiple Explorer images were already accepte
 in both Codex and Claude Code on 2026-09-19. This is owner-observed behavior on
 the current PC, not a timed benchmark or a clean-Windows installation test.
 
-The `-test` directory name is retained to preserve the pinned shortcut. At that
-September check, **HCA routing stayed on `WT-Layout-Fix-1.25.1912.0` by owner
-decision**. The later owner-current runtime is identified above; recovery
-acceptance alone does not switch HCA routing.
-Both installations and the immutable `layout-fix.1` archive remain intact.
+The historical `-test` directory name was retained to preserve the pinned
+shortcut. At that September check, **HCA routing stayed on
+`WT-Layout-Fix-1.25.1912.0` by owner decision**. The later owner-current runtime
+is identified above; recovery acceptance alone does not switch HCA routing. At
+that time both installations and the immutable `layout-fix.1` archive remained
+intact. On 2026-11-03 only the `rmb3` candidate is installed under
+`%LOCALAPPDATA%\Programs`; the 1.25.1912.0 folders are absent, and the HCA
+resolver still points at one of them.
 
-Release check, 2026-09-28: Preview `v1.25.1912.0` and stable
-`v1.24.11911.0` were the newest published versions in their channels.
-This is not a current-version claim. Recheck
+Release check, 2026-10-27: Stable `v1.25.2733.0` and Preview `v1.26.2734.0`
+were the newest published versions in their channels. This is a dated check,
+not a current-version claim. Recheck
 [Microsoft releases](https://github.com/microsoft/terminal/releases) before an upgrade.
 
 Current configuration: [settings/settings.json](settings/settings.json).
@@ -221,23 +246,29 @@ and screen buffers are deliberately unpublished. New sessions persist after
 normal exit. The settings file does not restore live agent processes.
 
 HCA commands `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` and `wth` have a separate
-launch target. As checked on 2026-09-20, channel `layout-fix` still selects
-`Programs/WT-Layout-Fix-1.25.1912.0`, **not this accepted recovery folder**.
-The owner explicitly keeps that daily route for now. Pinning the newer EXE does
-not change HCA. To inspect the live selection in an idle Zsh prompt:
+launch target. As checked on 2026-11-03, inside a Windows Terminal session HCA
+resolves the current portable runtime, which is `rmb3` here. Outside Terminal,
+channel `layout-fix` still selects
+`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, but that directory is
+**not installed on this PC**; the outside fallback therefore fails closed. The
+accepted `WT-Layout-Fix-1.25.2733.0-lf-rmb3` runtime has not been wired into that
+outside fallback. Pinning the newer EXE does not change HCA. To inspect the live
+selection in an idle Zsh prompt:
 
 ```zsh
 source ~/.zshrc
 wt-doctor
 ```
 
-Doctor currently shows channel `layout-fix`, the EXE in `Programs/WT-Layout-Fix-1.25.1912.0`
-and adjacent `settings/settings.json`. When the owner chooses to migrate HCA,
-follow [UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат)
+Inside Terminal, `wt-doctor` should report channel `current-portable` with the
+`rmb3` launcher and settings. Outside Terminal it stops at
+`where wt.exe: FAIL` before printing a channel because the configured 1912
+folder is absent. When the owner chooses to migrate the outside fallback, follow
+[UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат)
 and update the resolver/test/runbook together. Until then launch the accepted
-build directly or through its pinned shortcut. A project without a count opens one new
-single-pane tab in the most recently active window of this build. An explicit
-count enables splitting; named presets retain their layouts.
+`rmb3` build directly or through its pinned shortcut. A project without a count
+opens one new single-pane tab in the most recently active window of this build.
+An explicit count enables splitting; named presets retain their layouts.
 No Windows/WSL restart is needed. If the build is missing, HCA fails instead
 of switching silently to installed Preview or Stable.
 
@@ -284,7 +315,9 @@ In `WT-PASTE-TEST`, the owner confirmed PrintScreen → Ctrl+V and ordinary text
 in Codex on 2026-09-19. Its receipt remains historical:
 [clipboard-candidate-20260919.json](build/clipboard-candidate-20260919.json).
 
-The accepted build adds multiple Explorer files. Normal launch (no test tabs):
+The published `layout-fix.2` build adds multiple Explorer files. Normal launch
+of that archive's portable runtime (the 1.25.1912.0 folder is not installed on
+this PC; extract the published archive first if you need it):
 
 ```powershell
 & "$env:LOCALAPPDATA\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\WindowsTerminal.exe"
@@ -309,13 +342,24 @@ replacement; failed writes remove their incomplete file. PNGs survive Terminal
 exit so agents can read them later. Clean old files after finishing attachments;
 they are private local data, excluded from Git and release archives.
 
-Apply patches in order:
-1. [layout-fix.patch](patches/layout-fix.patch), source `a34eea7`;
-2. [clipboard-image-paste.patch](patches/clipboard-image-paste.patch), source `2d4c28b`;
-3. [clipboard-files-paste.patch](patches/clipboard-files-paste.patch), the incremental multi-file fix;
-4. [terminal-owned-right-button.patch](patches/terminal-owned-right-button.patch),
-   the secondary button stays with Terminal when the application tracks the
-   mouse; the primary button keeps reaching the application.
+Patch order depends on the base:
+
+- Published 1.25.1912.0 archive:
+  1. [layout-fix.patch](patches/layout-fix.patch), source `a34eea7`;
+  2. [clipboard-image-paste.patch](patches/clipboard-image-paste.patch), source `2d4c28b`;
+  3. [clipboard-files-paste.patch](patches/clipboard-files-paste.patch), the incremental multi-file fix.
+- Current Stable 1.25.2733.0 candidate adds, in order:
+  4. [preserve-runtime-tab-color.patch](patches/preserve-runtime-tab-color.patch);
+  5. [connection-lifecycle-diagnostics.patch](patches/connection-lifecycle-diagnostics.patch);
+  6. [suppress-exit-notice-on-auto-close.patch](patches/suppress-exit-notice-on-auto-close.patch);
+  7. [terminal-owned-right-button.patch](patches/terminal-owned-right-button.patch),
+     which keeps only the secondary button with Terminal when the application
+     tracks the mouse; the primary button keeps reaching the application.
+
+The exact current pins, source hashes and patch status are in
+[build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
+and [UPDATING.md](UPDATING.md). Do not apply the later patches to the published
+1.25.1912.0 archive without an explicit port and a new build.
 
 ### Why the right-button patch exists
 
@@ -399,8 +443,9 @@ folder as the build working without freezes with 50 terminals. The owner also
 reports everything checked and working; the explicit per-feature screenshot/text
 receipt remains from the preceding candidate. No instrumented 50-tab timings or
 full UI regression are claimed. `layout-fix.2` preserves the accepted runtime
-and current JSON without recompilation. Its shortcut is pinned; HCA still
-selects the older installation at the owner's request.
+and current JSON without recompilation. Its shortcut was pinned; HCA then
+selected the older installation at the owner's request. The current runtime
+check above records the later stale routing.
 
 <a id="рабочие-настройки"></a>
 ## Working settings
@@ -422,7 +467,7 @@ selects the older installation at the owner's request.
 | `Ctrl+Shift+F`, `Ctrl+Shift+P` | Standard search and command palette |
 
 Automatic URL detection was restored on 2026-09-19 in the daily portable
-configuration and the running `clipboard-files-test` candidate. It had remained
+configuration and the then-running `clipboard-files-test` candidate. It had remained
 disabled after the layout-freeze investigation. Upstream defaults to `true`:
 plain `http://localhost:3002` output is underlined on hover and opens via
 Ctrl+left-click in the system browser. This needs a settings change, not a new
@@ -450,8 +495,10 @@ Save work and finish agents first. Panes/output restore; live programs do not.
 <a id="исходный-код-и-границы-проверки"></a>
 ## Source and verification boundaries
 
-- Upstream: [microsoft/terminal, v1.25.1912.0](https://github.com/microsoft/terminal/tree/v1.25.1912.0).
-- Base: `1cea42d433253d95c4487a3037db48197b5e72f4`.
+- Published archive upstream: [microsoft/terminal, v1.25.1912.0](https://github.com/microsoft/terminal/tree/v1.25.1912.0).
+- Published archive base: `1cea42d433253d95c4487a3037db48197b5e72f4`.
+- Current candidate upstream: `v1.25.2733.0`, commit
+  `dc8ae365847d41f62d1ebca93815bb00959bc12f`.
 - Original local patch commit: `a34eea7b524f7516c68014a14bb94e215520e0fc`.
 - [Full patch](patches/layout-fix.patch) changes three files: `TerminalPage.cpp`,
   `TerminalPage.h`, `TermControl.cpp`.
@@ -460,21 +507,25 @@ Save work and finish agents first. Panes/output restore; live programs do not.
   deferred to the existing final refresh. `BackgroundBrush` notifies on object/
   color changes, including acrylic. The source patch changes neither the
   language-switch handler nor input bindings.
-- Build: Release/x64, VS Build Tools 2022 17.11.1, MSVC 14.41.34120,
-  Windows SDK 10.0.22621.0. Historical result: 0 errors, 70 warnings.
+- Published 1.25.1912.0 build: Release/x64, VS Build Tools 2022 17.11.1,
+  MSVC 14.41.34120, Windows SDK 10.0.22621.0. Historical result: 0 errors,
+  70 warnings. The 1.25.2733.0 candidate used VS 2026 Build Tools; exact
+  versions and exits are in the [dated report](docs/upgrade-20261026.md).
 - Stock/fix comparison with identical current settings and a complete UI
   regression remain unperformed. Cyrillic duplication occurred in both builds;
   HCA's accepted workaround above is independent of the Terminal binary patch.
 
-To recover source, obtain the official repository at the exact base above;
-check/apply `patches/layout-fix.patch` using `git apply --check` and `git apply`.
-Follow that upstream tag's build guide. A clean rebuild from this recovery kit
-has not been performed; use the tested binary release ZIP for quick recovery.
+To recover the published archive source, obtain `v1.25.1912.0` at the exact base
+above and apply the first three patches. For the current candidate, use
+`v1.25.2733.0` (`dc8ae365…`) and the ordered seven-patch chain above. Check and
+apply patches with `git apply --check` / `git apply`, then follow that tag's
+build guide. A clean rebuild from this recovery kit has not been performed; use
+the tested binary release ZIP for quick recovery.
 
 Current native checkout for Stable `v1.25.2733.0`:
 `C:\Users\Pavel\Source\terminal-v1.25.2733.0`
 (`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
-source used by the diagnostic build receipt. The older
+source used by the current `rmb3` build receipt. The older
 `C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
 Inspect Git in the selected checkout before work; the saved build receipt does
@@ -488,21 +539,25 @@ not the current Git `settings/settings.json`.
 <a id="обновление-резервной-копии"></a>
 ## Updating the recovery copy
 
-Accepted recovery configuration on this PC:
-`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0-clipboard-files-test\settings\settings.json`.
-The still-used older installation has an identical JSON at:
-`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json`.
-The reviewed snapshot was synchronized on 2026-09-19, including automatic URL
-detection, newline bindings, Ctrl+N/Ctrl+W and disabled Kitty mode for Ubuntu.
-After later changes review only this JSON first: it may contain personal paths
-and command lines. Buffers, runtime state and authentication stay out of Git.
+Current accepted runtime configuration on this PC:
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0\settings\settings.json`.
+Its SHA-256 is `20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda`,
+matching the repository snapshot checked on 2026-11-03. The published
+`layout-fix.2` settings path under `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
+is historical; that runtime is not installed on this PC.
+
+The reviewed snapshot was originally synchronized on 2026-09-19, including
+automatic URL detection, newline bindings, Ctrl+N/Ctrl+W and disabled Kitty mode
+for Ubuntu. After later changes review only this JSON first: it may contain
+personal paths and command lines. Buffers, runtime state and authentication stay
+out of Git.
 
 In WSL, from this repository root, after reviewing the changes:
 
 ```bash
-cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test/settings/settings.json settings/settings.json
+cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3/terminal-1.25.2733.0/settings/settings.json settings/settings.json
 python3 -m json.tool settings/settings.json > /dev/null
-cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test/settings/settings.json
+cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3/terminal-1.25.2733.0/settings/settings.json
 rtk proxy git diff -- settings/settings.json
 ```
 
