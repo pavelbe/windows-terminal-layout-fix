@@ -42,7 +42,9 @@ runtime (`rmb3`). Outside Terminal, channel `layout-fix` still points at
 `Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, so that fallback
 fails closed until the owner updates routing. The public `layout-fix.2` archive
 remains the released recovery artifact and is independent of this local
-candidate.
+candidate. Pending manual acceptance is listed in
+[docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
+settings drift is checked by `build/Test-RuntimeState.sh`.
 
 ## Tested build and maintainer recovery notes
 
