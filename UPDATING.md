@@ -1,8 +1,10 @@
 # Updating Windows Terminal and porting our patches
 
-This is the procedure for the next upgrade. The prepared Stable
-`v1.25.2733.0` candidate's build and package evidence is in
-[the dated report](docs/upgrade-20261026.md). [README.md](README.md) owns the
+This is the procedure for the next upgrade. The current recipe builds the
+separate Stable `v1.25.2733.0` `paste1` candidate; its build, delivery and pending
+acceptance are in [the candidate record](docs/paste-candidate-20261103.md).
+The first Stable build evidence remains in [the dated report](docs/upgrade-20261026.md).
+[README.md](README.md) owns the
 current runtime and recovery status. Obtain Microsoft's source separately;
 this repository is the recovery kit.
 
@@ -71,9 +73,9 @@ distribution. Close working windows only in the owner-approved transition window
 <a id="3-получить-исходники-и-проверить-патч"></a>
 ## 3. Obtain source and check each patch
 
-Published archive base: `v1.25.1912.0`,
+Previous `layout-fix.2` archive base: `v1.25.1912.0`,
 SHA `1cea42d433253d95c4487a3037db48197b5e72f4`.
-Current candidate base: Stable `v1.25.2733.0`, commit
+Published `layout-fix.3` and current candidate base: Stable `v1.25.2733.0`, commit
 `dc8ae365847d41f62d1ebca93815bb00959bc12f`.
 [patches/layout-fix.patch](patches/layout-fix.patch) comes from source commit
 `a34eea7b524f7516c68014a14bb94e215520e0fc`.
@@ -81,8 +83,9 @@ It is a C++ source diff; **it cannot be applied to an EXE or MSIX**. Port and
 re-check it against the selected tag; a clean apply does not prove semantics.
 
 Choose an exact release tag in WSL. This example uses the current candidate;
-for the published archive use the historical 1.25.1912.0 tag and only the first
-three patches. Keep the Windows/MSBuild checkout on NTFS, for example
+for published `layout-fix.3`, use the same base and only the first seven patches.
+Recovering `layout-fix.2` instead requires the historical 1.25.1912.0 tag and
+the first three patches. Keep the Windows/MSBuild checkout on NTFS, for example
 `C:\Users\Pavel\Source`, rather than a UNC path.
 
 ```bash

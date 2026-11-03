@@ -1,6 +1,6 @@
 ---
 name: windows-desktop-open
-version: 1.1.0
+version: 1.1.1
 description: Show a folder or file from this project on the Windows desktop - Explorer window, file selection, or a short open-in-Notepad++ request; includes the verified cmd-start recipe and the Explorer Home failure mode.
 ---
 
@@ -13,6 +13,10 @@ in Notepad++ from a WSL session on this host.
 
 - Resolve the real path and confirm it exists (`ls` on `/mnt/c/...` or the WSL
   path).
+- For a Terminal build folder, first distinguish the running runtime from a
+  prepared candidate or published archive. Read [the current runtime record](../../../README.md)
+  and its linked candidate record; verify the exact EXE/shortcut target. A folder
+  name or ProductVersion alone does not identify which build is running.
 - On this host a direct Windows executable call can fail with `exec format
   error` while `/init <windows-exe>` works. Run Windows commands from `/mnt/c`
   so CMD never receives a WSL UNC working directory.
@@ -21,11 +25,11 @@ in Notepad++ from a WSL session on this host.
 
 ## Open the Terminal build's own folder
 
-In the patched build used on this PC (`lf-menu2`) the new-tab menu has
+In a build carrying the three menu patches, the new-tab menu has
 `Explorer: Terminal folder` under the divider, and its generated shortcut
 (Ctrl+Shift+9) opens the folder of the running Terminal without creating a
-pane. That path works only in a build carrying the three menu patches; on an
-unpatched build the same profile opens a pane around `explorer.exe`. For an
+pane. The owner accepted this in `lf-menu2`; check README for the build in use.
+On an unpatched build the same profile opens a pane around `explorer.exe`. For an
 arbitrary folder or an older build, use the Explorer recipe below.
 
 ## Open a folder in Explorer
@@ -65,3 +69,7 @@ cd /mnt/c && /init "/mnt/c/Program Files/Notepad++/notepad++.exe" -nosession "C:
 - Long or multiline commands meant for pasting still go through
   `~/.claude/skills/notepad-open/SKILL.md`; this short form only opens a file.
 - Treat the launch as unverified until the owner confirms the window.
+
+## Version history
+
+- 1.1.1: distinguish running, candidate and archive paths before opening a build folder.

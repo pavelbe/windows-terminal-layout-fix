@@ -18,7 +18,7 @@ to be accepted or merged upstream**.
 | Problem | Change | Evidence and limits |
 | --- | --- | --- |
 | RU/EN switching stalls with many tabs | Coalesce repeated theme updates during settings reload | Owner tested 10, then 50 terminals on one PC; no instrumented benchmark |
-| Bitmap-only clipboard cannot be pasted as an image path | Snapshot bitmap, encode a temporary PNG, paste its quoted path | Owner-tested screenshot/text flow; temporary files remain local |
+| Bitmap-only clipboard cannot be pasted as an image path | Snapshot bitmap, encode a temporary PNG, paste its path | Owner-tested screenshot/text flow; temporary files remain local; path quoting added in `paste1` |
 | Several Explorer images attach incompletely | Read the full file selection and preserve per-file paste events | Owner-tested multi-image paste in Codex and Claude Code |
 | Right-button image paste is consumed by an application with mouse tracking | Keep only the secondary button with Terminal for paste; primary stays with the TUI | Owner-tested in Claude Code; left-button variant rejected because it broke TUI controls |
 
@@ -193,23 +193,24 @@ Agent rules: [AGENTS.md](AGENTS.md); `CLAUDE.md` imports the same guide.
 
 1. This repository and its release downloads are public. Review the tested
    platform and configuration notes above before installing.
-2. Open [release layout-fix.2](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2).
-   Download **WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip** and its **.zip.sha256**
+2. Open [release layout-fix.3](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.2733.0-layout-fix.3).
+   Download **WT-Layout-Fix-1.25.2733.0-layout-fix.3-win-x64.zip** and its **.zip.sha256**
    to Downloads. GitHub's "Source code (zip)" is not the executable package.
-   This ZIP includes the reviewed configuration, all three source patches and
-   the accepted runtime. The external release manifest records its exact bytes.
+   This ZIP includes the accepted `rmb3` runtime and its reviewed configuration.
+   Source patches are in this repository. The external release manifest records
+   the exact archive bytes; menu and `paste1` changes are separate local builds.
 3. Run in ordinary Windows PowerShell:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
-$zip = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip'
+$zip = Join-Path $env:USERPROFILE 'Downloads\WT-Layout-Fix-1.25.2733.0-layout-fix.3-win-x64.zip'
 $expected = ((Get-Content -LiteralPath ($zip + '.sha256') -Raw).Trim() -split '\s+')[0]
 if ($expected -notmatch '^[a-fA-F0-9]{64}$') { throw 'Invalid checksum file' }
 if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ine $expected) {
     throw 'Archive checksum mismatch'
 }
 $programs = Join-Path $env:LOCALAPPDATA 'Programs'
-$terminal = Join-Path $programs 'WT-Layout-Fix-1.25.1912.0-clipboard-files-test'
+$terminal = Join-Path $programs 'WT-Layout-Fix-1.25.2733.0-layout-fix.3'
 if (Test-Path -LiteralPath $terminal) {
     throw 'Destination already exists; keep it and extract this archive into a different folder'
 }
@@ -240,15 +241,16 @@ A missing font and a missing runtime are separate problems.
 <a id="что-переносится-и-что-нужно-отдельно"></a>
 ## Included files and separate prerequisites
 
-The archive contains EXE/DLL, XAML/PRI resources, `.portable`, license, all three
-patches, README/UPDATING, historical build evidence and a new release receipt.
-**Only** `settings/settings.json` is included from user data. The 64 runtime
-files match the accepted candidate receipt; settings match the reviewed current
-JSON. The complete archive inventory is
-[build/recovery-manifest-layout-fix.2.json](build/recovery-manifest-layout-fix.2.json).
-Its SHA256 describes this ZIP; the manifest is a separate release asset, avoiding
-a self-referential archive hash. The build/acceptance boundary is recorded in
-[build/release-receipt-layout-fix.2.json](build/release-receipt-layout-fix.2.json).
+The `layout-fix.3` archive contains EXE/DLL, XAML/PRI resources, `.portable`,
+licenses/notices and the reviewed release settings: 56 files in total.
+**Only** `settings/settings.json` is included from user data. Its frozen release
+snapshot differs from the later daily menu settings; inspect it before use.
+Patches, build evidence and recovery guides are in this repository. The complete
+archive inventory is
+[build/recovery-manifest-layout-fix.3.json](build/recovery-manifest-layout-fix.3.json).
+Its SHA256 describes this ZIP; the manifest is tracked here outside the archive,
+avoiding a self-referential archive hash. The build/acceptance boundary is recorded in
+[build/release-receipt-layout-fix.3.json](build/release-receipt-layout-fix.3.json).
 
 **Ubuntu/WSL, projects, HCA, Claude/Codex, authentication and session history are excluded.**
 Back them up separately before replacing the system. The config expects a distro
@@ -298,7 +300,7 @@ This is an HCA workaround, not a Terminal binary patch. Recheck Cyrillic and
 Ctrl/Shift+Enter when changing Codex/Terminal versions.
 
 These notes supersede the README in the original `layout-fix.1` ZIP.
-That archive and SHA256 are unchanged. For migration use `layout-fix.2`,
+That archive and SHA256 are unchanged. For migration use `layout-fix.3`,
 this current guide and the [HCA runbook](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md).
 
 <a id="цифровая-десятичная-клавиша-и-снимки-из-буфера"></a>
@@ -554,8 +556,9 @@ Save work and finish agents first. Panes/output restore; live programs do not.
   regression remain unperformed. Cyrillic duplication occurred in both builds;
   HCA's accepted workaround above is independent of the Terminal binary patch.
 
-To recover the published archive source, obtain `v1.25.1912.0` at the exact base
-above and apply the first three patches. For the current candidate, use
+To recover `layout-fix.2` source, obtain `v1.25.1912.0` at the exact base above
+and apply the first three patches. For published `layout-fix.3`, use
+`v1.25.2733.0` (`dc8ae365…`) and the first seven patches. For the current candidate, use
 `v1.25.2733.0` (`dc8ae365…`) and the ordered eleven-patch chain above for `paste1`
 (first ten for the daily `lf-menu2`). Check and
 apply patches with `git apply --check` / `git apply`, then follow that tag's
