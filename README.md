@@ -362,6 +362,13 @@ Patch order depends on the base:
   7. [terminal-owned-right-button.patch](patches/terminal-owned-right-button.patch),
      which keeps only the secondary button with Terminal when the application
      tracks the mouse; the primary button keeps reaching the application.
+  8. [utility-menu-below-separator.patch](patches/utility-menu-below-separator.patch),
+     which renders new-tab-menu entries placed after a separator below
+     Terminal's own separator, next to the settings group. Prepared
+     2026-11-03; not included in any published archive and not built yet. In a
+     build that carries it, put `{ "type": "separator" }` before the utility
+     profile in `newTabMenu`; without the patch that separator only adds a
+     second divider.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)

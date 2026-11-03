@@ -1,0 +1,40 @@
+diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
+index c734350..b1393ed 100644
+--- a/src/cascadia/TerminalApp/TerminalPage.cpp
++++ b/src/cascadia/TerminalApp/TerminalPage.cpp
+@@ -929,6 +929,23 @@ namespace winrt::TerminalApp::implementation
+         // that we then add to our Flyout.
+         auto entries = _settings.GlobalSettings().NewTabMenu();
+         auto items = _CreateNewTabFlyoutItems(entries);
++
++        // Entries after the last configured separator are utility items: they
++        // belong with the settings group, so render them below Terminal's own
++        // separator. The configured separator only marks the split.
++        std::vector<WUX::Controls::MenuFlyoutItemBase> trailingItems;
++        {
++            const auto lastSeparator = std::find_if(items.rbegin(), items.rend(), [](const auto& item) {
++                return item.try_as<WUX::Controls::MenuFlyoutSeparator>() != nullptr;
++            });
++            if (lastSeparator != items.rend())
++            {
++                const auto separatorPosition = std::prev(lastSeparator.base());
++                trailingItems.assign(std::next(separatorPosition), items.end());
++                items.erase(separatorPosition, items.end());
++            }
++        }
++
+         for (const auto& item : items)
+         {
+             newTabFlyout.Items().Append(item);
+@@ -938,6 +955,11 @@ namespace winrt::TerminalApp::implementation
+         auto separatorItem = WUX::Controls::MenuFlyoutSeparator{};
+         newTabFlyout.Items().Append(separatorItem);
+ 
++        for (const auto& item : trailingItems)
++        {
++            newTabFlyout.Items().Append(item);
++        }
++
+         // add static items
+         {
+             // Create the settings button.
