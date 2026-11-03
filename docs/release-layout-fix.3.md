@@ -1,13 +1,13 @@
-# Release `layout-fix.3` — packaged, not published
+# Release `layout-fix.3` — published
 
-Status 2026-11-03: **packaged, verified and owner-smoked on the packaged
-folder; not published.** The archive was produced from the accepted `rmb3`
-build with the pinned packager (no rebuild), its manifest was measured from the
-exact packaged bytes, and the archive passes the repository verifier. The owner
-ran the packaged runtime on 2026-11-03: the exit-notice flash is gone and the
-remaining checks carry over from the `rmb3` acceptance. A fresh extraction smoke
-of the ZIP itself has not been run. Creating release assets still needs
-explicit owner authorization.
+Status 2026-11-03: **published** as a pre-release at
+<https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.2733.0-layout-fix.3>.
+The archive was produced from the accepted `rmb3` build with the pinned packager
+(no rebuild), its manifest was measured from the exact packaged bytes, and it
+passes the repository verifier. The owner ran the packaged runtime on
+2026-11-03: the exit-notice flash is gone and the remaining checks carry over
+from the `rmb3` acceptance. A fresh extraction smoke of the ZIP itself has not
+been run.
 
 ## Recorded artifact (2026-11-03)
 
@@ -25,9 +25,9 @@ explicit owner authorization.
 
 The packaged runtime also exists locally under
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-layout-fix.3\WT-Layout-Fix-1.25.2733.0-layout-fix.3`
-with its `package-receipt.json`. Steps 1–5 and 7 are done for this archive;
+with its `package-receipt.json`. Steps 1–5, 7 and 8 are done for this archive;
 step 6 is partial (packaged-folder smoke passed 2026-11-03, fresh extraction
-smoke not run); step 8 (publication) remains.
+smoke not run).
 
 ## What the release would contain
 

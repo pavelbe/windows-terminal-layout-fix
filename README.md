@@ -1,13 +1,14 @@
 # Windows Terminal Layout Fix
 
 Community patches and recovery builds for **Windows Terminal, Windows x64**.
-The published `layout-fix.2` archive is based on Preview **1.25.1912.0**; the
-current maintainer candidate is Stable **1.25.2733.0-local-layoutfix-rmb3**.
+The latest published archive `layout-fix.3` is based on Stable **1.25.2733.0**
+(the owner-accepted `rmb3` build); `layout-fix.2` (Preview **1.25.1912.0**)
+remains available as the previous archive.
 The project addresses slow input-language switching with many tabs, clipboard
 image/file paste for terminal applications, and application-owned right-button
 paste behavior.
 
-[Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2) · [Quick start](docs/quick-start.md) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
+[Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.2733.0-layout-fix.3) · [Quick start](docs/quick-start.md) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
 
 This is an unofficial downstream project based on
 [Microsoft Terminal](https://github.com/microsoft/terminal), not a Microsoft
@@ -42,8 +43,8 @@ runtime (`rmb3`). Outside Terminal, channel `layout-fix` now selects the same
 `WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0` runtime; the resolver,
 its test and the HCA runbook were updated together on 2026-11-03. The public
 `layout-fix.2` archive
-remains the released recovery artifact and is independent of this local
-candidate. The owner passed the manual acceptance for `rmb3` on 2026-11-03
+remains available as the previous archive. `layout-fix.3` is published from the
+accepted build described here and is independent of this local candidate. The owner passed the manual acceptance for `rmb3` on 2026-11-03
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
 settings drift is checked by `build/Test-RuntimeState.sh`. The next public
 archive is packaged and verified locally but not published; the recorded

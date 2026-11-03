@@ -90,7 +90,10 @@
     "credentials"
   ],
   "publication": {
-    "published": false,
+    "published": true,
+    "publishedDate": "2026-11-03",
+    "url": "https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.2733.0-layout-fix.3",
+    "prerelease": true,
     "gate": "explicit owner authorization; GitHub Actions stay disabled"
   },
   "boundary": "Downstream patch set packaged from an owner-accepted local build; not upstream adoption. Fresh extraction smoke and publication remain outstanding."

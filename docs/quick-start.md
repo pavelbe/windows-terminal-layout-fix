@@ -7,32 +7,36 @@ rights, no change to an existing Windows Terminal installation.
 
 Download from [Releases](https://github.com/pavelbe/windows-terminal-layout-fix/releases):
 
-- `WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip` — published recovery build;
+- `WT-Layout-Fix-1.25.2733.0-layout-fix.3-win-x64.zip` — latest published
+  recovery build (Stable 1.25.2733.0);
 - its `.zip.sha256` checksum.
 
+`layout-fix.2` (Preview 1.25.1912.0) remains available as the previous archive.
 Windows 10/11 x64 only.
 
 ## 2. Verify the download
 
 ```powershell
-Get-FileHash .\WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip -Algorithm SHA256
+Get-FileHash .\WT-Layout-Fix-1.25.2733.0-layout-fix.3-win-x64.zip -Algorithm SHA256
 ```
 
-Compare with the `.zip.sha256` value. For a full check, including every file in
-the archive and the reviewed settings snapshot:
+Compare with the `.zip.sha256` value
+(`4c2ea421b49b38035bedc5d970fb7da37658bb5ed13e779eca430e8e9d6bacb0`). For a
+full check, including every file in the archive and the reviewed settings
+snapshot:
 
 ```bash
 python3 build/release_archive.py verify \
-  WT-Layout-Fix-1.25.1912.0-layout-fix.2-win-x64.zip \
-  --manifest build/recovery-manifest-layout-fix.2.json
+  WT-Layout-Fix-1.25.2733.0-layout-fix.3-win-x64.zip \
+  --manifest build/recovery-manifest-layout-fix.3.json
 ```
 
 ## 3. Run
 
 Extract the ZIP anywhere and start `WindowsTerminal.exe` from the extracted
-`WT-Layout-Fix-1.25.1912.0-clipboard-files-test` folder. A shortcut can target
-that exact EXE. Nothing is installed or registered; deleting the folder removes
-the build.
+`WT-Layout-Fix-1.25.2733.0-layout-fix.3` folder. A shortcut can target that
+exact EXE. Nothing is installed or registered; deleting the folder removes the
+build.
 
 ## 4. Settings
 
