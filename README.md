@@ -45,8 +45,9 @@ its test and the HCA runbook were updated together on 2026-11-03. The public
 remains the released recovery artifact and is independent of this local
 candidate. The owner passed the manual acceptance for `rmb3` on 2026-11-03
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
-settings drift is checked by `build/Test-RuntimeState.sh`. A prepared, not yet
-built release plan for the next public archive is in
+settings drift is checked by `build/Test-RuntimeState.sh`. The next public
+archive is packaged and verified locally but not published; the recorded
+artifact and remaining steps are in
 [docs/release-layout-fix.3.md](docs/release-layout-fix.3.md).
 
 ## Tested build and maintainer recovery notes
