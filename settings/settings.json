@@ -142,6 +142,13 @@
                 "hidden": false,
                 "name": "ClaudeWork",
                 "source": "Microsoft.WSL"
+            },
+            {
+                "closeOnExit": "always",
+                "commandline": "explorer.exe \"C:\\Users\\Pavel\\AppData\\Local\\Programs\\WT-Layout-Fix-1.25.2733.0-layout-fix.3\\WT-Layout-Fix-1.25.2733.0-layout-fix.3\"",
+                "guid": "{caa37a69-2b95-4277-8f08-1064a3fef5a2}",
+                "hidden": false,
+                "name": "Explorer: build folder"
             }
         ]
     },

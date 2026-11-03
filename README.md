@@ -548,8 +548,13 @@ not the current Git `settings/settings.json`.
 
 Current accepted runtime configuration on this PC:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0\settings\settings.json`.
-Its SHA-256 is `20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda`,
-matching the repository snapshot checked on 2026-11-03. The published
+Its SHA-256 is `d72445f88135d5b2979ed64117a2f02b83aedb30a2e604c914448a6bde458941`,
+matching the repository snapshot checked on 2026-11-03. The snapshot adds a
+new-tab-menu profile `Explorer: build folder` (GUID
+`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`) that runs `explorer.exe` on the
+packaged `layout-fix.3` folder and closes its own pane through `closeOnExit`.
+The published archives keep the settings snapshot they were packaged with. The
+published
 `layout-fix.2` settings path under `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
 is historical; that runtime is not installed on this PC.
 
