@@ -1,0 +1,103 @@
+diff --git a/src/cascadia/TerminalApp/ClipboardFiles.h b/src/cascadia/TerminalApp/ClipboardFiles.h
+--- a/src/cascadia/TerminalApp/ClipboardFiles.h
++++ b/src/cascadia/TerminalApp/ClipboardFiles.h
+@@ -7,10 +7,32 @@
+ #include <shellapi.h>
+ #include <wil/result.h>
+ #include <string>
++#include <string_view>
+ #include <vector>
+ 
+ namespace clipboard
+ {
++    inline std::wstring quotePath(const std::wstring_view path)
++    {
++        std::wstring text{ L"\"" };
++        text.append(path);
++        text.push_back(L'"');
++        return text;
++    }
++
++    // Each destination negotiates bracketed paste independently.
++    inline std::wstring framePaste(const std::wstring_view text, const bool bracketed)
++    {
++        if (!bracketed)
++        {
++            return std::wstring{ text };
++        }
++        std::wstring framed{ L"\x1b[200~" };
++        framed.append(text);
++        framed.append(L"\x1b[201~");
++        return framed;
++    }
++
+     // Snapshot every Explorer file while the clipboard is open. Each string is
+     // a separate paste: Codex recognizes one image path per bracketed paste.
+     // Windows paths remain Windows paths, as in the existing single-file paste.
+@@ -31,9 +53,8 @@
+             // Explorer paths cannot contain these. Refuse malformed clipboard
+             // payloads rather than putting control sequences into terminal input.
+             THROW_HR_IF(E_INVALIDARG, path.find_first_of(L"\"\r\n\x1b") != std::wstring::npos);
+-            auto& paste = pastes.emplace_back(index ? L" \"" : L"\"");
+-            paste.append(path);
+-            paste.push_back(L'"');
++            auto& paste = pastes.emplace_back(index ? L" " : L"");
++            paste.append(quotePath(path));
+         }
+         return pastes;
+     }
+diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
+--- a/src/cascadia/TerminalApp/TerminalPage.cpp
++++ b/src/cascadia/TerminalApp/TerminalPage.cpp
+@@ -2969,6 +2969,8 @@
+         const auto globalSettings = _settings.GlobalSettings();
+         const auto bracketedPaste = eventArgs.BracketedPasteEnabled();
+         const auto sourceId = sender.try_as<ControlInteractivity>().Id();
++        // Clipboard access and confirmation can yield while the user changes tabs.
++        const auto sourceTab = _GetFocusedTabImpl();
+ 
+         // GetClipboardData might block for up to 30s for delay-rendered contents.
+         co_await winrt::resume_background();
+@@ -3006,7 +3008,7 @@
+         {
+             // Use the existing file-path paste contract, including bracketed
+             // paste and warnings. Do not rewrite the user's clipboard.
+-            text = winrt::hstring{ clipboard::saveTemporaryPng(image.get()) };
++            text = winrt::hstring{ clipboard::quotePath(clipboard::saveTemporaryPng(image.get())) };
+         }
+ 
+         if (!bracketedPaste && globalSettings.TrimPaste())
+@@ -3118,24 +3120,27 @@
+         co_await wil::resume_foreground(dispatcher);
+         if (const auto strongThis = weakThis.get())
+         {
+-            if (const auto& tab{ strongThis->_GetFocusedTabImpl() })
+-            {
+-                if (tab->TabStatus().IsInputBroadcastActive())
++            if (const auto& tab{ sourceTab })
++            {
++                // Moving the final pane can detach the root while paste is pending.
++                if (const auto root{ tab->GetRootPane() }; root && tab->TabStatus().IsInputBroadcastActive())
+                 {
+-                    tab->GetRootPane()->WalkTree([&](auto&& pane) {
++                    root->WalkTree([&](auto&& pane) {
+                         if (const auto control = pane->GetTerminalControl())
+                         {
+                             if (control.ContentId() != sourceId && !control.ReadOnly())
+                             {
+                                 if (filePastes.empty())
+                                 {
+-                                    control.RawWriteString(text);
++                                    const auto filtered = Utils::FilterStringForPaste(text, Utils::CarriageReturnNewline | Utils::ControlCodes);
++                                    control.RawWriteString(winrt::hstring{ clipboard::framePaste(filtered, control.BracketedPasteEnabled()) });
+                                 }
+                                 else
+                                 {
+                                     for (const auto& paste : filePastes)
+                                     {
+-                                        const auto data = control.BracketedPasteEnabled() ? L"\x1b[200~" + paste + L"\x1b[201~" : paste;
++                                        const auto filtered = Utils::FilterStringForPaste(paste, Utils::CarriageReturnNewline | Utils::ControlCodes);
++                                        const auto data = clipboard::framePaste(filtered, control.BracketedPasteEnabled());
+                                         control.RawWriteString(winrt::hstring{ data });
+                                     }
+                                 }

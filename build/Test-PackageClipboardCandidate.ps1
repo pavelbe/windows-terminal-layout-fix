@@ -65,5 +65,33 @@ Set-Content -LiteralPath $OutputPath -Value 'synthetic merged resources'
     if ((Get-Content -LiteralPath (Join-Path $destination 'settings/settings.json') -Raw) -ne
         (Get-Content -LiteralPath $settings -Raw)) { throw 'Reviewed settings changed' }
     Write-Host 'PASS: dirty layout refused before writes; clean candidate includes only the reviewed settings'
+
+    # Execute the new packager's exact read-only MSIX preflight with real ZIPs.
+    $packageScript = Join-Path $PSScriptRoot 'Package-PasteCandidate-20261103.ps1'
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [Management.Automation.Language.Parser]::ParseFile($packageScript, [ref]$tokens, [ref]$parseErrors)
+    if ($parseErrors.Count) { throw 'Paste packager has syntax errors' }
+    $preflight = @($ast.FindAll({ param($node)
+        $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Assert-CleanTerminalPackage'
+    }, $false))
+    if ($preflight.Count -ne 1) { throw 'Expected exactly one package settings preflight' }
+    . ([scriptblock]::Create($preflight[0].Extent.Text))
+    foreach ($entryName in @('settings/', 'settings/state.json', 'Settings/SETTINGS.JSON', 'settings', 'resources.pri')) {
+        $zipPath = Join-Path $root ([guid]::NewGuid().ToString('N') + '.msix')
+        $zip = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Create)
+        try { $null = $zip.CreateEntry($entryName) }
+        finally { $zip.Dispose() }
+        $failure = $null
+        try { Assert-CleanTerminalPackage -Path $zipPath }
+        catch { $failure = $_ }
+        if ($entryName -eq 'resources.pri') {
+            if ($null -ne $failure) { throw 'Clean package unexpectedly refused' }
+        }
+        elseif ($null -eq $failure -or $failure.Exception.Message -notlike '*settings directory*') {
+            throw "Package settings preflight did not refuse: $entryName"
+        }
+    }
+    Write-Host 'PASS: MSIX settings entries refused; clean package accepted before extraction'
 }
 finally { if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force } }

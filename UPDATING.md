@@ -188,6 +188,13 @@ and failed-write cleanup. Never inject Enter or replace the system clipboard.
 The owner accepted screenshots/text in the first candidate; multi-file candidate
 acceptance and promotion are tracked in README, not inferred from build success.
 
+After the three menu patches, `patches/clipboard-paste-parity.patch` adds the
+`paste1` clipboard changes. Screenshot paths use the same quoting as Explorer
+paths; broadcast text/images use each receiving pane's bracketed-paste mode.
+The original tab is retained before async clipboard access, so changing focus
+does not redirect a pending broadcast to another tab. The native header smoke
+checks quoting and paste boundaries; tab-switch UI acceptance stays separate.
+
 <a id="4-собрать-на-windows"></a>
 ## 4. Build on Windows
 
@@ -248,11 +255,13 @@ a bare `explorer.exe` profile's folder without a pane, both from the menu item
 and from its generated keyboard shortcut.
 The first
 unbranded build's frozen recipe and receipts remain historical evidence.
-`$ExpectedStatus`/`$ExpectedSourceHashes` describe the `lf-menu2` source state
-(`TerminalPage.cpp` `16bb852f…`, `AppActionHandlers.cpp` `d6ae2b20…`) and
+`$ExpectedStatus`/`$ExpectedSourceHashes` now describe the `paste1` source state
+(`TerminalPage.cpp` `382b1cfb…`, `AppActionHandlers.cpp` `d6ae2b20…`) and
 include `ConptyConnection.h/.idl`, `TerminalPaneContent.h/.cpp` and
 `ControlInteractivity.cpp`; re-pin them from the exact tree after any further
-source change. The `lf-menu2` run `20261103-200344…` passed the package build
+source change. The product suffix is `local-layoutfix-paste1`, distinct from
+the earlier menu build's `rmb3` label. The `lf-menu2` run `20261103-200344…`
+passed the package build
 and Terminal Core tests; the `rmb3` run `20261101-112434…` is the
 pre-menu fallback.
 The earlier diag2 run is the pre-right-button fallback.
@@ -286,6 +295,13 @@ earlier `build/Package-Rmb3Candidate-20261101.ps1` is the pre-menu fallback, and
 `build/Package-LFStableCandidate-20261027.ps1` is the diag2
 pre-right-button fallback. Rebind pins from the exact build before packaging a
 different run.
+
+For the prepared `paste1` source/build, use
+`build/Package-PasteCandidate-20261103.ps1` instead. It pins that separate run
+and checks MSIX entries for a `settings` directory before any destination or
+extraction writes. The menu packager remains bound to its older MSIX and must
+not be repinned to stand in for the new candidate. Current build/package proof
+and pending manual checks: [paste candidate](docs/paste-candidate-20261103.md).
 
 The base provides
 [New-UnpackagedTerminalDistribution.ps1](https://github.com/microsoft/terminal/blob/v1.25.2733.0/build/scripts/New-UnpackagedTerminalDistribution.ps1).

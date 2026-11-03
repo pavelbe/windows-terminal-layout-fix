@@ -51,6 +51,12 @@ settings drift is checked by `build/Test-RuntimeState.sh`. The published
 `layout-fix.3` record and its remaining checks are in
 [docs/release-layout-fix.3.md](docs/release-layout-fix.3.md).
 
+**Prepared clipboard candidate:** `paste1` adds quoted screenshot paths,
+per-pane broadcast paste boundaries and the original-tab binding across async
+clipboard access. Its build, package and manual-acceptance status are tracked in
+[the candidate record](docs/paste-candidate-20261103.md). The accepted daily
+runtime and HCA routing remain `lf-menu2` until separate manual acceptance.
+
 ## Tested build and maintainer recovery notes
 
 **Right-button paste candidate, 2026-11-01 — accepted by the owner:**
@@ -382,6 +388,12 @@ Patch order depends on the base:
      `Terminal.OpenNewTabProfileN` action, so Ctrl+Shift+9 opens the folder
      without creating a tab either. In the daily `lf-menu2` candidate; not in
      any published archive.
+ 11. [clipboard-paste-parity.patch](patches/clipboard-paste-parity.patch),
+     which quotes screenshot paths like Explorer file paths, preserves each
+     broadcast destination's bracketed-paste mode for text and images, and keeps
+     broadcast on the tab that requested the paste across async clipboard access.
+     Prepared in the separate `paste1` candidate; absent from `lf-menu2` and
+     published archives.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
@@ -544,7 +556,8 @@ Save work and finish agents first. Panes/output restore; live programs do not.
 
 To recover the published archive source, obtain `v1.25.1912.0` at the exact base
 above and apply the first three patches. For the current candidate, use
-`v1.25.2733.0` (`dc8ae365…`) and the ordered ten-patch chain above. Check and
+`v1.25.2733.0` (`dc8ae365…`) and the ordered eleven-patch chain above for `paste1`
+(first ten for the daily `lf-menu2`). Check and
 apply patches with `git apply --check` / `git apply`, then follow that tag's
 build guide. A clean rebuild from this recovery kit has not been performed; use
 the tested binary release ZIP for quick recovery.
@@ -552,7 +565,8 @@ the tested binary release ZIP for quick recovery.
 Current native checkout for Stable `v1.25.2733.0`:
 `C:\Users\Pavel\Source\terminal-v1.25.2733.0`
 (`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
-source used by the current `lf-menu2` build receipt. The older
+source now prepared for `paste1`; the earlier `lf-menu2` receipt retains its
+original source hashes. The older
 `C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
 Inspect Git in the selected checkout before work; the saved build receipt does

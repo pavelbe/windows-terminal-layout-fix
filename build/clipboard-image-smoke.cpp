@@ -60,6 +60,13 @@ int wmain(int argc, wchar_t** argv)
 try
 {
     const auto apartment = wil::CoInitializeEx();
+    const auto screenshotPath = clipboard::quotePath(L"C:\\Temp Folder\\Снимок.png");
+    require(screenshotPath == L"\"C:\\Temp Folder\\Снимок.png\"", "screenshot path must remain one quoted attachment");
+    require(clipboard::framePaste(screenshotPath, true) == L"\x1b[200~\"C:\\Temp Folder\\Снимок.png\"\x1b[201~", "broadcast screenshot must use destination bracketed paste");
+    require(clipboard::framePaste(screenshotPath, false) == screenshotPath, "plain destination must not receive paste markers");
+    require(clipboard::framePaste(L"first\rsecond", true) == L"\x1b[200~first\rsecond\x1b[201~", "normalized broadcast text must retain paste boundaries");
+    require(clipboard::framePaste(L"", true) == L"\x1b[200~\x1b[201~", "empty bracketed paste must remain observable");
+    std::cout << "PASS quoted screenshot path; per-destination screenshot/text/empty paste boundaries\n";
     checkFiles({}, {});
     checkFiles({ L"C:\\one.png" }, { L"\"C:\\one.png\"" });
     checkFiles({ L"C:\\one.png", L"C:\\Снимки экрана\\два.png", L"C:\\three.txt" },

@@ -37,7 +37,7 @@ $VersioningMajor = [int]$VersioningTagParts[0]
 $VersioningMinor = [int]$VersioningTagParts[1]
 $VersioningBuildNumber = [int]$VersioningTagParts[2]
 $VersioningBuildRevision = [int]$VersioningTagParts[3]
-$VersioningLocalProductVersion = "$VersioningTagVersion-local-layoutfix-rmb3"
+$VersioningLocalProductVersion = "$VersioningTagVersion-local-layoutfix-paste1"
 $VersioningFeedKey = 'TerminalDependencies'
 $VersioningOverlayPropsName = 'Directory.Build.props'
 $VersioningOverlayTargetsName = 'Directory.Build.targets'
@@ -74,7 +74,7 @@ $ExpectedSourceHashes = [ordered]@{
     'res/terminal.ico' = '6a0a1ab4c869add88fd38761d945563d35d4836751e2fd38c040a7329b10cade'
     'src/cascadia/TerminalApp/AppActionHandlers.cpp' = 'd6ae2b20cfee3fc7b7e37da1ad94b88ea5f16b25e73929f9941fe5a05e4de40c'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = '4a0e19b3cecfa5b3918f71b01bb496757a009138e81d17d29d22a50224001611'
-    'src/cascadia/TerminalApp/TerminalPage.cpp' = '16bb852ffc9a48a747792e6d9c1d5d4c0c39043d71314bc43663fc6cd33d2b8a'
+    'src/cascadia/TerminalApp/TerminalPage.cpp' = '382b1cfb24863c830b9a24290d02de5fff50cc794d3c1da748b9657b6f0974e1'
     'src/cascadia/TerminalApp/TerminalPage.h' = 'be74cd1284822fe784dd81607d3777646ca810fa6d916d87c594629a2e64c417'
     'src/cascadia/TerminalApp/TerminalPaneContent.cpp' = 'e06f495faeed8e142dc2e6ee25aee4c068ece250787603857006e2bb9c72e7cb'
     'src/cascadia/TerminalApp/TerminalPaneContent.h' = '40febda456e23ee273d5731302a6ad3b808f2e5fec02086ac6233c441bcd6194'
@@ -87,7 +87,7 @@ $ExpectedSourceHashes = [ordered]@{
     'src/cascadia/TerminalCore/Terminal.cpp' = '668e39077527ffdeb5d774a67d399a46667f91b4d2f91d620ed92e068d0dc48c'
     'src/cascadia/TerminalCore/Terminal.hpp' = '33eddaf6de362f030901d06ff67bd0a220dff57c571a87782b90282cf8ab12d6'
     'src/cascadia/UnitTests_TerminalCore/TerminalApiTest.cpp' = 'e3eacabf2096abc46ff01ae72c540545a433630fe8d1a7880a22381d2ddf975b'
-    'src/cascadia/TerminalApp/ClipboardFiles.h' = '1c8547a9ec18603d6ed69e5e469f1a98986f4c85b031c8c7fef745b176008b77'
+    'src/cascadia/TerminalApp/ClipboardFiles.h' = '1dba6eaa96eb20fc57f3cf65b7502d0f50520499a4fe0f1dcaf5c5a5bf6adbac'
     'src/cascadia/TerminalApp/ClipboardImage.h' = '2ec2f844a73792635e8800a142f5dc169cb4e74590afe8a5c192380e4ea8f5cd'
 }
 
