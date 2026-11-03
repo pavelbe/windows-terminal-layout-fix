@@ -37,6 +37,8 @@ $VersioningMajor = [int]$VersioningTagParts[0]
 $VersioningMinor = [int]$VersioningTagParts[1]
 $VersioningBuildNumber = [int]$VersioningTagParts[2]
 $VersioningBuildRevision = [int]$VersioningTagParts[3]
+# Product/About version embedded in the new EXE/DLL; not a path or download URL.
+# The matching packager's -Destination selects a separate portable runtime folder.
 $VersioningLocalProductVersion = "$VersioningTagVersion-local-layoutfix-paste1"
 $VersioningFeedKey = 'TerminalDependencies'
 $VersioningOverlayPropsName = 'Directory.Build.props'

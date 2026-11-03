@@ -265,6 +265,14 @@ passed the package build
 and Terminal Core tests; the `rmb3` run `20261101-112434…` is the
 pre-menu fallback.
 The earlier diag2 run is the pre-right-button fallback.
+
+`$VersioningLocalProductVersion` is embedded Product/About metadata, not an
+installation path or download URL. The numeric file/package version remains
+`1.25.2733.0`; the suffix identifies the downstream source variant. Packaging
+chooses the output folder through `-Destination`. Keep the existing `lf-menu2`
+runtime intact and deliver `paste1` to a separate `lf-paste1` folder, as recorded
+in [the candidate record](docs/paste-candidate-20261103.md).
+
 `-Run` performs the two restores, Release/x64 CascadiaPackage build, Terminal
 Core test-project build and tagged `terminalCore` unit tests, with `/m:2` and
 separate local logs/exit codes. It does not launch, register or install Terminal
