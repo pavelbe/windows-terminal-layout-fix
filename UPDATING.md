@@ -51,8 +51,9 @@ repository snapshot. The earlier `WT-Layout-Fix-1.25.1912.0`,
 receipts and the published `layout-fix.2` archive remain historical evidence.
 Do not overwrite or delete the accepted `rmb3` runtime during candidate
 preparation. Inside a Windows Terminal session, HCA follows the current portable
-runtime. Outside Terminal, the `layout-fix` fallback is still stale: it points
-at the absent 1.25.1912.0 clipboard-files folder and fails closed.
+runtime. Outside Terminal, the `layout-fix` fallback now selects the same rmb3
+runtime; the resolver, its test and the HCA runbook were updated together on
+2026-11-03.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -426,15 +427,11 @@ original backup; do not hand-edit state. Launch and pin the new EXE.
 **HCA routing needs a separate change.** As checked on 2026-11-03,
 `_wt_resolve_terminal()` in
 `~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` follows the current
-portable runtime inside a Windows Terminal session. Outside Terminal, channel
-`layout-fix` selects
-`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, which is not
-installed on this PC. The accepted `rmb3` runtime is not wired into that outside
-fallback, so `wt` fails closed there. Recheck the live implementation before
-acting. Do not promote a recovery release into daily routing implicitly.
-When the owner chooses the transition, update the outside fallback to the
-verified directory together with `tests/test-wt-commands.sh` and the HCA
-runbook; keep
+portable runtime inside a Windows Terminal session and selects the accepted
+`rmb3` runtime outside Terminal (channel `layout-fix`). Do not promote a
+recovery release into daily routing implicitly: a new candidate still needs the
+resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together;
+keep
 channel `layout-fix`. Do not hide new binaries in a folder bearing an old version.
 
 For an official **installed** Preview/Stable package, set

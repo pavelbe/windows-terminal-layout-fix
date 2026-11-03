@@ -38,9 +38,10 @@ not a prerequisite for running the portable EXE.
 **Current runtime check (2026-11-03):** the installed candidate on this PC is
 `WT-Layout-Fix-1.25.2733.0-lf-rmb3`; the 1.25.1912.0 recovery folders are not
 present. Inside a Windows Terminal session, HCA follows the current portable
-runtime (`rmb3`). Outside Terminal, channel `layout-fix` still points at
-`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, so that fallback
-fails closed until the owner updates routing. The public `layout-fix.2` archive
+runtime (`rmb3`). Outside Terminal, channel `layout-fix` now selects the same
+`WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0` runtime; the resolver,
+its test and the HCA runbook were updated together on 2026-11-03. The public
+`layout-fix.2` archive
 remains the released recovery artifact and is independent of this local
 candidate. Pending manual acceptance is listed in
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
@@ -161,7 +162,7 @@ is identified above; recovery acceptance alone does not switch HCA routing. At
 that time both installations and the immutable `layout-fix.1` archive remained
 intact. On 2026-11-03 only the `rmb3` candidate is installed under
 `%LOCALAPPDATA%\Programs`; the 1.25.1912.0 folders are absent, and the HCA
-resolver still points at one of them.
+resolver targets the installed `rmb3` runtime.
 
 Release check, 2026-10-27: Stable `v1.25.2733.0` and Preview `v1.26.2734.0`
 were the newest published versions in their channels. This is a dated check,
@@ -249,13 +250,11 @@ normal exit. The settings file does not restore live agent processes.
 
 HCA commands `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` and `wth` have a separate
 launch target. As checked on 2026-11-03, inside a Windows Terminal session HCA
-resolves the current portable runtime, which is `rmb3` here. Outside Terminal,
-channel `layout-fix` still selects
-`Programs/WT-Layout-Fix-1.25.1912.0-clipboard-files-test`, but that directory is
-**not installed on this PC**; the outside fallback therefore fails closed. The
-accepted `WT-Layout-Fix-1.25.2733.0-lf-rmb3` runtime has not been wired into that
-outside fallback. Pinning the newer EXE does not change HCA. To inspect the live
-selection in an idle Zsh prompt:
+resolves the current portable runtime, which is `rmb3` here; outside Terminal,
+channel `layout-fix` selects the same
+`Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0` runtime.
+Pinning the newer EXE does not change HCA. To inspect the live selection in an
+idle Zsh prompt:
 
 ```zsh
 source ~/.zshrc
@@ -263,11 +262,12 @@ wt-doctor
 ```
 
 Inside Terminal, `wt-doctor` should report channel `current-portable` with the
-`rmb3` launcher and settings. Outside Terminal it stops at
-`where wt.exe: FAIL` before printing a channel because the configured 1912
-folder is absent. When the owner chooses to migrate the outside fallback, follow
-[UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат)
-and update the resolver/test/runbook together. Until then launch the accepted
+`rmb3` launcher and settings; outside Terminal it reports channel `layout-fix`
+with the same launcher (checked on this PC). A future candidate still needs the
+resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together,
+as in
+[UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат);
+recovery acceptance alone does not move the fallback. Launch the accepted
 `rmb3` build directly or through its pinned shortcut. A project without a count
 opens one new single-pane tab in the most recently active window of this build.
 An explicit count enables splitting; named presets retain their layouts.
@@ -447,7 +447,7 @@ receipt remains from the preceding candidate. No instrumented 50-tab timings or
 full UI regression are claimed. `layout-fix.2` preserves the accepted runtime
 and current JSON without recompilation. Its shortcut was pinned; HCA then
 selected the older installation at the owner's request. The current runtime
-check above records the later stale routing.
+check above records the later migration to `rmb3`.
 
 <a id="рабочие-настройки"></a>
 ## Working settings
