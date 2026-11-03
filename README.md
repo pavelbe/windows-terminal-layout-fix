@@ -548,12 +548,13 @@ not the current Git `settings/settings.json`.
 
 Current accepted runtime configuration on this PC:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0\settings\settings.json`.
-Its SHA-256 is `1fe0c248f4e660596589ac95eb259b05c291383b924fbedf58aa05a07bf027e7`,
+Its SHA-256 is `6f452b5a2fe21afa3f4a6ac108b668b082182b04088df529cd246854d35a22b6`,
 matching the repository snapshot checked on 2026-11-03. The snapshot adds a
 new-tab-menu profile `Explorer: Terminal folder` (GUID
-`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`) that walks the process parents to the
-running `WindowsTerminal` executable and opens its folder in Explorer, falling
-back to `%LOCALAPPDATA%\Programs`; the pane closes through `closeOnExit`. It
+`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`), listed under a separator below the
+profiles, that walks the process parents to the running `WindowsTerminal`
+executable and opens its folder in Explorer, falling back to
+`%LOCALAPPDATA%\Programs`; the pane closes through `closeOnExit`. It
 follows the build actually in use, not a hardcoded path. The published archives
 keep the settings snapshot they were packaged with. The
 published
