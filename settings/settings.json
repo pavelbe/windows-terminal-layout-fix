@@ -73,13 +73,6 @@
     [
         {
             "type": "remainingProfiles"
-        },
-        {
-            "type": "separator"
-        },
-        {
-            "profile": "{caa37a69-2b95-4277-8f08-1064a3fef5a2}",
-            "type": "profile"
         }
     ],
     "profiles":
