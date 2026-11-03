@@ -7,7 +7,7 @@ The project addresses slow input-language switching with many tabs, clipboard
 image/file paste for terminal applications, and application-owned right-button
 paste behavior.
 
-[Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
+[Download](https://github.com/pavelbe/windows-terminal-layout-fix/releases/tag/v1.25.1912.0-layout-fix.2) · [Quick start](docs/quick-start.md) · [Source patches](patches) · [Build and upgrade](UPDATING.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
 
 This is an unofficial downstream project based on
 [Microsoft Terminal](https://github.com/microsoft/terminal), not a Microsoft
@@ -43,9 +43,11 @@ runtime (`rmb3`). Outside Terminal, channel `layout-fix` now selects the same
 its test and the HCA runbook were updated together on 2026-11-03. The public
 `layout-fix.2` archive
 remains the released recovery artifact and is independent of this local
-candidate. Pending manual acceptance is listed in
+candidate. The owner passed the manual acceptance for `rmb3` on 2026-11-03
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
-settings drift is checked by `build/Test-RuntimeState.sh`.
+settings drift is checked by `build/Test-RuntimeState.sh`. A prepared, not yet
+built release plan for the next public archive is in
+[docs/release-layout-fix.3.md](docs/release-layout-fix.3.md).
 
 ## Tested build and maintainer recovery notes
 
@@ -75,7 +77,8 @@ brief text flash before pane removal. Build and Terminal Core tests passed
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-diag2\terminal-1.25.2733.0`,
 shortcut **Terminal LF Diag2 1.25**, and the reviewed settings, but that folder
 is not installed on this PC. No app was launched, registered, installed or
-switched; manual split/exit acceptance is pending. Measured pane-removal delay,
+switched for this candidate; its exit-notice behaviour was accepted later inside
+`rmb3` (see the manual acceptance results). Measured pane-removal delay,
 design, behavior matrix and residual risks:
 [exit-notice suppression](docs/exit-notice-suppression-20261101.md).
 

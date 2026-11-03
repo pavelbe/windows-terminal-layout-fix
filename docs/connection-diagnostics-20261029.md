@@ -104,3 +104,51 @@ Follow-up: the 2026-11-01
 [exit-notice suppression](exit-notice-suppression-20261101.md) patch removes the
 brief `ProcessExited` text flash measured on this build; it is not part of the
 diagnostic candidate.
+
+## Log review, 2026-11-03 (rmb3 runtime)
+
+The connection log on this PC was aggregated by build, event and exit code
+through 2026-11-03:
+
+| event | code | count |
+| --- | --- | --- |
+| `started` | 0 | 163 |
+| `exited` | 0 | 55 |
+| `exited` | 259 (`0x00000103`, still active at close) | 52 |
+| `exited` | 1 | 8 |
+| `launch-failed` | `0x80070002` (file not found) | 4 |
+
+Finding: every non-zero record reproduces the lifecycle fixture, not daily use.
+
+- The eight `code=1` exits belong to the Windows PowerShell profile
+  (`{61c54bbd-c2c6-5271-96e7-009a87ff44bf}`) and last under 0.4 s. They match the
+  fixture's `failure` and `immediate-failure` panes, which exit `1` by design
+  (`build/Test-ConnectionLifecycle.ps1`, launch at line 68 and the `0x00000001`
+  text assertion at line 91).
+- The four `0x80070002` records match the fixture's missing-executable scenario
+  (`lf-missing-executable-…exe`, line 112 and the launch-failure assertion at
+  line 125). Their profile GUID `{3ad42e7b-…}` is not present in the live
+  settings and is the profile Terminal assigns to the failing command.
+- They arrive in four bursts (2026-10-29 10:11, 10:13, 10:19 and 2026-10-31
+  22:46), each with two short-lived PowerShell panes plus one failing launch —
+  the shape of one fixture run, four runs in total.
+- The Ubuntu profile used for daily work (`{52d9ee01-…}`) appears only with
+  `exited code=0` or `code=259`; no Ubuntu pane recorded exit code `1`.
+
+Consequence: no organic `exit code 1` pane is recorded, so the owner's
+intermittent split failure left no `code=1` entry. The log neither confirms nor
+denies a product defect yet; the earlier statement that the cause is unproven
+stands.
+
+Aggregate a fresh log with:
+
+```bash
+awk '{e="";c="";for(i=1;i<=NF;i++){if($i~/^event=/)e=$i;if($i~/^code=/)c=$i}print e,c}' \
+  "$LOCALAPPDATA_LOG" | sort | uniq -c | sort -rn
+```
+
+On recurrence, note the local time, then print the window around it and the
+full history of that session GUID. Distinguish the two outcomes: a pane with
+`started` and `exited code=1` points at the started shell; a pane that closes
+with no record at all never reached ConPTY start, so the failure is earlier in
+the launch path and this instrumentation cannot see it.

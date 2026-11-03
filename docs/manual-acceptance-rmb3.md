@@ -47,14 +47,15 @@ issue with the exact EXE path, Windows version and reproduction.
 
 | # | Check | Result | Notes |
 | --- | --- | --- | --- |
-| 1 | Exit notice on pane close | | |
-| 2 | Right-button image paste | | |
-| 3 | Left-button regression guard | | |
-| 4 | Multi-file paste | | |
-| 5 | Taskbar pin and grouping | | |
-| 6 | Settings untouched | | |
+| 1 | Exit notice on pane close | PASS | Owner-confirmed 2026-11-03 |
+| 2 | Right-button image paste | PASS | Owner-confirmed 2026-11-03 |
+| 3 | Left-button regression guard | PASS | Owner-confirmed 2026-11-03 |
+| 4 | Multi-file paste | PASS | Owner-confirmed 2026-11-03 |
+| 5 | Taskbar pin and grouping | PASS | Owner-confirmed 2026-11-03 |
+| 6 | Settings untouched | PASS | Owner-confirmed 2026-11-03 |
 
-Passed checks close the pending manual acceptance noted in README. They do not
+The owner reported all six checks passing on 2026-11-03. These results close the
+manual acceptance noted in README for the `rmb3` candidate. They do not
 by themselves authorize a public release archive: a new archive still needs its
 own versioned manifest measured from the packaged bytes and a fresh Windows
 smoke of that exact package.

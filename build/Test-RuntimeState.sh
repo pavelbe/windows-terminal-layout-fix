@@ -3,8 +3,9 @@
 #
 # Reports portable runtimes installed under %LOCALAPPDATA%\Programs, compares
 # the settings file used by the HCA outside-Terminal fallback with the reviewed
-# repository snapshot, and points at missing pieces. It never writes, launches,
-# registers or switches anything; exit 1 means drift was found.
+# repository snapshot, and checks that the resolver, its test fixture and the
+# HCA runbook name the same runtime path. It never writes, launches, registers
+# or switches anything; exit 1 means drift was found.
 set -uo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -95,9 +96,40 @@ else
                 else
                     fail "HCA fallback settings differ from the repository snapshot (${fallback_sha:-missing})"
                 fi
+                info "fallback WindowsTerminal.exe sha256: $(sha256sum "$fallback_dir/WindowsTerminal.exe" 2>/dev/null | cut -d' ' -f1) ($(stat -c %s "$fallback_dir/WindowsTerminal.exe" 2>/dev/null) bytes)"
             fi
         fi
     fi
+fi
+
+# Cross-repository consistency: the resolver, its test fixture and the HCA
+# runbook must name the same runtime path. A stale copy in any of them sends
+# readers to a folder that no longer exists.
+runtime_tail() {
+    grep -oE 'WT-Layout-Fix-[A-Za-z0-9._-]+[\\/]terminal-[A-Za-z0-9._-]+' "$1" 2>/dev/null |
+        tr '\\' '/' | sort -u
+}
+resolver_tails="$([[ -f "$resolver" ]] && runtime_tail "$resolver")"
+if [[ -z "$resolver_tails" ]]; then
+    skip "no runtime path found in the resolver; skipping path comparison"
+else
+    for reader in "test fixture:$hca_root/tests/test-wt-commands.sh" \
+        "runbook:$hca_root/docs/04-commands/windows-terminal-tabs-panels.md"; do
+        label="${reader%%:*}"
+        file="${reader#*:}"
+        if [[ ! -f "$file" ]]; then
+            skip "$label not found: $file"
+            continue
+        fi
+        tails="$(runtime_tail "$file")"
+        if [[ -z "$tails" ]]; then
+            fail "$label has no runtime path"
+        elif [[ "$tails" == "$resolver_tails" ]]; then
+            pass "$label matches the resolver path"
+        else
+            fail "$label names a different runtime: $(printf '%s' "$tails" | tr '\n' ' ')"
+        fi
+    done
 fi
 
 echo ""
