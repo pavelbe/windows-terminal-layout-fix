@@ -36,19 +36,19 @@ including an `Ubuntu` profile; review paths, profiles and keybindings for your
 machine. HCA commands in the later maintenance notes are optional local tooling,
 not a prerequisite for running the portable EXE.
 
-**Current runtime check (2026-11-03):** the installed candidate on this PC is
-`WT-Layout-Fix-1.25.2733.0-lf-rmb3`; the 1.25.1912.0 recovery folders are not
-present. Inside a Windows Terminal session, HCA follows the current portable
-runtime (`rmb3`). Outside Terminal, channel `layout-fix` now selects the same
-`WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0` runtime; the resolver,
+**Current runtime check (2026-11-03):** the daily runtime on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-menu2` — the accepted `rmb3` build plus the three
+menu patches ([record](docs/menu-candidate-20261103.md)); the 1.25.1912.0
+recovery folders are not present. Inside a Windows Terminal session, HCA follows
+the current portable runtime (`lf-menu2`). Outside Terminal, channel
+`layout-fix` selects the same
+`WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0` runtime; the resolver,
 its test and the HCA runbook were updated together on 2026-11-03. The public
-`layout-fix.2` archive
-remains available as the previous archive. `layout-fix.3` is published from the
-accepted build described here and is independent of this local candidate. The owner passed the manual acceptance for `rmb3` on 2026-11-03
+`layout-fix.2` and pre-release `layout-fix.3` archives do not include the menu
+patches. The owner passed the manual acceptance for `rmb3` on 2026-11-03
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
-settings drift is checked by `build/Test-RuntimeState.sh`. The next public
-archive is packaged and verified locally but not published; the recorded
-artifact and remaining steps are in
+settings drift is checked by `build/Test-RuntimeState.sh`. The published
+`layout-fix.3` record and its remaining checks are in
 [docs/release-layout-fix.3.md](docs/release-layout-fix.3.md).
 
 ## Tested build and maintainer recovery notes
@@ -165,9 +165,10 @@ shortcut. At that September check, **HCA routing stayed on
 `WT-Layout-Fix-1.25.1912.0` by owner decision**. The later owner-current runtime
 is identified above; recovery acceptance alone does not switch HCA routing. At
 that time both installations and the immutable `layout-fix.1` archive remained
-intact. On 2026-11-03 only the `rmb3` candidate is installed under
-`%LOCALAPPDATA%\Programs`; the 1.25.1912.0 folders are absent, and the HCA
-resolver targets the installed `rmb3` runtime.
+intact. On 2026-11-03 the accepted daily runtime is
+`WT-Layout-Fix-1.25.2733.0-lf-menu2`; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays
+installed as rollback, and the 1.25.1912.0 folders are absent. The HCA resolver
+targets `lf-menu2`.
 
 Release check, 2026-10-27: Stable `v1.25.2733.0` and Preview `v1.26.2734.0`
 were the newest published versions in their channels. This is a dated check,
@@ -255,9 +256,9 @@ normal exit. The settings file does not restore live agent processes.
 
 HCA commands `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` and `wth` have a separate
 launch target. As checked on 2026-11-03, inside a Windows Terminal session HCA
-resolves the current portable runtime, which is `rmb3` here; outside Terminal,
-channel `layout-fix` selects the same
-`Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0` runtime.
+resolves the current portable runtime, which is `lf-menu2` here; outside
+Terminal, channel `layout-fix` selects the same
+`Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0` runtime.
 Pinning the newer EXE does not change HCA. To inspect the live selection in an
 idle Zsh prompt:
 
@@ -267,13 +268,15 @@ wt-doctor
 ```
 
 Inside Terminal, `wt-doctor` should report channel `current-portable` with the
-`rmb3` launcher and settings; outside Terminal it reports channel `layout-fix`
-with the same launcher (checked on this PC). A future candidate still needs the
+launcher of the build in use (`lf-menu2` after the switch); outside Terminal it
+reports channel `layout-fix` with the same launcher (checked on this PC). A
+future candidate still needs the
 resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together,
 as in
 [UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат);
 recovery acceptance alone does not move the fallback. Launch the accepted
-`rmb3` build directly or through its pinned shortcut. A project without a count
+`lf-menu2` build through its pinned shortcut **Terminal LF Menu 1.25**;
+**Terminal LF RMB3 1.25** remains the rollback. A project without a count
 opens one new single-pane tab in the most recently active window of this build.
 An explicit count enables splitting; named presets retain their layouts.
 No Windows/WSL restart is needed. If the build is missing, HCA fails instead
@@ -550,7 +553,7 @@ the tested binary release ZIP for quick recovery.
 Current native checkout for Stable `v1.25.2733.0`:
 `C:\Users\Pavel\Source\terminal-v1.25.2733.0`
 (`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
-source used by the current `rmb3` build receipt. The older
+source used by the current `lf-menu2` build receipt. The older
 `C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
 Inspect Git in the selected checkout before work; the saved build receipt does
@@ -565,15 +568,15 @@ not the current Git `settings/settings.json`.
 ## Updating the recovery copy
 
 Current accepted runtime configuration on this PC:
-`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-rmb3\terminal-1.25.2733.0\settings\settings.json`.
-Its SHA-256 is `1fe0c248f4e660596589ac95eb259b05c291383b924fbedf58aa05a07bf027e7`,
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0\settings\settings.json`.
+Its SHA-256 is `d662100c4bf90241f2ef2234949fcf91f74cba3a49f1764abe7f15b3fa68317a`,
 matching the repository snapshot checked on 2026-11-03. The snapshot adds a
 new-tab-menu profile `Explorer: Terminal folder` (GUID
-`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`) that walks the process parents to the
-running `WindowsTerminal` executable and opens its folder in Explorer, falling
-back to `%LOCALAPPDATA%\Programs`; the pane closes through `closeOnExit`. It
-follows the build actually in use, not a hardcoded path. The published archives
-keep the settings snapshot they were packaged with. The
+`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`) with `"commandline": "explorer.exe"`,
+placed after a `separator` entry. Only a build with the menu patches opens the
+running Terminal's folder without a pane; on an unpatched build the same profile
+starts a pane around a GUI process. The published archives keep the settings
+snapshot they were packaged with. The
 published
 `layout-fix.2` settings path under `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
 is historical; that runtime is not installed on this PC.
@@ -587,9 +590,9 @@ out of Git.
 In WSL, from this repository root, after reviewing the changes:
 
 ```bash
-cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3/terminal-1.25.2733.0/settings/settings.json settings/settings.json
+cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2/terminal-1.25.2733.0/settings/settings.json settings/settings.json
 python3 -m json.tool settings/settings.json > /dev/null
-cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-rmb3/terminal-1.25.2733.0/settings/settings.json
+cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2/terminal-1.25.2733.0/settings/settings.json
 rtk proxy git diff -- settings/settings.json
 ```
 

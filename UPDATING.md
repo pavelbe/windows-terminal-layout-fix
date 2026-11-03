@@ -42,18 +42,20 @@ See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/ter
 ## 2. Preserve the working installation
 
 Save the current JSON and review its diff as described in README.
-On 2026-11-03 the installed runtime on this PC is
-`WT-Layout-Fix-1.25.2733.0-lf-rmb3`; its `settings/settings.json` matches the
+On 2026-11-03 the daily runtime on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-menu2` — the accepted `rmb3` build plus the three
+menu patches; its `settings/settings.json` matches the
 repository snapshot. The earlier `WT-Layout-Fix-1.25.1912.0`,
 `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`,
 `WT-Layout-Fix-1.25.1912.0-tab-color-test` and
 `WT-Layout-Fix-1.25.2733.0-lf-diag2` folders are not installed; their
 receipts and the published `layout-fix.2` archive remain historical evidence.
-Do not overwrite or delete the accepted `rmb3` runtime during candidate
-preparation. Inside a Windows Terminal session, HCA follows the current portable
-runtime. Outside Terminal, the `layout-fix` fallback now selects the same rmb3
-runtime; the resolver, its test and the HCA runbook were updated together on
-2026-11-03.
+Do not overwrite or delete the accepted `lf-menu2` runtime during candidate
+preparation; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays installed as rollback.
+Inside a Windows Terminal session, HCA follows the current portable
+runtime. Outside Terminal, the `layout-fix` fallback now selects the same
+`lf-menu2` runtime; the resolver, its test and the HCA runbook were updated
+together on 2026-11-03.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -240,17 +242,20 @@ suppression patch and the terminal-owned right-button patch. The prepared
 [utility-menu patch](patches/utility-menu-below-separator.patch),
 [explorer-profile patch](patches/explorer-profile-opens-folder.patch) and
 [explorer-profile shortcut patch](patches/explorer-profile-shortcut.patch) are
-not part of the accepted `rmb3` build or any published archive; a build that
-applies them moves new-tab entries placed after a separator below Terminal's
-own separator and opens a bare `explorer.exe` profile's folder without a pane,
-both from the menu item and from its generated keyboard shortcut.
+in the daily `lf-menu2` candidate but not in any published archive; they move
+new-tab entries placed after a separator below Terminal's own separator and open
+a bare `explorer.exe` profile's folder without a pane, both from the menu item
+and from its generated keyboard shortcut.
 The first
 unbranded build's frozen recipe and receipts remain historical evidence.
-`$ExpectedStatus`/`$ExpectedSourceHashes` describe the `rmb3` source state and
+`$ExpectedStatus`/`$ExpectedSourceHashes` describe the `lf-menu2` source state
+(`TerminalPage.cpp` `16bb852f…`, `AppActionHandlers.cpp` `d6ae2b20…`) and
 include `ConptyConnection.h/.idl`, `TerminalPaneContent.h/.cpp` and
 `ControlInteractivity.cpp`; re-pin them from the exact tree after any further
-source change. The `rmb3` run `20261101-112434…` passed the package build and
-Terminal Core tests; the earlier diag2 run is the pre-right-button fallback.
+source change. The `lf-menu2` run `20261103-200344…` passed the package build
+and Terminal Core tests; the `rmb3` run `20261101-112434…` is the
+pre-menu fallback.
+The earlier diag2 run is the pre-right-button fallback.
 `-Run` performs the two restores, Release/x64 CascadiaPackage build, Terminal
 Core test-project build and tagged `terminalCore` unit tests, with `/m:2` and
 separate local logs/exit codes. It does not launch, register or install Terminal
@@ -436,7 +441,7 @@ original backup; do not hand-edit state. Launch and pin the new EXE.
 `_wt_resolve_terminal()` in
 `~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` follows the current
 portable runtime inside a Windows Terminal session and selects the accepted
-`rmb3` runtime outside Terminal (channel `layout-fix`). Do not promote a
+`lf-menu2` runtime outside Terminal (channel `layout-fix`). Do not promote a
 recovery release into daily routing implicitly: a new candidate still needs the
 resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together;
 keep
