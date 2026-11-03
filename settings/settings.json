@@ -145,10 +145,10 @@
             },
             {
                 "closeOnExit": "always",
-                "commandline": "explorer.exe \"C:\\Users\\Pavel\\AppData\\Local\\Programs\\WT-Layout-Fix-1.25.2733.0-layout-fix.3\\WT-Layout-Fix-1.25.2733.0-layout-fix.3\"",
+                "commandline": "powershell.exe -NoProfile -Command \"$q='ProcessId=';$p=Get-Process -Id $PID;while($p -and $p.ProcessName -ne 'WindowsTerminal'){$pp=(Get-CimInstance Win32_Process -Filter ($q + $p.Id)).ParentProcessId;$p=Get-Process -Id $pp -ErrorAction SilentlyContinue};if($p){$d=Split-Path -LiteralPath $p.Path}else{$d=Join-Path $env:LOCALAPPDATA 'Programs'};& explorer.exe $d\"",
                 "guid": "{caa37a69-2b95-4277-8f08-1064a3fef5a2}",
                 "hidden": false,
-                "name": "Explorer: build folder"
+                "name": "Explorer: Terminal folder"
             }
         ]
     },
