@@ -55,7 +55,9 @@ settings drift is checked by `build/Test-RuntimeState.sh`. The published
 per-pane broadcast paste boundaries and the original-tab binding across async
 clipboard access. The owner confirmed screenshots, multiple-image paste,
 right-button paste and multiple-image drag/drop in Codex and Claude Code.
-The `paste2` follow-up embeds the actual build version in lifecycle diagnostics.
+The owner also passed the daily-use smoke in `paste2`, which embeds the actual
+build version in lifecycle diagnostics. `paste3` adds logger formatting and an
+automatic embedded-icon packaging check.
 Build, delivery and remaining manual checks are tracked in
 [the candidate record](docs/paste-candidate-20261103.md). HCA's outside-Terminal
 fallback remains `lf-menu2`; these checks do not implicitly switch routing.
@@ -403,6 +405,9 @@ Patch order depends on the base:
      which derives lifecycle log `build=` from the same `ProductStringVersion`
      embedded in the connection DLL, replacing the fixed diagnostic date marker.
      In the separate `paste2` candidate; absent from earlier runtime bytes.
+ 13. [diagnostic-format.patch](patches/diagnostic-format.patch), which applies
+     upstream clang-format to the lifecycle logger without changing its tokens.
+     In the separate `paste3` candidate.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
@@ -566,8 +571,8 @@ Save work and finish agents first. Panes/output restore; live programs do not.
 To recover `layout-fix.2` source, obtain `v1.25.1912.0` at the exact base above
 and apply the first three patches. For published `layout-fix.3`, use
 `v1.25.2733.0` (`dc8ae365…`) and the first seven patches. For the current candidate, use
-`v1.25.2733.0` (`dc8ae365…`) and the ordered twelve-patch chain above for `paste2`
-(first eleven for `paste1`, first ten for the daily `lf-menu2`). Check and
+`v1.25.2733.0` (`dc8ae365…`) and the ordered thirteen-patch chain above for `paste3`
+(first twelve for `paste2`, first eleven for `paste1`, first ten for `lf-menu2`). Check and
 apply patches with `git apply --check` / `git apply`, then follow that tag's
 build guide. A clean rebuild from this recovery kit has not been performed; use
 the tested binary release ZIP for quick recovery.
@@ -575,7 +580,7 @@ the tested binary release ZIP for quick recovery.
 Current native checkout for Stable `v1.25.2733.0`:
 `C:\Users\Pavel\Source\terminal-v1.25.2733.0`
 (`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
-source now prepared for `paste2`; the earlier `lf-menu2` receipt retains its
+source now prepared for `paste3`; the earlier `lf-menu2` receipt retains its
 original source hashes. The older
 `C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.

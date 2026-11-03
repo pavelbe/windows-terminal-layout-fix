@@ -1,0 +1,39 @@
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.cpp b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+--- a/src/cascadia/TerminalConnection/ConptyConnection.cpp
++++ b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+@@ -56,9 +56,7 @@
+             }
+         }
+         path.append(L"\\connection-events.log");
+-        const wil::unique_hfile file{ CreateFileW(path.c_str(), FILE_APPEND_DATA | FILE_READ_ATTRIBUTES,
+-                                                FILE_SHARE_READ, nullptr, OPEN_ALWAYS,
+-                                                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr) };
++        const wil::unique_hfile file{ CreateFileW(path.c_str(), FILE_APPEND_DATA | FILE_READ_ATTRIBUTES, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT, nullptr) };
+         if (!file)
+         {
+             return;
+@@ -72,9 +70,21 @@
+         SYSTEMTIME time{};
+         GetSystemTime(&time);
+         const auto record = fmt::format(FMT_COMPILE("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z build={} pid={} child={} session={} profile={} event={} code={} hex={:#010x}\r\n"),
+-                                        time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds,
+-                                        WT_DIAGNOSTIC_BUILD_VERSION, GetCurrentProcessId(), childPid, winrt::to_string(winrt::to_hstring(session)),
+-                                        winrt::to_string(winrt::to_hstring(profile)), event, code, code);
++                                        time.wYear,
++                                        time.wMonth,
++                                        time.wDay,
++                                        time.wHour,
++                                        time.wMinute,
++                                        time.wSecond,
++                                        time.wMilliseconds,
++                                        WT_DIAGNOSTIC_BUILD_VERSION,
++                                        GetCurrentProcessId(),
++                                        childPid,
++                                        winrt::to_string(winrt::to_hstring(session)),
++                                        winrt::to_string(winrt::to_hstring(profile)),
++                                        event,
++                                        code,
++                                        code);
+         // No rotation/deletion: preserve earlier evidence and cap total storage.
+         // A full, locked or unwritable log is best-effort only; sessions still work.
+         constexpr DWORD limit = 8 * 1024 * 1024;

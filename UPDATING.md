@@ -1,7 +1,7 @@
 # Updating Windows Terminal and porting our patches
 
 This is the procedure for the next upgrade. The current recipe builds the
-separate Stable `v1.25.2733.0` `paste2` candidate; its build, delivery and pending
+separate Stable `v1.25.2733.0` `paste3` candidate; its build, delivery and pending
 acceptance are in [the candidate record](docs/paste-candidate-20261103.md).
 The first Stable build evidence remains in [the dated report](docs/upgrade-20261026.md).
 [README.md](README.md) owns the
@@ -258,15 +258,17 @@ a bare `explorer.exe` profile's folder without a pane, both from the menu item
 and from its generated keyboard shortcut.
 The first
 unbranded build's frozen recipe and receipts remain historical evidence.
-`$ExpectedStatus`/`$ExpectedSourceHashes` now describe the `paste2` source state
+`$ExpectedStatus`/`$ExpectedSourceHashes` now describe the `paste3` source state
 (`TerminalPage.cpp` `382b1cfb…`, `AppActionHandlers.cpp` `d6ae2b20…`) and
 include `ConptyConnection.h/.idl`, `TerminalPaneContent.h/.cpp` and
 `ControlInteractivity.cpp`; re-pin them from the exact tree after any further
-source change. The product suffix is `local-layoutfix-paste2`, distinct from
+source change. The product suffix is `local-layoutfix-paste3`, distinct from
 the earlier menu build's `rmb3` label. `paste2` adds
 `patches/diagnostic-build-version.patch` after `paste1`: the connection project
 passes `ProductStringVersion` into the logger at compilation, so no version-file
 read is added to connection start. Its project file and source are pinned too.
+`paste3` then applies
+`patches/diagnostic-format.patch`, a whitespace-only logger correction.
 The `lf-menu2` run `20261103-200344…`
 passed the package build
 and Terminal Core tests; the `rmb3` run `20261101-112434…` is the
@@ -277,7 +279,7 @@ The earlier diag2 run is the pre-right-button fallback.
 installation path or download URL. The numeric file/package version remains
 `1.25.2733.0`; the suffix identifies the downstream source variant. Packaging
 chooses the output folder through `-Destination`. Keep the existing `lf-menu2`
-runtime intact and deliver `paste2` to a separate `lf-paste2` folder, as recorded
+runtime intact and deliver `paste3` to a separate `lf-paste3` folder, as recorded
 in [the candidate record](docs/paste-candidate-20261103.md).
 
 `-Run` performs the two restores, Release/x64 CascadiaPackage build, Terminal
@@ -311,10 +313,12 @@ earlier `build/Package-Rmb3Candidate-20261101.ps1` is the pre-menu fallback, and
 pre-right-button fallback. Rebind pins from the exact build before packaging a
 different run.
 
-For the current `paste2` source/build, use
-`build/Package-PasteCandidate2-20261103.ps1`. The earlier
-`build/Package-PasteCandidate-20261103.ps1` retains the `paste1` run pins.
-Both check MSIX entries for a `settings` directory before any destination or
+For the current `paste3` source/build, use
+`build/Package-PasteCandidate3-20261103.ps1`. It also pins and runs
+`build/Test-EmbeddedIcon.ps1` against the packaged EXE and reviewed square ICO;
+all frames and languages in primary icon group 101 must match before a package
+receipt is written. Earlier paste recipes retain their original run pins.
+All three check MSIX entries for a `settings` directory before any destination or
 extraction writes. Preserve the older recipes and rebind a new recipe to each
 new build. Current build/package proof and pending manual checks:
 [paste candidate](docs/paste-candidate-20261103.md).

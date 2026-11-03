@@ -152,3 +152,13 @@ full history of that session GUID. Distinguish the two outcomes: a pane with
 `started` and `exited code=1` points at the started shell; a pane that closes
 with no record at all never reached ConPTY start, so the failure is earlier in
 the launch path and this instrumentation cannot see it.
+
+## Later Application-event reconciliation — 2026-11-03
+
+A later seven-day scan found three Application Error 1000 events from
+2026-10-29 10:03–10:06 UTC, all for the isolated
+`Downloads\WT-Diagnostics-20261029\baseline\WindowsTerminal.exe`, with
+`TerminalApp.dll` / `0xc0000005` / offset `0x14bc8d`. This supersedes the earlier
+no-crash statement for that seven-day window. Their cause is unknown; they are
+not current-runtime crash evidence. Current paste/runtime checks and the bounded
+log review are in [the candidate record](paste-candidate-20261103.md#clipboard-failure-and-log-review).

@@ -1,0 +1,50 @@
+{
+  "defaultProfile": "{6f3ef6ab-cde4-478c-b5ca-6844c23e65b5}",
+  "firstWindowPreference": "defaultProfile",
+  "windowingBehavior": "useNew",
+  "warnAboutMultiLinePaste": false,
+  "warnAboutLargePaste": false,
+  "profiles": {
+    "defaults": {
+      "closeOnExit": "graceful"
+    },
+    "list": [
+      {
+        "guid": "{6f3ef6ab-cde4-478c-b5ca-6844c23e65b5}",
+        "name": "LF paste witness",
+        "commandline": "cmd.exe /d"
+      }
+    ]
+  },
+  "actions": [
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 0
+      },
+      "keys": "f5"
+    },
+    {
+      "command": "toggleBroadcastInput",
+      "keys": "f6"
+    },
+    {
+      "command": "paste",
+      "keys": "f7"
+    },
+    {
+      "command": {
+        "action": "switchToTab",
+        "index": 1
+      },
+      "keys": "f8"
+    },
+    {
+      "command": {
+        "action": "movePane",
+        "index": 1
+      },
+      "keys": "f9"
+    }
+  ]
+}

@@ -39,7 +39,7 @@ $VersioningBuildNumber = [int]$VersioningTagParts[2]
 $VersioningBuildRevision = [int]$VersioningTagParts[3]
 # Product/About version embedded in the new EXE/DLL; not a path or download URL.
 # The matching packager's -Destination selects a separate portable runtime folder.
-$VersioningLocalProductVersion = "$VersioningTagVersion-local-layoutfix-paste2"
+$VersioningLocalProductVersion = "$VersioningTagVersion-local-layoutfix-paste3"
 $VersioningFeedKey = 'TerminalDependencies'
 $VersioningOverlayPropsName = 'Directory.Build.props'
 $VersioningOverlayTargetsName = 'Directory.Build.targets'
@@ -84,7 +84,7 @@ $ExpectedSourceHashes = [ordered]@{
     'src/cascadia/TerminalApp/dll/TerminalApp.vcxproj' = '86c7b61659b99d2bfb468210ccea1b81f50f6ae310c49b67f57d40172f946cce'
     'src/cascadia/TerminalControl/ControlInteractivity.cpp' = 'dea48b7f73c3582cae9a6e1d50e3e67f3de9a1fdaf675db72d554d07efaf9308'
     'src/cascadia/TerminalControl/TermControl.cpp' = '4fdd6aa1a62d6507bf4ff92a710b6a53493fb341b028e56cb58568fc8cfd3323'
-    'src/cascadia/TerminalConnection/ConptyConnection.cpp' = 'e657856fbe32cc9479698036149e8d6be3b50b4217f175544ec96594631b6fba'
+    'src/cascadia/TerminalConnection/ConptyConnection.cpp' = '8770f112b4c9a12069bbe3c99f20d6bd31f45fd1af460a1582d2011d75696259'
     'src/cascadia/TerminalConnection/ConptyConnection.h' = '63ffc99a3c27ba3216ecb3e1c047ce1969300fc57043507005c5d479f986b5c1'
     'src/cascadia/TerminalConnection/ConptyConnection.idl' = '70ab0a02fa7c9dbde62102d8fa5906c0d4a31b09bfc08e9e882f4b06b2e86ee2'
     'src/cascadia/TerminalConnection/TerminalConnection.vcxproj' = 'a2d833f730fc578ca2e32c8b4e2d4f7411f09210ceb69f1789836e4cf808e2c1'

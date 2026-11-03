@@ -80,6 +80,10 @@ current patch chain. Keep that reviewed chain unchanged. Release
 `WindowsTerminal.rc` embeds this resource; `icon.cpp` loads it for window icons,
 including after theme changes. High-contrast resources remain upstream.
 
+`build/Test-EmbeddedIcon.ps1 -TerminalExe <EXE> -ExpectedIcon <ICO>` compares
+every primary-group frame and language without launching the EXE. The `paste3`
+packager runs this check before accepting its output.
+
 Package into a fresh candidate directory. The `-lf-square` example below is the
 2026-10-28 square candidate; the current `lf-menu2` runtime already embeds this icon.
 A shortcut should target that exact `WindowsTerminal.exe` and use the same EXE as `IconLocation`, index 0.

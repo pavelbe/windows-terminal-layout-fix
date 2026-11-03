@@ -96,22 +96,25 @@ Use only the separate candidate after its build/package checks pass:
 1. **OWNER PASS, 2026-11-03:** screenshots, multiple-image paste, right-button
    paste and ordinary paste in Codex and Claude Code. Multiple-image drag/drop
    was separately confirmed in both TUIs.
-2. **NOT RUN:** with broadcast enabled in an isolated tab, paste into panes with different
-   bracketed-paste modes. Check screenshot/text boundaries in each destination.
-3. **NOT RUN:** with a controlled delayed clipboard provider, switch tabs while paste is
-   pending. A different tab must receive no broadcast. Repeat while moving the
+2. **AUTOMATED PASS in paste2/paste3:** with broadcast enabled in an isolated
+   tab, paste into panes with different bracketed-paste modes. Check screenshot/text boundaries in each destination.
+3. **AUTOMATED PASS in paste2/paste3:** with a controlled delayed clipboard
+   provider, switch tabs while paste is pending. A different tab must receive no broadcast. Repeat while moving the
    last source pane; the old root must not be traversed. This requires a native
-   runtime fixture; source review alone does not prove it. Use disposable local
-   shells; never submit test text to running agents.
-4. **NOT RUN in this build:** check the menu folder item and Ctrl+Shift+9, RU/EN, tab color and normal split
-   exit. These behaviors were accepted in earlier binaries, not in this build.
+   runtime fixture (now implemented below); source review alone does not prove
+   it. Use disposable local shells; never submit test text to running agents.
+4. **OWNER PASS in paste2, 2026-11-03:** RU/EN, the menu folder item,
+   Ctrl+Shift+9, splitting and closing panes. Tab color was accepted earlier;
+   restoration remains a separate check.
 
 Owner TUI acceptance is limited to the cases above. Restoration and routing
 promotion remain separate; do not close working sessions to test restoration.
 
 ## Diagnostic build identity follow-up — paste2
 
-Status: **DELIVERED_NOT_MANUALLY_ACCEPTED**. `paste2` retains the owner-tested
+Status: **OWNER_DAILY_SMOKE_PASS** (2026-11-03). The owner confirmed RU/EN,
+the menu folder item, Ctrl+Shift+9, splitting and closing panes in `paste2`.
+`paste2` retains the owner-tested
 clipboard and drag/drop code from `paste1` unchanged. It adds only
 `patches/diagnostic-build-version.patch`: the logger's fixed
 `build=lf-diag-20261029` becomes the existing MSBuild `ProductStringVersion`,
@@ -156,6 +159,97 @@ Desktop shortcut: **Terminal LF Paste2 1.25**. The delivered directory itself
 was not launched; lifecycle smoke used a separate package-only copy with
 synthetic fixture settings. No ZIP, public asset replacement, registration or
 routing promotion was performed. The owner acceptance above applies to
-`paste1`; the remaining manual checks also remain unproven in `paste2`.
+`paste1`; the later owner daily-use checks above apply to `paste2`.
+Automated broadcast/delayed-paste results are recorded in the follow-up below.
 Private local evidence, frozen recipes and before-source copies:
 `%LOCALAPPDATA%\TerminalLayoutFix\Review-20261103-diagver1`.
+
+## Runtime verification and packaging follow-up — paste3
+
+Status: **DELIVERED_RUNTIME_SMOKE_PASS_NOT_OWNER_ACCEPTED**. Native source differs
+from `paste2` only in whitespace within the lifecycle logger, delivered as
+`patches/diagnostic-format.patch`. The pre/post token comparison and scoped
+upstream clang-format check passed. All thirteen patches reconstruct the same
+18 affected upstream source files after CRLF/LF normalization.
+
+- Release/x64 package build and **56/56 Terminal Core tests** passed. Run:
+  `20261103-230446-16c99166ee3649759bc99192cef7e8f4`.
+- Build receipt SHA-256:
+  `e3993e7c703d9d6eee66742bf28cb043203d2718541c1528ad3abba307879983`.
+- MSIX SHA-256:
+  `f9009e6cc8965462a53ac8aacb4e48a4af43ad13cbcdf21d6478b9a407cdb5ff`.
+- `Test-PasteRuntime.ps1` passed all **four native scenarios** on package-only
+  copies of both `paste2` and `paste3`: text broadcast, bitmap broadcast, delayed
+  paste while switching tabs, and delayed paste while moving the last pane.
+  Native receivers record actual ConPTY bytes. Plain and bracketed receivers
+  must receive their exact expected payload; the unrelated tab stays empty.
+  The clipboard provider confirms a real `WM_RENDERFORMAT` request and waits
+  for an explicit release after the UI transition. No running agent receives
+  synthetic input. The empty-recipient observation window is 500 ms after input.
+- With the final unchanged harness on isolated `menu2` bytes, the text case
+  fails at `BRACKETED_PEER: paste framing differs.` and both delayed cases fail
+  at `OTHER_TAB: unrelated recipient received paste.` These are product RED
+  controls, separate from the initial harness-setup failures.
+- Independent review found two harness-isolation gaps, both corrected: require
+  a real adjacent `.portable` file before writes/launch, and send key messages
+  directly to a PID/ancestry-checked XAML focus HWND instead of global input.
+  Missing-marker controls refused both this runner and the existing lifecycle
+  runner before creating evidence. A foreground-switch control delivered its
+  command to the original Terminal; the second owned window saw zero key events.
+- All **four lifecycle scenarios** passed on `paste3`, including exact log/DLL
+  version equality. Intentional error windows belong only to those fixtures.
+- The new pinned packager automatically compares **all nine icon frames in all
+  languages of primary resource group 101** before writing a successful receipt.
+  Correct artwork passes; an altered first-frame payload fails at
+  `Embedded icon frame 0 payload differs.` No EXE code is loaded or launched.
+- Offline packaging tests passed for all three immutable paste recipes; all
+  **55 runtime files** matched the package inventory before delivery. Only the
+  reviewed settings JSON was added; no session state was copied.
+
+Use the separate **Terminal LF Paste3 1.25** desktop shortcut, targeting:
+
+```text
+C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.2733.0-lf-paste3\terminal-1.25.2733.0\WindowsTerminal.exe
+```
+
+The delivered directory was not launched. Native smoke used isolated copies;
+owner daily-use acceptance above applies to `paste2`. Existing installations,
+HCA fallback, public archives and working sessions remain unchanged. No ZIP.
+Private evidence: `%LOCALAPPDATA%\TerminalLayoutFix\Review-20261103-paste3`.
+
+### Repeat the native paste checks
+
+Use a fresh package-only copy with its `.portable` marker. Create a new
+`settings` directory and copy `build/paste-runtime-settings.json` into it as
+`settings.json`; never use daily settings or session state. Terminal may add
+built-in profiles when saving that synthetic file, so restore the fixture JSON
+only in that isolated inactive copy before another run. The test temporarily
+replaces clipboard contents with synthetic text/bitmap data, opens visible
+witness windows, and addresses its own window controls. It closes only its own
+witnesses. Run from native PowerShell 7.4+:
+
+```powershell
+.\build\Test-PasteRuntime.ps1 -TerminalRoot C:\scratch\paste-fixture -EvidenceDirectory C:\scratch\new-paste-evidence
+```
+
+`-Cases delayed-tab` selects one named case for diagnosis. The default runs all
+four. Source compilation requires the same VS2026 C++ Build Tools as the build.
+The renderer/receiver fixture is synthetic test code, not shipped runtime code.
+
+### Clipboard failure and log review
+
+The existing production-header smoke passed PNG lifetime/roundtrip and the
+unwritable-destination case: saving refuses without returning a false path or
+damaging an existing PNG. No routine screenshot-save failure was reproduced,
+so no speculative notification or new logging path was added. The connection
+log does not record clipboard failures; its silence cannot prove paste health.
+
+The seven-day Application event scan inspected 76 events (IDs 1000/1001), with
+no cap reached. Three Terminal crashes and their WER reports all reference the
+old `Downloads\WT-Diagnostics-20261029\baseline` EXE: `TerminalApp.dll`,
+`0xc0000005`, offset `0x14bc8d`. They do not identify a defect in the installed
+`menu2`, `paste2` or `paste3` bytes. Their cause remains unknown; later successful
+fixtures do not explain a historical crash. Existing nonzero connection records
+match the documented lifecycle fixtures, including today's RED/GREEN runs;
+`259` means still active when queried at close. These best-effort logs establish
+neither absence of all defects nor a reason to alter working paste behavior.

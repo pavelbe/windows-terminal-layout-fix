@@ -67,7 +67,7 @@ Set-Content -LiteralPath $OutputPath -Value 'synthetic merged resources'
     Write-Host 'PASS: dirty layout refused before writes; clean candidate includes only the reviewed settings'
 
     # Execute each pinned packager's exact read-only MSIX preflight with real ZIPs.
-    foreach ($packageName in @('Package-PasteCandidate-20261103.ps1', 'Package-PasteCandidate2-20261103.ps1')) {
+    foreach ($packageName in @('Package-PasteCandidate-20261103.ps1', 'Package-PasteCandidate2-20261103.ps1', 'Package-PasteCandidate3-20261103.ps1')) {
         $packageScript = Join-Path $PSScriptRoot $packageName
         $tokens = $null
         $parseErrors = $null

@@ -8,6 +8,9 @@ $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
 Set-StrictMode -Version Latest
 $exe = Join-Path $TerminalRoot 'WindowsTerminal.exe'
+if (!(Test-Path -LiteralPath (Join-Path $TerminalRoot '.portable') -PathType Leaf)) {
+    throw 'Fixture runtime requires its adjacent .portable marker before any writes or launches.'
+}
 $expectedBuildVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo(
     (Join-Path $TerminalRoot 'TerminalConnection.dll')).ProductVersion
 if ([string]::IsNullOrWhiteSpace($expectedBuildVersion)) { throw 'Missing connection library product version.' }
