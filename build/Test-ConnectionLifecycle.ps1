@@ -8,6 +8,9 @@ $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
 Set-StrictMode -Version Latest
 $exe = Join-Path $TerminalRoot 'WindowsTerminal.exe'
+$expectedBuildVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo(
+    (Join-Path $TerminalRoot 'TerminalConnection.dll')).ProductVersion
+if ([string]::IsNullOrWhiteSpace($expectedBuildVersion)) { throw 'Missing connection library product version.' }
 if (Get-Process WindowsTerminal -ErrorAction SilentlyContinue | Where-Object Path -EQ $exe) {
     throw 'Use an isolated, inactive test runtime.'
 }
@@ -91,12 +94,15 @@ foreach ($name in @('success', 'failure', 'immediate-failure')) {
         } "exit $code pane count and error text"
         $log = Join-Path $env:LOCALAPPDATA 'TerminalLayoutFix\Diagnostics\connection-events.log'
         $logged = $false
+        $versionMatches = $false
         if (Test-Path $log) {
             $events = @(Get-Content $log | Where-Object { $_.Contains(" session={$session} ") })
             $logged = $events.Count -eq 2 -and $events[0] -match 'event=started code=0 ' -and
                 $events[0] -notmatch 'child=0 ' -and $events[1] -match "event=exited code=$code "
+            $versionMatches = $events.Count -eq 2 -and
+                @($events | Where-Object { !$_.Contains(" build=$expectedBuildVersion ") }).Count -eq 0
         }
-        $results += [ordered]@{ name = $name; exitCode = $code; documents = $expectedCount; session = $session; terminalPid = $process.Id; loggedInOrder = $logged }
+        $results += [ordered]@{ name = $name; exitCode = $code; documents = $expectedCount; session = $session; terminalPid = $process.Id; expectedBuildVersion = $expectedBuildVersion; loggedInOrder = $logged; buildVersionMatches = $versionMatches }
     }
     finally {
         [IO.File]::WriteAllText($anchorGate, '')
@@ -122,7 +128,8 @@ try {
     $events = @()
     if (Test-Path $log) { $events = @(Get-Content $log | Select-Object -Skip $priorLines | Where-Object { $_ -match " pid=$($process.Id) " }) }
     $logged = $events.Count -eq 1 -and $events[0] -match 'event=launch-failed code=2147942402 '
-    $results += [ordered]@{ name = 'launch-failure'; exitCode = '0x80070002'; documents = 1; terminalPid = $process.Id; loggedInOrder = $logged }
+    $versionMatches = $events.Count -eq 1 -and $events[0].Contains(" build=$expectedBuildVersion ")
+    $results += [ordered]@{ name = 'launch-failure'; exitCode = '0x80070002'; documents = 1; terminalPid = $process.Id; expectedBuildVersion = $expectedBuildVersion; loggedInOrder = $logged; buildVersionMatches = $versionMatches }
 }
 finally {
     Stop-FixtureProcess $process
@@ -131,4 +138,7 @@ $results | ConvertTo-Json | Set-Content (Join-Path $EvidenceDirectory 'result.js
 $results | ConvertTo-Json
 if ($RequireDiagnostics -and @($results | Where-Object { !$_.loggedInOrder }).Count) {
     throw 'Missing persisted lifecycle evidence for observed shell exits.'
+}
+if ($RequireDiagnostics -and @($results | Where-Object { !$_.buildVersionMatches }).Count) {
+    throw 'Lifecycle diagnostics build version differs from TerminalConnection.dll.'
 }

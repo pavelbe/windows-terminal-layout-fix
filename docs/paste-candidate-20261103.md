@@ -68,16 +68,22 @@ branches share destination framing. There is no new runtime dependency or flag.
 
 ## Local delivery
 
-Status: **DELIVERED_NOT_LAUNCHED_NOT_ACCEPTED**. The separate portable runtime is:
+Status: **OWNER_CLIPBOARD_AND_DRAGDROP_PASS** (2026-11-03). The owner confirmed
+screenshots, multiple-image paste, right-button paste and ordinary paste in
+both Codex and Claude Code. Multiple-image drag/drop also works in both TUIs;
+the proposed drag/drop parity change is therefore unnecessary. This does not
+claim broadcast, delayed-paste tab/pane movement or restoration coverage.
+The separate portable runtime is:
 
 ```text
 C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.2733.0-lf-paste1\terminal-1.25.2733.0\WindowsTerminal.exe
 ```
 
 The verified desktop shortcut is `C:\Users\Pavel\Desktop\Terminal LF Paste1 1.25.lnk`.
-Package and delivery receipts are in the runtime's parent directory. No archive,
-app launch, registration, live-runtime replacement or routing change was made.
-All manual checks below remain **NOT RUN** for these runtime bytes.
+Package and original delivery receipts are in the runtime's parent directory;
+their `NOT_LAUNCHED` status describes agent delivery before the owner's tests.
+No archive, registration, live-runtime replacement or routing change was made.
+The checks below retain their individual coverage boundaries.
 
 Local diagnostic inputs, RED variants, logs and the preserved pre-edit source
 are under `%LOCALAPPDATA%\TerminalLayoutFix\Review-20261103-paste1`.
@@ -87,18 +93,69 @@ These are private local evidence, excluded from Git and releases.
 
 Use only the separate candidate after its build/package checks pass:
 
-1. Paste a fresh screenshot, ordinary text, and one/three Explorer images into
-   Codex and Claude Code. Check order, one attachment per image, no extra Enter,
-   and both Ctrl+V and the right button.
-2. With broadcast enabled in an isolated tab, paste into panes with different
+1. **OWNER PASS, 2026-11-03:** screenshots, multiple-image paste, right-button
+   paste and ordinary paste in Codex and Claude Code. Multiple-image drag/drop
+   was separately confirmed in both TUIs.
+2. **NOT RUN:** with broadcast enabled in an isolated tab, paste into panes with different
    bracketed-paste modes. Check screenshot/text boundaries in each destination.
-3. With a controlled delayed clipboard provider, switch tabs while paste is
+3. **NOT RUN:** with a controlled delayed clipboard provider, switch tabs while paste is
    pending. A different tab must receive no broadcast. Repeat while moving the
    last source pane; the old root must not be traversed. This requires a native
    runtime fixture; source review alone does not prove it. Use disposable local
    shells; never submit test text to running agents.
-4. Check the menu folder item and Ctrl+Shift+9, RU/EN, tab color and normal split
+4. **NOT RUN in this build:** check the menu folder item and Ctrl+Shift+9, RU/EN, tab color and normal split
    exit. These behaviors were accepted in earlier binaries, not in this build.
 
-No new Windows UI/TUI acceptance, restoration test or routing promotion is
-claimed. Do not close working sessions to test restoration.
+Owner TUI acceptance is limited to the cases above. Restoration and routing
+promotion remain separate; do not close working sessions to test restoration.
+
+## Diagnostic build identity follow-up — paste2
+
+Status: **DELIVERED_NOT_MANUALLY_ACCEPTED**. `paste2` retains the owner-tested
+clipboard and drag/drop code from `paste1` unchanged. It adds only
+`patches/diagnostic-build-version.patch`: the logger's fixed
+`build=lf-diag-20261029` becomes the existing MSBuild `ProductStringVersion`,
+passed as a compile-time string to TerminalConnection. No runtime file reads,
+new dependencies, logging guards, storage cap or recovery behavior change.
+
+- The twelve-patch chain reconstructed all **18 affected source files** from
+  the pinned upstream SHA, with no differences after CRLF/LF normalization.
+- Release/x64 package build and **56/56 Terminal Core tests** passed. Run:
+  `20261103-224630-2b30db038e6944918bf7302cacea4399`.
+- Build receipt SHA-256:
+  `c23b4c712e616065cc4516f458cd899048e5879448d3582a98116acc1c7bba30`.
+- MSIX SHA-256:
+  `cf6427da7ff1ab7703181feff86f02318f8037bb2df7eac3457682bccbe9d067`.
+- The unchanged lifecycle regression failed on isolated `paste1` bytes at the
+  new build-version assertion: all four existing event-order checks passed,
+  but all four version comparisons failed. On isolated `paste2` bytes, all
+  four scenarios passed both checks, including launch failure. The expected
+  version is read independently from `TerminalConnection.dll` resources:
+  `1.25.2733.0-local-layoutfix-paste2`.
+- These native fixtures intentionally displayed shell/launch errors and closed
+  only their own exact-path processes. Working Terminal/WSL sessions were kept.
+- Offline packaging regression passed for both pinned paste recipes. All
+  **55 package files** were verified by size/SHA-256 before copying only the
+  reviewed settings JSON. PowerShell AST and project XML checks passed.
+- Scoped clang-format reported existing argument-layout debt in the logger:
+  11 diagnostics on the pre-edit statement and 12 with the new argument.
+  This formatting check is **not green**; no unrelated reformat was applied.
+- All **nine embedded icon frames** in the delivered EXE match the reviewed
+  square LF icon. EXE SHA-256:
+  `d03879f28bc82f6198365bfe9253f27c5351c4f6f08da8c6a654b714042ea772`.
+- Runtime-state checks passed: HCA fallback and its test/runbook remain on
+  `lf-menu2`; its settings still match the reviewed repository JSON.
+
+Ready local EXE:
+
+```text
+C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.2733.0-lf-paste2\terminal-1.25.2733.0\WindowsTerminal.exe
+```
+
+Desktop shortcut: **Terminal LF Paste2 1.25**. The delivered directory itself
+was not launched; lifecycle smoke used a separate package-only copy with
+synthetic fixture settings. No ZIP, public asset replacement, registration or
+routing promotion was performed. The owner acceptance above applies to
+`paste1`; the remaining manual checks also remain unproven in `paste2`.
+Private local evidence, frozen recipes and before-source copies:
+`%LOCALAPPDATA%\TerminalLayoutFix\Review-20261103-diagver1`.

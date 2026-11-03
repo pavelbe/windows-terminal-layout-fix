@@ -1,0 +1,27 @@
+diff --git a/src/cascadia/TerminalConnection/ConptyConnection.cpp b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+--- a/src/cascadia/TerminalConnection/ConptyConnection.cpp
++++ b/src/cascadia/TerminalConnection/ConptyConnection.cpp
+@@ -71,9 +71,9 @@
+         }
+         SYSTEMTIME time{};
+         GetSystemTime(&time);
+-        const auto record = fmt::format(FMT_COMPILE("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z build=lf-diag-20261029 pid={} child={} session={} profile={} event={} code={} hex={:#010x}\r\n"),
++        const auto record = fmt::format(FMT_COMPILE("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z build={} pid={} child={} session={} profile={} event={} code={} hex={:#010x}\r\n"),
+                                         time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds,
+-                                        GetCurrentProcessId(), childPid, winrt::to_string(winrt::to_hstring(session)),
++                                        WT_DIAGNOSTIC_BUILD_VERSION, GetCurrentProcessId(), childPid, winrt::to_string(winrt::to_hstring(session)),
+                                         winrt::to_string(winrt::to_hstring(profile)), event, code, code);
+         // No rotation/deletion: preserve earlier evidence and cap total storage.
+         // A full, locked or unwritable log is best-effort only; sessions still work.
+diff --git a/src/cascadia/TerminalConnection/TerminalConnection.vcxproj b/src/cascadia/TerminalConnection/TerminalConnection.vcxproj
+--- a/src/cascadia/TerminalConnection/TerminalConnection.vcxproj
++++ b/src/cascadia/TerminalConnection/TerminalConnection.vcxproj
+@@ -89,7 +89,7 @@
+   <ItemDefinitionGroup>
+     <ClCompile>
+       <!-- By defining this here, we ensure that we don't try to dllimport conpty -->
+-      <PreprocessorDefinitions>CONPTY_IMPEXP=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>WT_DIAGNOSTIC_BUILD_VERSION=&quot;$(ProductStringVersion)&quot;;CONPTY_IMPEXP=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <AdditionalIncludeDirectories>$(IntDir)..\OpenConsoleProxy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+     </ClCompile>
+     <Link>

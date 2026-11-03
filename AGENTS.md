@@ -12,7 +12,7 @@ Read UPDATING.md before porting, building, packaging or changing recovery steps.
   daily candidate is `lf-menu2` with the three menu patches. Read README.md for
   the runtime and patch order. Source identity and original hashes in
   build/original-build-receipt.json are historical; do not overwrite them.
-- The current build recipe pins the separate `paste1` source, not the daily
+- The current build recipe pins the separate `paste2` source, not the daily
   `lf-menu2` binary. Read docs/paste-candidate-20261103.md for its delivered
   runtime, evidence and pending manual acceptance.
 - Inside Terminal HCA follows the current portable runtime; outside, channel
