@@ -1,10 +1,13 @@
 # Release `layout-fix.3` — packaged, not published
 
-Status 2026-11-03: **packaged and verified locally; not published, not
-smoked on a fresh extraction yet.** The archive was produced from the accepted
-`rmb3` build with the pinned packager (no rebuild), its manifest was measured
-from the exact packaged bytes, and the archive passes the repository verifier.
-Creating release assets still needs explicit owner authorization.
+Status 2026-11-03: **packaged, verified and owner-smoked on the packaged
+folder; not published.** The archive was produced from the accepted `rmb3`
+build with the pinned packager (no rebuild), its manifest was measured from the
+exact packaged bytes, and the archive passes the repository verifier. The owner
+ran the packaged runtime on 2026-11-03: the exit-notice flash is gone and the
+remaining checks carry over from the `rmb3` acceptance. A fresh extraction smoke
+of the ZIP itself has not been run. Creating release assets still needs
+explicit owner authorization.
 
 ## Recorded artifact (2026-11-03)
 
@@ -16,13 +19,15 @@ Creating release assets still needs explicit owner authorization.
 | SHA-256 | `4c2ea421b49b38035bedc5d970fb7da37658bb5ed13e779eca430e8e9d6bacb0` |
 | Files | 56 (includes `.portable` and the reviewed `settings/settings.json`) |
 | Manifest | `build/recovery-manifest-layout-fix.3.json` |
+| Release receipt | `build/release-receipt-layout-fix.3.json` |
+| Package receipt | `build/package-receipt-layout-fix.3.json` |
 | Verification | `release_archive.py verify` → PASS on 2026-11-03 |
 
 The packaged runtime also exists locally under
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-layout-fix.3\WT-Layout-Fix-1.25.2733.0-layout-fix.3`
-with its `package-receipt.json`. Steps 1–5 below are done for this archive;
-step 6 (fresh Windows smoke of the extracted archive), step 7 (release receipt)
-and step 8 (publication) remain.
+with its `package-receipt.json`. Steps 1–5 and 7 are done for this archive;
+step 6 is partial (packaged-folder smoke passed 2026-11-03, fresh extraction
+smoke not run); step 8 (publication) remains.
 
 ## What the release would contain
 

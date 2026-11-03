@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "releaseTag": "v1.25.2733.0-layout-fix.3",
+  "recordedDate": "2026-11-03",
+  "runtimeDirectory": "WT-Layout-Fix-1.25.2733.0-layout-fix.3",
+  "upstreamTag": "v1.25.2733.0",
+  "upstreamCommit": "dc8ae365847d41f62d1ebca93815bb00959bc12f",
+  "sourceCommit": "dc8ae365847d41f62d1ebca93815bb00959bc12f",
+  "sourceNote": "Upstream tag tree with the seven reviewed patches applied in the build tree; patch file hashes are recorded below and in the packaged build receipt.",
+  "candidateReceipt": {
+    "path": "build/package-receipt-layout-fix.3.json",
+    "sha256": "e8b03e857604d9fe2570c92353f3219114082c463bf3843f913622deefb9986c"
+  },
+  "patchOrder": [
+    {
+      "path": "patches/layout-fix.patch",
+      "sha256": "1abc24a13d6abca55f92e815d809451c5c9885134c2ccb01edaaa5da75798584"
+    },
+    {
+      "path": "patches/clipboard-image-paste.patch",
+      "sha256": "49c16f1c0d465d1a9ce7aa1a5b065141d8e116a66a73bd2c19cc98f9b9ad9908"
+    },
+    {
+      "path": "patches/clipboard-files-paste.patch",
+      "sha256": "b9eb8b280234cba1350e176ce5446619b2201a71d5153a922e5af27ffe9ea9ea"
+    },
+    {
+      "path": "patches/preserve-runtime-tab-color.patch",
+      "sha256": "b24492f94e6dd9f7e7e7e05ccbd1e723a935f05a3b924927c27bdb4daa9a845d"
+    },
+    {
+      "path": "patches/connection-lifecycle-diagnostics.patch",
+      "sha256": "3badbd61e4449b3559f69c29796b42a51d38446b5a7d0e6d4d0ba1ab0d32645b"
+    },
+    {
+      "path": "patches/suppress-exit-notice-on-auto-close.patch",
+      "sha256": "ca1ca63d7b15e06a1d2805a407c85a2479f36e1d59a5f5886e68e9d17bfb4c3c"
+    },
+    {
+      "path": "patches/terminal-owned-right-button.patch",
+      "sha256": "092b8ec43e0093bdb6d0ac5f7ee30473f6d31669bc0b75c7f69144782c56657b"
+    }
+  ],
+  "runtimeVerification": {
+    "files": 56,
+    "allMatchManifest": true,
+    "TerminalApp.dll": "4023aa7b840409e4144faca1ba8b888f673f41a5f7f2e9ad6526d19cff1d88ae",
+    "WindowsTerminal.exe": "269d9cabb516c38d0c80f12f12af48893a4702f0ce719acdba3c8e2c48691179"
+  },
+  "settings": {
+    "path": "settings/settings.json",
+    "sha256": "20426242513f01c691e127f2f26415721260aa7dc7868a3cf9faccbb733cdeda",
+    "matchesReviewedGitSnapshot": true,
+    "matchesAcceptedInstallation": true,
+    "changeSinceCandidateReceipt": "none"
+  },
+  "build": {
+    "rebuiltForThisArchive": false,
+    "historicalEvidence": "pinned rmb3 run 20261101-112434-9e0ea9d6f2ff43aa85d1aec277ce8bd5",
+    "configuration": "Release/x64",
+    "terminalCoreTests": "56 passed, 0 failed"
+  },
+  "ownerAcceptance": {
+    "confirmedDate": "2026-11-03",
+    "identifiedDirectory": "WT-Layout-Fix-1.25.2733.0-layout-fix.3",
+    "rmb3ManualAcceptance": "OWNER PASS on 2026-11-03: exit notice, right-button paste, left-button controls, multi-file paste, taskbar pin/grouping, settings unchanged",
+    "archiveSmoke": "OWNER PASS on 2026-11-03 on the packaged runtime folder: no ProcessExited flash; other checks carried over from the rmb3 acceptance",
+    "freshExtractionSmoke": "NOT RUN",
+    "freshWindowsInstallation": "NOT RUN",
+    "sameCurrentConfigStockComparison": "NOT RUN"
+  },
+  "dailyRouting": {
+    "changed": false,
+    "hcaFallback": "layout-fix channel resolves the installed rmb3 runtime",
+    "ownerDecision": "The release archive does not move daily routing implicitly."
+  },
+  "officialReleaseCheck": {
+    "date": "2026-10-27",
+    "stable": "v1.25.2733.0",
+    "preview": "v1.26.2734.0",
+    "newerReleaseFound": false,
+    "source": "https://github.com/microsoft/terminal/releases"
+  },
+  "exclusions": [
+    "state and terminal buffers",
+    "screenshots",
+    "traces/dumps/logs/backups",
+    "WSL distributions",
+    "projects",
+    "credentials"
+  ],
+  "publication": {
+    "published": false,
+    "gate": "explicit owner authorization; GitHub Actions stay disabled"
+  },
+  "boundary": "Downstream patch set packaged from an owner-accepted local build; not upstream adoption. Fresh extraction smoke and publication remain outstanding."
+}

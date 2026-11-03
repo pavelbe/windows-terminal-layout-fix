@@ -1,0 +1,293 @@
+{
+  "status": "PACKAGED_NOT_LAUNCHED",
+  "createdUtc": "2026-11-03T16:14:42.1261274Z",
+  "buildReceiptSha256": "641cc6c30d259f55cc5f234ffc04754ec5ee5561a14f3a4f4e9fdb81c7cc6f20",
+  "inputs": {
+    "C:\\Users\\Pavel\\AppData\\Local\\TerminalLayoutFix\\BuildLogs\\WT-v1.25.2733.0\\20261101-112434-9e0ea9d6f2ff43aa85d1aec277ce8bd5\\build-receipt.json": "641cc6c30d259f55cc5f234ffc04754ec5ee5561a14f3a4f4e9fdb81c7cc6f20",
+    "C:\\Users\\Pavel\\Source\\terminal-v1.25.2733.0\\src\\cascadia\\CascadiaPackage\\AppPackages\\CascadiaPackage_1.25.2733.0_x64_Test\\CascadiaPackage_1.25.2733.0_x64.msix": "4ff4e73128ad928dfad885ea44e46c6a159225ff89a49aa90ffcb19cccb05d00",
+    "C:\\Users\\Pavel\\Source\\terminal-v1.25.2733.0\\src\\cascadia\\CascadiaPackage\\AppPackages\\CascadiaPackage_1.25.2733.0_x64_Test\\Dependencies\\x64\\Microsoft.UI.Xaml.2.8.appx": "0c1d46883629a75bff7881661e4bb8ac2510983f9341f35d87dc63702cb85118",
+    "C:\\Users\\Pavel\\Source\\terminal-v1.25.2733.0\\build\\scripts\\New-UnpackagedTerminalDistribution.ps1": "d30bdd45862e44855f505a4339cabc2a1abcfbd1ea3a12bcef9eec10dc4fa7bd",
+    "C:\\Users\\Pavel\\Source\\terminal-v1.25.2733.0\\build\\scripts\\Merge-TerminalAndXamlResources.ps1": "f1feae943935f651cd133d8126dd3ac6431a70785e1440c88fe364c207708ea3",
+    "C:\\Users\\Pavel\\Source\\terminal-v1.25.2733.0\\build\\scripts\\Merge-PriFiles.ps1": "e00337d397c642ebf95bfafc0e996ed245c1e54ff5c3eafb3463b49f96b7805e"
+  },
+  "runtimePath": "C:\\Users\\Pavel\\AppData\\Local\\Programs\\WT-Layout-Fix-1.25.2733.0-layout-fix.3\\terminal-1.25.2733.0",
+  "files": [
+    {
+      "path": ".portable",
+      "bytes": 2,
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "path": "defaults.json",
+      "bytes": 36728,
+      "sha256": "5abe4fefaf0d0d1cb160924ba55b26677e9c5c41eec4b0ad3d2c57a0e3ccf504"
+    },
+    {
+      "path": "elevate-shim.exe",
+      "bytes": 170496,
+      "sha256": "5d08418aa2c0852547412557e33669eac5429ea56987e1a9a396e7bb029c069b"
+    },
+    {
+      "path": "Images\\terminal_contrast-black.ico",
+      "bytes": 43062,
+      "sha256": "29864669d81e7d4e50a8ecc16e992b339658454f5234e1949c512a07edbbabf4"
+    },
+    {
+      "path": "Images\\terminal_contrast-white.ico",
+      "bytes": 43076,
+      "sha256": "0b452ba3cc2ef2e330422aaa55a78fe59b5454279bb35778f2633d770f592f3b"
+    },
+    {
+      "path": "Microsoft.Terminal.Control.dll",
+      "bytes": 1645568,
+      "sha256": "cb6ec9026867ebe5df9956bd8b00bca788db961cacb05ece28d5737e4cf54cbb"
+    },
+    {
+      "path": "Microsoft.Terminal.Settings.Editor.dll",
+      "bytes": 3507712,
+      "sha256": "db253da06598bedcdeabd08ca2824e53bf84bb934b4aa17dadf2cb38baa88af3"
+    },
+    {
+      "path": "Microsoft.Terminal.Settings.Model.dll",
+      "bytes": 2174976,
+      "sha256": "8e3a40fa96dd4adfbd1f27759802e5927a2426b35887808fc28fb1dd93c3c202"
+    },
+    {
+      "path": "Microsoft.Terminal.UI.dll",
+      "bytes": 219648,
+      "sha256": "831861a5eea3c327d5c046e18ad0c18bd2840bfc7f03065e1e52a392ad9be4d8"
+    },
+    {
+      "path": "Microsoft.Terminal.UI.Markdown.dll",
+      "bytes": 355328,
+      "sha256": "e15704b604a0318507b57b3911afdc22a82b66ac7c82bda63bb58a7ac2892e28"
+    },
+    {
+      "path": "Microsoft.UI.Xaml.dll",
+      "bytes": 6115768,
+      "sha256": "8b92de46c8950ced663e970a3352d3930ff3c978f3c73770935b5316cf6ca5ad"
+    },
+    {
+      "path": "Microsoft.UI.Xaml\\Assets\\NoiseAsset_256x256_PNG.png",
+      "bytes": 3241,
+      "sha256": "4f2aa94a2e345a32dae689176b86c644bef87081ff9daef8c77417731862031b"
+    },
+    {
+      "path": "NOTICE.html",
+      "bytes": 552,
+      "sha256": "048d09d5c155b726f1b133c6f2d1c1f141fc8fd1458bf460d00e74d2dde5a814"
+    },
+    {
+      "path": "obj\\x64\\Release\\BuildInfo.xml",
+      "bytes": 486,
+      "sha256": "2b7f76517b8afcfeb64b7c3d84f14e50ec0951ca020dd8747da2c5860a5a2177"
+    },
+    {
+      "path": "OpenConsole.exe",
+      "bytes": 1147904,
+      "sha256": "518a5cf6c70682c115ac39ddada935cf16568c205b24eada0a96c83c760bb8a1"
+    },
+    {
+      "path": "OpenConsoleProxy.dll",
+      "bytes": 28672,
+      "sha256": "9f1b2f75462ebbc23c69d4f1dd10c06cc7b40042f226c988fc87c1de19cfccee"
+    },
+    {
+      "path": "ProfileGeneratorIcons\\AzureCloudShell.png",
+      "bytes": 943,
+      "sha256": "db182b52129d6cd66fa60e9ec74e690369eb053699a58ef5707da9c4399d60fe"
+    },
+    {
+      "path": "ProfileGeneratorIcons\\PowerShell.png",
+      "bytes": 1357,
+      "sha256": "69da2be6d04562817eb7e379c394bd738371882b6db30a1a0c304a7379d67443"
+    },
+    {
+      "path": "ProfileGeneratorIcons\\SSH.png",
+      "bytes": 787,
+      "sha256": "f61db9bcc372516558e00cfebc4ff9c310675cd4c9ec6bfe2dc97b86120db376"
+    },
+    {
+      "path": "ProfileGeneratorIcons\\VisualStudio.png",
+      "bytes": 1616,
+      "sha256": "1076e1c09147816ee95747fc3420c695eb1ebbabd30a27248590b7d2f374c791"
+    },
+    {
+      "path": "ProfileGeneratorIcons\\WSL.png",
+      "bytes": 1668,
+      "sha256": "8e52bdaff8d8307d1e0585cbb17282a46d69af8846ebea37e576b4c9c019d577"
+    },
+    {
+      "path": "ProfileIcons\\{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.scale-100.png",
+      "bytes": 243,
+      "sha256": "b774f1b51667fa6ee4eccf9568dadd5dea40e79ef847e163e80b279d55338511"
+    },
+    {
+      "path": "ProfileIcons\\{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.scale-200.png",
+      "bytes": 641,
+      "sha256": "0d575b3d46310599369bcb41ebedd4fd8e3d76e6887bdf8ade9e2fb7f06667d0"
+    },
+    {
+      "path": "ProfileIcons\\{574e775e-4f2a-5b96-ac1e-a2962a402336}.scale-100.png",
+      "bytes": 737,
+      "sha256": "8f81d3436aa7a675ed6e17f73bcafac807d070a910fa3286ab0ce4ae437b223d"
+    },
+    {
+      "path": "ProfileIcons\\{574e775e-4f2a-5b96-ac1e-a2962a402336}.scale-200.png",
+      "bytes": 1464,
+      "sha256": "43f262ca440644b97e1d76411238bd9c87c7137e19dde948a39920389907b522"
+    },
+    {
+      "path": "ProfileIcons\\{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.scale-100.png",
+      "bytes": 616,
+      "sha256": "225f69c01321d74637be8d3a041469ff141a7b50e37d529d6b185543030d86ee"
+    },
+    {
+      "path": "ProfileIcons\\{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.scale-200.png",
+      "bytes": 1145,
+      "sha256": "ce9b7c608daac3e788b589c28dfd0dc3477bee6b46535dec2e5c9a4372470045"
+    },
+    {
+      "path": "ProfileIcons\\{9acb9455-ca41-5af7-950f-6bca1bc9722f}.scale-100.png",
+      "bytes": 755,
+      "sha256": "92e13dc9a7989969667889390d771b364147fc94b259e01b8df64b4ed6d6a2f5"
+    },
+    {
+      "path": "ProfileIcons\\{9acb9455-ca41-5af7-950f-6bca1bc9722f}.scale-200.png",
+      "bytes": 1668,
+      "sha256": "8e52bdaff8d8307d1e0585cbb17282a46d69af8846ebea37e576b4c9c019d577"
+    },
+    {
+      "path": "ProfileIcons\\{b453ae62-4e3d-5e58-b989-0a998ec441b8}.scale-100.png",
+      "bytes": 480,
+      "sha256": "8180f10e3746de383720b1ba708f385962d66696f6892c51dda4aa7cc0c8de02"
+    },
+    {
+      "path": "ProfileIcons\\{b453ae62-4e3d-5e58-b989-0a998ec441b8}.scale-200.png",
+      "bytes": 943,
+      "sha256": "db182b52129d6cd66fa60e9ec74e690369eb053699a58ef5707da9c4399d60fe"
+    },
+    {
+      "path": "ProfileIcons\\pwsh-preview.scale-100.png",
+      "bytes": 467,
+      "sha256": "592862382a46c236c50899ec68ced77630dac228c2c588955c7b89d38f7c46a7"
+    },
+    {
+      "path": "ProfileIcons\\pwsh-preview.scale-125.png",
+      "bytes": 606,
+      "sha256": "7425cb7ca6c49012a7f04ef8f2f9e8a45ac11af4f4445a87ecf73848ba022628"
+    },
+    {
+      "path": "ProfileIcons\\pwsh-preview.scale-150.png",
+      "bytes": 680,
+      "sha256": "f73a78e761d53185ac9f5d693d8e23505f7f21131b9c562b3dfc68a33e0299af"
+    },
+    {
+      "path": "ProfileIcons\\pwsh-preview.scale-200.png",
+      "bytes": 809,
+      "sha256": "47d2c2fb504cb7abe79184ba5857ea78f8b2ddae5667a53a7472c421d121b9f6"
+    },
+    {
+      "path": "ProfileIcons\\pwsh.scale-100.png",
+      "bytes": 750,
+      "sha256": "1e870e4eeda1440e5c8eeb673806466beaf156eb26dfa41539480d23433fe5e2"
+    },
+    {
+      "path": "ProfileIcons\\pwsh.scale-125.png",
+      "bytes": 1051,
+      "sha256": "6fcaa38c91cbc961dc69b29d98e24323048965dbc53f3570e0bd683fd4bb6161"
+    },
+    {
+      "path": "ProfileIcons\\pwsh.scale-150.png",
+      "bytes": 989,
+      "sha256": "f1f79191a7a9a2b3cf32a7dd3ec23810494faadde0fcefc29e3a9b00b155dc03"
+    },
+    {
+      "path": "ProfileIcons\\pwsh.scale-200.png",
+      "bytes": 1357,
+      "sha256": "69da2be6d04562817eb7e379c394bd738371882b6db30a1a0c304a7379d67443"
+    },
+    {
+      "path": "ProfileIcons\\vs-cmd.scale-100.png",
+      "bytes": 433,
+      "sha256": "82145026660f5550437bbf73c32a006244f8845b531d4bbec2d4903860938452"
+    },
+    {
+      "path": "ProfileIcons\\vs-cmd.scale-150.png",
+      "bytes": 804,
+      "sha256": "00bfd2ce8690914feb08b9fc079bfd52378f5687bfc89b6c276977e08766e8eb"
+    },
+    {
+      "path": "ProfileIcons\\vs-cmd.scale-200.png",
+      "bytes": 1267,
+      "sha256": "95315646a7ff0b3e387c0cb3572fe2c9ba46410b90d50f69beca8fa406621937"
+    },
+    {
+      "path": "ProfileIcons\\vs-powershell.scale-100.png",
+      "bytes": 758,
+      "sha256": "5b070331f25f4bc00ecfc41455087ca42514766f09df44ab212da5790f5e5b60"
+    },
+    {
+      "path": "ProfileIcons\\vs-powershell.scale-150.png",
+      "bytes": 1314,
+      "sha256": "95a5fd04df60b722df61d2dbf3ad109713010fc8b38ad3ea1c0b40ad9629dff5"
+    },
+    {
+      "path": "ProfileIcons\\vs-powershell.scale-200.png",
+      "bytes": 1807,
+      "sha256": "54f619cbfdc7c2297d893e8cc6c0a8c045db1daeabc8fa1fa43439f15b45a59e"
+    },
+    {
+      "path": "ProfileIcons\\vs-pwsh.scale-100.png",
+      "bytes": 819,
+      "sha256": "b32bf11e4f4fe8f82ddc2b65c028c30ffe9abe79faf6981565aae4561ba46d45"
+    },
+    {
+      "path": "ProfileIcons\\vs-pwsh.scale-150.png",
+      "bytes": 1300,
+      "sha256": "b4b87122c42468d12c774e3ca0e5f9dc3c3e4d632aa60b0b9be0b8588ca6b38f"
+    },
+    {
+      "path": "ProfileIcons\\vs-pwsh.scale-200.png",
+      "bytes": 1808,
+      "sha256": "2a8ae61e7aeba63978d75cb7b8d76fb4f7abfd069dd093638812a8ec46154e81"
+    },
+    {
+      "path": "resources.pri",
+      "bytes": 11908992,
+      "sha256": "67f40aeff9bf345cf66fa009996dc8d12e3dcba8808af7d12f376f56fa2cd6d4"
+    },
+    {
+      "path": "TerminalApp.dll",
+      "bytes": 3051520,
+      "sha256": "4023aa7b840409e4144faca1ba8b888f673f41a5f7f2e9ad6526d19cff1d88ae"
+    },
+    {
+      "path": "TerminalConnection.dll",
+      "bytes": 470528,
+      "sha256": "635823d7a28209ec250ce476bf2bd8c0ba2453a92a9a863a90c42b6f5c7899ab"
+    },
+    {
+      "path": "TerminalThemeHelpers.dll",
+      "bytes": 40960,
+      "sha256": "929ddfb7696bbe75234b2bf2ae1997b05502cc45b263ce53a5d27e7bf23abd77"
+    },
+    {
+      "path": "WindowsTerminal.exe",
+      "bytes": 646656,
+      "sha256": "269d9cabb516c38d0c80f12f12af48893a4702f0ce719acdba3c8e2c48691179"
+    },
+    {
+      "path": "WindowsTerminalShellExt.dll",
+      "bytes": 110080,
+      "sha256": "6aba6b278d9e5688add1c6d6fa1d5f391864099da826c074114315fbadce2791"
+    },
+    {
+      "path": "wt.exe",
+      "bytes": 170496,
+      "sha256": "abbdf9fff5973807af96874fabc49899c768273953eb4284f83242798118c0ac"
+    }
+  ],
+  "archiveCreated": false,
+  "extractionPath": "C:\\Users\\Pavel\\AppData\\Local\\Temp\\lf-package-1ee6efa6c36541adb2d35c5796488a01"
+}
