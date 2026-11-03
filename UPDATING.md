@@ -237,11 +237,13 @@ checks the prepared source by tag, patch status and hashes; its default is a
 read-only plan. The current recipe also requires the [square LF icon overlay](assets/README.md)
 at `res/terminal.ico`, the lifecycle diagnostic patch, the exit-notice
 suppression patch and the terminal-owned right-button patch. The prepared
-[utility-menu patch](patches/utility-menu-below-separator.patch) and
-[explorer-profile patch](patches/explorer-profile-opens-folder.patch) are not
-part of the accepted `rmb3` build or any published archive; a build that
+[utility-menu patch](patches/utility-menu-below-separator.patch),
+[explorer-profile patch](patches/explorer-profile-opens-folder.patch) and
+[explorer-profile shortcut patch](patches/explorer-profile-shortcut.patch) are
+not part of the accepted `rmb3` build or any published archive; a build that
 applies them moves new-tab entries placed after a separator below Terminal's
-own separator and opens a bare `explorer.exe` profile's folder without a pane.
+own separator and opens a bare `explorer.exe` profile's folder without a pane,
+both from the menu item and from its generated keyboard shortcut.
 The first
 unbranded build's frozen recipe and receipts remain historical evidence.
 `$ExpectedStatus`/`$ExpectedSourceHashes` describe the `rmb3` source state and

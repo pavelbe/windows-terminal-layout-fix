@@ -1,0 +1,29 @@
+diff --git a/src/cascadia/TerminalApp/AppActionHandlers.cpp b/src/cascadia/TerminalApp/AppActionHandlers.cpp
+index a48a088..2583fc9 100644
+--- a/src/cascadia/TerminalApp/AppActionHandlers.cpp
++++ b/src/cascadia/TerminalApp/AppActionHandlers.cpp
+@@ -472,6 +472,24 @@ namespace winrt::TerminalApp::implementation
+                 return;
+             }
+ 
++            // A profile whose command is exactly explorer.exe is a utility:
++            // open this Terminal's folder instead of starting a tab, so the
++            // keyboard shortcut does not flash an empty pane first.
++            if (const auto& terminalArgs{ realArgs.ContentArgs().try_as<NewTerminalArgs>() })
++            {
++                if (const auto index{ terminalArgs.ProfileIndex() })
++                {
++                    const auto profile{ _settings.ActiveProfiles().GetAt(gsl::narrow<uint32_t>(index.Value())) };
++                    if (_wcsicmp(profile.Commandline().c_str(), L"explorer.exe") == 0)
++                    {
++                        const auto folder{ std::filesystem::path{ wil::GetModuleFileNameW<std::wstring>(nullptr) }.parent_path() };
++                        ShellExecuteW(nullptr, L"open", folder.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
++                        args.Handled(true);
++                        return;
++                    }
++                }
++            }
++
+             LOG_IF_FAILED(_OpenNewTab(realArgs.ContentArgs()));
+             args.Handled(true);
+         }

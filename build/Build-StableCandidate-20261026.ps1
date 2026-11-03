@@ -51,6 +51,7 @@ $TaefExe = 'packages\Microsoft.Taef.10.100.251104001\build\Binaries\x64\te.exe'
 
 $ExpectedStatus = [ordered]@{
     'res/terminal.ico' = ' M'
+    'src/cascadia/TerminalApp/AppActionHandlers.cpp' = ' M'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = ' M'
     'src/cascadia/TerminalApp/TerminalPage.cpp' = ' M'
     'src/cascadia/TerminalApp/TerminalPage.h' = ' M'
@@ -71,6 +72,7 @@ $ExpectedStatus = [ordered]@{
 
 $ExpectedSourceHashes = [ordered]@{
     'res/terminal.ico' = '6a0a1ab4c869add88fd38761d945563d35d4836751e2fd38c040a7329b10cade'
+    'src/cascadia/TerminalApp/AppActionHandlers.cpp' = 'd6ae2b20cfee3fc7b7e37da1ad94b88ea5f16b25e73929f9941fe5a05e4de40c'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = '4a0e19b3cecfa5b3918f71b01bb496757a009138e81d17d29d22a50224001611'
     'src/cascadia/TerminalApp/TerminalPage.cpp' = '16bb852ffc9a48a747792e6d9c1d5d4c0c39043d71314bc43663fc6cd33d2b8a'
     'src/cascadia/TerminalApp/TerminalPage.h' = 'be74cd1284822fe784dd81607d3777646ca810fa6d916d87c594629a2e64c417'

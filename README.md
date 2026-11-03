@@ -375,6 +375,11 @@ Patch order depends on the base:
      Prepared 2026-11-03; not built yet. Patches 8 and 9 together serve a bare
      `explorer.exe` profile placed after a separator entry, so the menu item
      opens the running build's folder without a terminal flash.
+ 10. [explorer-profile-shortcut.patch](patches/explorer-profile-shortcut.patch),
+     which applies the same behaviour to the generated
+     `Terminal.OpenNewTabProfileN` action, so Ctrl+Shift+9 opens the folder
+     without creating a tab either. Prepared 2026-11-03; not built into any
+     published archive.
 
 The exact current pins, source hashes and patch status are in
 [build/Build-StableCandidate-20261026.ps1](build/Build-StableCandidate-20261026.ps1)
