@@ -5,6 +5,9 @@ Read README.md before changing this repository. This is not the upstream source
 checkout and not the Atreno application.
 Read UPDATING.md before porting, building, packaging or changing recovery steps.
 
+HCA owns `wt` and AI commands; read the
+[workspace ownership routes](README.md#maintainer-workspace-ownership).
+
 - Repository is public by owner decision. Do not change visibility or enable Actions.
 - Keep executable archives in reviewed GitHub Releases, not Git history;
   creating/replacing release assets still requires explicit owner authorization.

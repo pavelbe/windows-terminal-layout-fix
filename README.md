@@ -193,6 +193,17 @@ input workaround have separate owners; an official EXE does not include our patc
 
 Agent rules: [AGENTS.md](AGENTS.md); `CLAUDE.md` imports the same guide.
 
+## Maintainer workspace ownership
+
+Work on Terminal source patches, builds, embedded icons, settings snapshots and
+acceptance here (`~/Projects/windows-terminal-layout-fix`). HCA command menus,
+`wt` layouts/routing, Codex account/API selection and `cxreset` belong to
+`~/hca-system-v3`. Its private maintainer documentation (access required):
+[WT commands](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/windows-terminal-tabs-panels.md),
+[usage accounting and prices](https://github.com/pavelbe/hca-system-v3/blob/main/docs/04-commands/codex-usage-accounting.md),
+[accounting skill](https://github.com/pavelbe/hca-system-v3/blob/main/.agents/skills/hca-codex-accounting/SKILL.md).
+HCA is optional for public recovery; these links do not add it to a release.
+
 <a id="быстро-восстановить-на-другой-windows"></a>
 ## Quick recovery on another Windows installation
 
