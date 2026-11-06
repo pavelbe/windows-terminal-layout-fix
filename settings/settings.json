@@ -77,7 +77,7 @@
         },
         {
             "id": "Terminal.OpenNewTabProfile9",
-            "keys": "ctrl+shift+0"
+            "keys": "alt+0"
         }
     ],
     "newTabMenu":

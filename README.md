@@ -612,7 +612,7 @@ The repository snapshot was updated on 2026-11-06 for the pending `lf-menu3`
 candidate, so it no longer matches that runtime until the owner accepts the
 candidate and routing switches; `build/Test-RuntimeState.sh` reports this
 settings drift until then. The snapshot SHA-256 is
-`c574f90e6892f9f602a70ead39079b13d9e572673491f5ffc83aee0dd08fb8e3`. It adds two
+`94089b4422f452f73112ffa767aa4a96df7d874a426f198405187df435ed62af`. It adds two
 new-tab-menu profiles after a `separator` entry: `Explorer: Terminal folder`
 (GUID `{caa37a69-2b95-4277-8f08-1064a3fef5a2}`, `"commandline":
 "explorer.exe"`) and `Explorer: This PC` (GUID
@@ -620,8 +620,9 @@ new-tab-menu profiles after a `separator` entry: `Explorer: Terminal folder`
 shell:MyComputerFolder"`). Default keybindings cover profile indexes 0–8 only,
 so `Ctrl+Shift+9` labels the terminal-folder profile (index 8) through
 `Terminal.OpenNewTabProfile8`; index 9 needs the explicit
-`Terminal.OpenNewTabProfile9` action bound to `Ctrl+Shift+0`, whose manual
-verification is pending. Only a build with the menu patches opens these folders
+`Terminal.OpenNewTabProfile9` action bound to `Alt+0` (owner-verified
+2026-11-06; `Ctrl+Shift+0` and `Ctrl+Alt+0` never reached the window, so any
+change of that chord needs a manual check). Only a build with the menu patches opens these folders
 without a pane; on an unpatched build the same profiles start panes around a
 GUI process. The published archives keep the settings
 snapshot they were packaged with. The
