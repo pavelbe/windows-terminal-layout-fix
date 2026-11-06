@@ -1,18 +1,62 @@
 diff --git a/src/cascadia/TerminalApp/TerminalPage.cpp b/src/cascadia/TerminalApp/TerminalPage.cpp
-index c734350..863c14b 100644
+index 34223bc..fdb2d14 100644
 --- a/src/cascadia/TerminalApp/TerminalPage.cpp
 +++ b/src/cascadia/TerminalApp/TerminalPage.cpp
-@@ -1240,6 +1240,18 @@ namespace winrt::TerminalApp::implementation
+@@ -1178,6 +1178,46 @@ namespace winrt::TerminalApp::implementation
+     // Method Description:
+     // - This method creates a flyout menu item for a given profile with the given index.
+     //   It makes sure to set the correct icon, keybinding, and click-action.
++    // A profile whose command is explorer.exe is a utility: it opens a folder
++    // instead of starting a pane. No argument opens this Terminal's own folder;
++    // an argument opens that target, for example shell:MyComputerFolder.
++    static std::optional<std::wstring> _ExplorerTarget(const winrt::hstring& commandline)
++    {
++        std::wstring command{ commandline };
++        const auto first = command.find_first_not_of(L" \t");
++        if (first == std::wstring::npos)
++        {
++            return std::nullopt;
++        }
++        command.erase(0, first);
++        const auto space = command.find_first_of(L" \t");
++        const auto exe = command.substr(0, space);
++        if (_wcsicmp(exe.c_str(), L"explorer.exe") != 0 && _wcsicmp(exe.c_str(), L"explorer") != 0)
++        {
++            return std::nullopt;
++        }
++        if (space == std::wstring::npos)
++        {
++            return std::wstring{};
++        }
++        auto target = command.substr(space + 1);
++        const auto begin = target.find_first_not_of(L" \t");
++        if (begin == std::wstring::npos)
++        {
++            return std::wstring{};
++        }
++        target.erase(0, begin);
++        while (!target.empty() && (target.back() == L' ' || target.back() == L'\t'))
++        {
++            target.pop_back();
++        }
++        if (target.size() >= 2 && target.front() == L'"' && target.back() == L'"')
++        {
++            target = target.substr(1, target.size() - 2);
++        }
++        return target;
++    }
++
+     WUX::Controls::MenuFlyoutItem TerminalPage::_CreateNewTabFlyoutProfile(const Profile profile, int profileIndex, const winrt::hstring& iconPathOverride)
+     {
+         auto profileMenuItem = WUX::Controls::MenuFlyoutItem{};
+@@ -1240,6 +1280,15 @@ namespace winrt::TerminalApp::implementation
          toolTip.Content(textBlock);
          WUX::Controls::ToolTipService::SetToolTip(profileMenuItem, toolTip);
  
-+        // A bare explorer.exe profile opens this Terminal's own folder in
-+        // Explorer instead of creating a pane around a GUI process, so the
-+        // menu item does not flash an empty terminal first.
-+        if (_wcsicmp(profile.Commandline().c_str(), L"explorer.exe") == 0)
++        if (const auto explorerTarget{ _ExplorerTarget(profile.Commandline()) })
 +        {
-+            profileMenuItem.Click([](auto&&, auto&&) {
-+                const auto folder{ std::filesystem::path{ wil::GetModuleFileNameW<std::wstring>(nullptr) }.parent_path() };
++            profileMenuItem.Click([target = *explorerTarget](auto&&, auto&&) {
++                const auto folder{ target.empty() ? std::filesystem::path{ wil::GetModuleFileNameW<std::wstring>(nullptr) }.parent_path().wstring() : target };
 +                ShellExecuteW(nullptr, L"open", folder.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 +            });
 +            return profileMenuItem;

@@ -1,22 +1,68 @@
 diff --git a/src/cascadia/TerminalApp/AppActionHandlers.cpp b/src/cascadia/TerminalApp/AppActionHandlers.cpp
-index a48a088..2583fc9 100644
+index a48a088..22baf3f 100644
 --- a/src/cascadia/TerminalApp/AppActionHandlers.cpp
 +++ b/src/cascadia/TerminalApp/AppActionHandlers.cpp
-@@ -472,6 +472,24 @@ namespace winrt::TerminalApp::implementation
+@@ -456,6 +456,46 @@ namespace winrt::TerminalApp::implementation
+         args.Handled(true);
+     }
+ 
++    // A profile whose command is explorer.exe is a utility: it opens a folder
++    // instead of starting a tab. No argument opens this Terminal's own folder;
++    // an argument opens that target, for example shell:MyComputerFolder.
++    static std::optional<std::wstring> _ExplorerTarget(const winrt::hstring& commandline)
++    {
++        std::wstring command{ commandline };
++        const auto first = command.find_first_not_of(L" \t");
++        if (first == std::wstring::npos)
++        {
++            return std::nullopt;
++        }
++        command.erase(0, first);
++        const auto space = command.find_first_of(L" \t");
++        const auto exe = command.substr(0, space);
++        if (_wcsicmp(exe.c_str(), L"explorer.exe") != 0 && _wcsicmp(exe.c_str(), L"explorer") != 0)
++        {
++            return std::nullopt;
++        }
++        if (space == std::wstring::npos)
++        {
++            return std::wstring{};
++        }
++        auto target = command.substr(space + 1);
++        const auto begin = target.find_first_not_of(L" \t");
++        if (begin == std::wstring::npos)
++        {
++            return std::wstring{};
++        }
++        target.erase(0, begin);
++        while (!target.empty() && (target.back() == L' ' || target.back() == L'\t'))
++        {
++            target.pop_back();
++        }
++        if (target.size() >= 2 && target.front() == L'"' && target.back() == L'"')
++        {
++            target = target.substr(1, target.size() - 2);
++        }
++        return target;
++    }
++
+     void TerminalPage::_HandleNewTab(const IInspectable& /*sender*/,
+                                      const ActionEventArgs& args)
+     {
+@@ -472,6 +512,23 @@ namespace winrt::TerminalApp::implementation
                  return;
              }
  
-+            // A profile whose command is exactly explorer.exe is a utility:
-+            // open this Terminal's folder instead of starting a tab, so the
-+            // keyboard shortcut does not flash an empty pane first.
++            // A profile whose command is explorer.exe opens a folder rather
++            // than a tab, so its generated shortcut does not flash a pane.
 +            if (const auto& terminalArgs{ realArgs.ContentArgs().try_as<NewTerminalArgs>() })
 +            {
 +                if (const auto index{ terminalArgs.ProfileIndex() })
 +                {
 +                    const auto profile{ _settings.ActiveProfiles().GetAt(gsl::narrow<uint32_t>(index.Value())) };
-+                    if (_wcsicmp(profile.Commandline().c_str(), L"explorer.exe") == 0)
++                    if (const auto explorerTarget{ _ExplorerTarget(profile.Commandline()) })
 +                    {
-+                        const auto folder{ std::filesystem::path{ wil::GetModuleFileNameW<std::wstring>(nullptr) }.parent_path() };
++                        const auto folder{ explorerTarget->empty() ? std::filesystem::path{ wil::GetModuleFileNameW<std::wstring>(nullptr) }.parent_path().wstring() : *explorerTarget };
 +                        ShellExecuteW(nullptr, L"open", folder.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 +                        args.Handled(true);
 +                        return;

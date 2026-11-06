@@ -75,9 +75,9 @@ $ExpectedStatus = [ordered]@{
 
 $ExpectedSourceHashes = [ordered]@{
     'res/terminal.ico' = '6a0a1ab4c869add88fd38761d945563d35d4836751e2fd38c040a7329b10cade'
-    'src/cascadia/TerminalApp/AppActionHandlers.cpp' = 'd6ae2b20cfee3fc7b7e37da1ad94b88ea5f16b25e73929f9941fe5a05e4de40c'
+    'src/cascadia/TerminalApp/AppActionHandlers.cpp' = 'c333c489a05355ad3932cecbff83ff41da56a5e55c7ac3c149dacf6eb3f856a1'
     'src/cascadia/TerminalApp/TerminalAppLib.vcxproj' = '4a0e19b3cecfa5b3918f71b01bb496757a009138e81d17d29d22a50224001611'
-    'src/cascadia/TerminalApp/TerminalPage.cpp' = '382b1cfb24863c830b9a24290d02de5fff50cc794d3c1da748b9657b6f0974e1'
+    'src/cascadia/TerminalApp/TerminalPage.cpp' = 'd893360219299bb27449e75624ce68938230096ef1e082f867fbbd7cfc8058a8'
     'src/cascadia/TerminalApp/TerminalPage.h' = 'be74cd1284822fe784dd81607d3777646ca810fa6d916d87c594629a2e64c417'
     'src/cascadia/TerminalApp/TerminalPaneContent.cpp' = 'e06f495faeed8e142dc2e6ee25aee4c068ece250787603857006e2bb9c72e7cb'
     'src/cascadia/TerminalApp/TerminalPaneContent.h' = '40febda456e23ee273d5731302a6ad3b808f2e5fec02086ac6233c441bcd6194'
