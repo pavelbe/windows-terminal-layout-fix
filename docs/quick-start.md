@@ -4,7 +4,7 @@ Five-minute recovery with a portable build: no installer, no administrator
 rights, no change to an existing Windows Terminal installation.
 
 This guide uses the published `layout-fix.3` archive. The maintainer's accepted
-daily `lf-menu2` and delivered `paste1`/`paste2`/`paste3` candidates are separate
+daily `lf-menu3` and delivered `paste1`/`paste2`/`paste3` candidates are separate
 local builds;
 see [current runtime status](../README.md)
 and [paste candidate evidence and acceptance](paste-candidate-20261103.md).

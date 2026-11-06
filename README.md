@@ -36,14 +36,15 @@ including an `Ubuntu` profile; review paths, profiles and keybindings for your
 machine. HCA commands in the later maintenance notes are optional local tooling,
 not a prerequisite for running the portable EXE.
 
-**Current runtime check (2026-11-03):** the daily runtime on this PC is
-`WT-Layout-Fix-1.25.2733.0-lf-menu2` — the accepted `rmb3` build plus the three
-menu patches ([record](docs/menu-candidate-20261103.md)); the 1.25.1912.0
+**Current runtime check (2026-11-06):** the daily runtime on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-menu3` — the accepted `rmb3` build plus the three
+menu patches and the generalized Explorer target
+([record](docs/menu-candidate-20261106.md)); the 1.25.1912.0
 recovery folders are not present. Inside a Windows Terminal session, HCA follows
-the current portable runtime (`lf-menu2`). Outside Terminal, channel
+the current portable runtime (`lf-menu3`). Outside Terminal, channel
 `layout-fix` selects the same
-`WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0` runtime; the resolver,
-its test and the HCA runbook were updated together on 2026-11-03. The public
+`WT-Layout-Fix-1.25.2733.0-lf-menu3\terminal-1.25.2733.0` runtime; the resolver,
+its test and the HCA runbook were updated together on 2026-11-06. The public
 `layout-fix.2` and pre-release `layout-fix.3` archives do not include the menu
 patches. The owner passed the manual acceptance for `rmb3` on 2026-11-03
 [docs/manual-acceptance-rmb3.md](docs/manual-acceptance-rmb3.md); runtime and
@@ -60,7 +61,7 @@ build version in lifecycle diagnostics. `paste3` adds logger formatting and an
 automatic embedded-icon packaging check.
 Build, delivery and remaining manual checks are tracked in
 [the candidate record](docs/paste-candidate-20261103.md). HCA's outside-Terminal
-fallback remains `lf-menu2`; these checks do not implicitly switch routing.
+fallback remains `lf-menu3`; these checks do not implicitly switch routing.
 
 ## Tested build and maintainer recovery notes
 
@@ -176,10 +177,10 @@ shortcut. At that September check, **HCA routing stayed on
 `WT-Layout-Fix-1.25.1912.0` by owner decision**. The later owner-current runtime
 is identified above; recovery acceptance alone does not switch HCA routing. At
 that time both installations and the immutable `layout-fix.1` archive remained
-intact. On 2026-11-03 the accepted daily runtime is
-`WT-Layout-Fix-1.25.2733.0-lf-menu2`; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays
+intact. On 2026-11-06 the accepted daily runtime is
+`WT-Layout-Fix-1.25.2733.0-lf-menu3`; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays
 installed as rollback, and the 1.25.1912.0 folders are absent. The HCA resolver
-targets `lf-menu2`.
+targets `lf-menu3`.
 
 Release check, 2026-10-27: Stable `v1.25.2733.0` and Preview `v1.26.2734.0`
 were the newest published versions in their channels. This is a dated check,
@@ -279,10 +280,10 @@ and screen buffers are deliberately unpublished. New sessions persist after
 normal exit. The settings file does not restore live agent processes.
 
 HCA commands `wt`, `atreno`, `wtc`, `wtd`, `wtw`, `wtp` and `wth` have a separate
-launch target. As checked on 2026-11-03, inside a Windows Terminal session HCA
-resolves the current portable runtime, which is `lf-menu2` here; outside
+launch target. As checked on 2026-11-06, inside a Windows Terminal session HCA
+resolves the current portable runtime, which is `lf-menu3` here; outside
 Terminal, channel `layout-fix` selects the same
-`Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0` runtime.
+`Programs/WT-Layout-Fix-1.25.2733.0-lf-menu3\terminal-1.25.2733.0` runtime.
 Pinning the newer EXE does not change HCA. To inspect the live selection in an
 idle Zsh prompt:
 
@@ -292,14 +293,14 @@ wt-doctor
 ```
 
 Inside Terminal, `wt-doctor` should report channel `current-portable` with the
-launcher of the build in use (`lf-menu2` after the switch); outside Terminal it
+launcher of the build in use (`lf-menu3` after the switch); outside Terminal it
 reports channel `layout-fix` with the same launcher (checked on this PC). A
 future candidate still needs the
 resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together,
 as in
 [UPDATING section 7](UPDATING.md#7-переключить-запуск-и-оставить-откат);
 recovery acceptance alone does not move the fallback. Launch the accepted
-`lf-menu2` build through its pinned shortcut **Terminal LF Menu 1.25**;
+`lf-menu3` build through its pinned shortcut **Terminal LF Menu 1.25**;
 **Terminal LF RMB3 1.25** remains the rollback. A project without a count
 opens one new single-pane tab in the most recently active window of this build.
 An explicit count enables splitting; named presets retain their layouts.
@@ -392,20 +393,23 @@ Patch order depends on the base:
   8. [utility-menu-below-separator.patch](patches/utility-menu-below-separator.patch),
      which renders new-tab-menu entries placed after a separator below
      Terminal's own separator, next to the settings group. In the daily
-     `lf-menu2` candidate; not in any published archive. In a build that
-     carries it, put `{ "type": "separator" }` before the utility profile in
-     `newTabMenu`; without the patch that separator only adds a second divider.
+     `lf-menu2` and `lf-menu3` candidates; not in any published archive. In a
+     build that carries it, put `{ "type": "separator" }` before the utility
+     profile in `newTabMenu`; without the patch that separator only adds a
+     second divider.
   9. [explorer-profile-opens-folder.patch](patches/explorer-profile-opens-folder.patch),
-     which makes a profile whose command is exactly `explorer.exe` open this
-     Terminal's own folder through `ShellExecute` instead of creating a pane.
-     In the daily `lf-menu2` candidate. Patches 8 and 9 together serve a bare
-     `explorer.exe` profile placed after a separator entry, so the menu item
-     opens the running build's folder without a terminal flash.
+     which makes a profile whose command starts with `explorer.exe` open a
+     folder through `ShellExecute` instead of creating a pane: no argument opens
+     this Terminal's own folder, a following argument opens that target, for
+     example `shell:MyComputerFolder`. In the daily `lf-menu2` and `lf-menu3`
+     candidates. Patches 8 and 9 together serve the utility profiles placed
+     after a separator entry, so a menu item opens its folder without a
+     terminal flash.
  10. [explorer-profile-shortcut.patch](patches/explorer-profile-shortcut.patch),
      which applies the same behaviour to the generated
      `Terminal.OpenNewTabProfileN` action, so Ctrl+Shift+9 opens the folder
-     without creating a tab either. In the daily `lf-menu2` candidate; not in
-     any published archive.
+     without creating a tab either. In the daily `lf-menu2` and `lf-menu3`
+     candidates; not in any published archive.
  11. [clipboard-paste-parity.patch](patches/clipboard-paste-parity.patch),
      which quotes screenshot paths like Explorer file paths, preserves each
      broadcast destination's bracketed-paste mode for text and images, and keeps
@@ -583,7 +587,8 @@ To recover `layout-fix.2` source, obtain `v1.25.1912.0` at the exact base above
 and apply the first three patches. For published `layout-fix.3`, use
 `v1.25.2733.0` (`dc8ae365…`) and the first seven patches. For the current candidate, use
 `v1.25.2733.0` (`dc8ae365…`) and the ordered thirteen-patch chain above for `paste3`
-(first twelve for `paste2`, first eleven for `paste1`, first ten for `lf-menu2`). Check and
+(first twelve for `paste2`, first eleven for `paste1`, first ten for `lf-menu2`
+and `lf-menu3`). Check and
 apply patches with `git apply --check` / `git apply`, then follow that tag's
 build guide. A clean rebuild from this recovery kit has not been performed; use
 the tested binary release ZIP for quick recovery.
@@ -591,8 +596,8 @@ the tested binary release ZIP for quick recovery.
 Current native checkout for Stable `v1.25.2733.0`:
 `C:\Users\Pavel\Source\terminal-v1.25.2733.0`
 (`/mnt/c/Users/Pavel/Source/terminal-v1.25.2733.0` from WSL), containing the C++
-source now prepared for `paste3`; the earlier `lf-menu2` receipt retains its
-original source hashes. The older
+source now prepared for `paste3`; the earlier `lf-menu2` and `lf-menu3`
+receipts retain their original source hashes. The older
 `C:\Users\Pavel\Projects\terminal-layout-fix` checkout remains historical.
 This recovery repository is separate: `~/Projects/windows-terminal-layout-fix`.
 Inspect Git in the selected checkout before work; the saved build receipt does
@@ -607,11 +612,8 @@ not the current Git `settings/settings.json`.
 ## Updating the recovery copy
 
 Accepted runtime configuration on this PC:
-`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0\settings\settings.json`.
-The repository snapshot was updated on 2026-11-06 for the pending `lf-menu3`
-candidate, so it no longer matches that runtime until the owner accepts the
-candidate and routing switches; `build/Test-RuntimeState.sh` reports this
-settings drift until then. The snapshot SHA-256 is
+`%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-menu3\terminal-1.25.2733.0\settings\settings.json`.
+It matches the repository snapshot reviewed on 2026-11-06; SHA-256
 `94089b4422f452f73112ffa767aa4a96df7d874a426f198405187df435ed62af`. It adds two
 new-tab-menu profiles after a `separator` entry: `Explorer: Terminal folder`
 (GUID `{caa37a69-2b95-4277-8f08-1064a3fef5a2}`, `"commandline":
@@ -639,9 +641,9 @@ out of Git.
 In WSL, from this repository root, after reviewing the changes:
 
 ```bash
-cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2/terminal-1.25.2733.0/settings/settings.json settings/settings.json
+cp /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu3/terminal-1.25.2733.0/settings/settings.json settings/settings.json
 python3 -m json.tool settings/settings.json > /dev/null
-cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu2/terminal-1.25.2733.0/settings/settings.json
+cmp settings/settings.json /mnt/c/Users/Pavel/AppData/Local/Programs/WT-Layout-Fix-1.25.2733.0-lf-menu3/terminal-1.25.2733.0/settings/settings.json
 rtk proxy git diff -- settings/settings.json
 ```
 

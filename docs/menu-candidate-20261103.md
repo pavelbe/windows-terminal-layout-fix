@@ -1,8 +1,10 @@
 # Menu candidate — 2026-11-03
 
-Local portable build `WT-Layout-Fix-1.25.2733.0-lf-menu2` extends the accepted
-`rmb3` build with the three prepared menu patches. It is the daily runtime on
-this PC and is not published: no archive, manifest or release asset changed.
+Local portable build `WT-Layout-Fix-1.25.2733.0-lf-menu2` extended the accepted
+`rmb3` build with the three prepared menu patches. It was the daily runtime on
+this PC until the `lf-menu3` candidate replaced it on 2026-11-06
+([successor record](menu-candidate-20261106.md)); it is not published: no
+archive, manifest or release asset changed.
 
 ## Build and package
 

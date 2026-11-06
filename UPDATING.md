@@ -44,20 +44,21 @@ See [Microsoft distribution types](https://learn.microsoft.com/en-us/windows/ter
 ## 2. Preserve the working installation
 
 Save the current JSON and review its diff as described in README.
-On 2026-11-03 the daily runtime on this PC is
-`WT-Layout-Fix-1.25.2733.0-lf-menu2` — the accepted `rmb3` build plus the three
+On 2026-11-06 the daily runtime on this PC is
+`WT-Layout-Fix-1.25.2733.0-lf-menu3` — the accepted `rmb3` build plus the three
 menu patches; its `settings/settings.json` matches the
 repository snapshot. The earlier `WT-Layout-Fix-1.25.1912.0`,
 `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`,
 `WT-Layout-Fix-1.25.1912.0-tab-color-test` and
 `WT-Layout-Fix-1.25.2733.0-lf-diag2` folders are not installed; their
 receipts and the published `layout-fix.2` archive remain historical evidence.
-Do not overwrite or delete the accepted `lf-menu2` runtime during candidate
-preparation; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays installed as rollback.
+Do not overwrite or delete the accepted `lf-menu3` runtime during candidate
+preparation; `WT-Layout-Fix-1.25.2733.0-lf-rmb3` stays installed as rollback,
+and `lf-menu2` remains from the previous acceptance.
 Inside a Windows Terminal session, HCA follows the current portable
 runtime. Outside Terminal, the `layout-fix` fallback now selects the same
-`lf-menu2` runtime; the resolver, its test and the HCA runbook were updated
-together on 2026-11-03.
+`lf-menu3` runtime; the resolver, its test and the HCA runbook were updated
+together on 2026-11-06.
 Candidates use separate directories, never a symlink to shared live settings.
 
 To migrate tabs/buffers later, save work and exit the old Terminal normally,
@@ -252,10 +253,12 @@ suppression patch and the terminal-owned right-button patch. The prepared
 [utility-menu patch](patches/utility-menu-below-separator.patch),
 [explorer-profile patch](patches/explorer-profile-opens-folder.patch) and
 [explorer-profile shortcut patch](patches/explorer-profile-shortcut.patch) are
-in the daily `lf-menu2` candidate but not in any published archive; they move
+in the daily `lf-menu2` and `lf-menu3` candidates but not in any published
+archive; they move
 new-tab entries placed after a separator below Terminal's own separator and open
-a bare `explorer.exe` profile's folder without a pane, both from the menu item
-and from its generated keyboard shortcut.
+an `explorer.exe` profile's folder without a pane — a bare `explorer.exe` opens
+the running build's folder and an argument opens that target — both from the
+menu item and from its generated keyboard shortcut.
 The first
 unbranded build's frozen recipe and receipts remain historical evidence.
 `$ExpectedStatus`/`$ExpectedSourceHashes` now describe the `paste3` source state
@@ -270,7 +273,7 @@ read is added to connection start. Its project file and source are pinned too.
 `paste3` then applies
 `patches/diagnostic-format.patch`, a whitespace-only logger correction.
 The `lf-menu2` run `20261103-200344…`
-passed the package build
+and the `lf-menu3` run `20261106-103811…` passed the package build
 and Terminal Core tests; the `rmb3` run `20261101-112434…` is the
 pre-menu fallback.
 The earlier diag2 run is the pre-right-button fallback.
@@ -278,7 +281,7 @@ The earlier diag2 run is the pre-right-button fallback.
 `$VersioningLocalProductVersion` is embedded Product/About metadata, not an
 installation path or download URL. The numeric file/package version remains
 `1.25.2733.0`; the suffix identifies the downstream source variant. Packaging
-chooses the output folder through `-Destination`. Keep the existing `lf-menu2`
+chooses the output folder through `-Destination`. Keep the existing `lf-menu3`
 runtime intact and deliver `paste3` to a separate `lf-paste3` folder, as recorded
 in [the candidate record](docs/paste-candidate-20261103.md).
 
@@ -306,8 +309,9 @@ directory, direct EXE link and shortcut. Do not create ZIP deliverables for
 ordinary local builds. The archive recipe below documents the previous build;
 future local packaging must use a verified directory output. Creating a public
 release archive remains a separate explicitly requested task.
-`build/Package-MenuCandidate2-20261103.ps1` is the current `lf-menu2` packager
-and pins that build receipt, MSIX, XAML dependency and upstream helpers. The
+`build/Package-MenuCandidate3-20261106.ps1` is the current `lf-menu3` packager
+and pins that build receipt, MSIX, XAML dependency and upstream helpers;
+`build/Package-MenuCandidate2-20261103.ps1` packaged `lf-menu2`. The
 earlier `build/Package-Rmb3Candidate-20261101.ps1` is the pre-menu fallback, and
 `build/Package-LFStableCandidate-20261027.ps1` is the diag2
 pre-right-button fallback. Rebind pins from the exact build before packaging a
@@ -329,8 +333,8 @@ Recheck parameters in the new tag. For AppX packaging, select exact paths to
 **your freshly built** Terminal MSIX/AppX and the matching Microsoft.UI.Xaml
 x64 AppX dependency; never select the first file found.
 
-For the current lf-menu2 build,
-[`build/Package-MenuCandidate2-20261103.ps1`](build/Package-MenuCandidate2-20261103.ps1)
+For the current lf-menu3 build,
+[`build/Package-MenuCandidate3-20261106.ps1`](build/Package-MenuCandidate3-20261106.ps1)
 pins the build receipt, MSIX, XAML dependency and three upstream packaging
 helpers. Its default verifies inputs and prints a plan; `-Run` packages into
 the supplied new `-Destination` and records a package receipt. It refuses an
@@ -424,8 +428,8 @@ and `/p:SolutionDir=<absolute checkout path ending in \>`; stop on nonzero
 helper does not build them.
 
 This historical example targets the old `v1.25.1912.0` checkout; those
-source/settings paths are not present on this PC. For the current `lf-menu2`
-candidate, use `build/Package-MenuCandidate2-20261103.ps1`.
+source/settings paths are not present on this PC. For the current `lf-menu3`
+candidate, use `build/Package-MenuCandidate3-20261106.ps1`.
 
 ```powershell
 .\Package-ClipboardCandidate.ps1 -SourceRoot 'C:\Users\Pavel\Projects\terminal-layout-fix' -SettingsFile 'C:\Users\Pavel\AppData\Local\Programs\WT-Layout-Fix-1.25.1912.0\settings\settings.json' -Destination 'C:\Users\Pavel\AppData\Local\Programs\WT-Clipboard-New'
@@ -474,11 +478,11 @@ windows normally. Copy private state while the candidate is closed; verify
 restoration again. If incompatible, keep the candidate's clean state and the
 original backup; do not hand-edit state. Launch and pin the new EXE.
 
-**HCA routing needs a separate change.** As checked on 2026-11-03,
+**HCA routing needs a separate change.** As checked on 2026-11-06,
 `_wt_resolve_terminal()` in
 `~/hca-system-v3/modules/zsh/terminal/81-wt-split-panes.zsh` follows the current
 portable runtime inside a Windows Terminal session and selects the accepted
-`lf-menu2` runtime outside Terminal (channel `layout-fix`). Do not promote a
+`lf-menu3` runtime outside Terminal (channel `layout-fix`). Do not promote a
 recovery release into daily routing implicitly: a new candidate still needs the
 resolver path, `tests/test-wt-commands.sh` and the HCA runbook updated together;
 keep
