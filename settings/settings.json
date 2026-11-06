@@ -17,6 +17,13 @@
         {
             "command": "newTab",
             "id": "User.NewTab"
+        },
+        {
+            "command": {
+                "action": "newTab",
+                "index": 9
+            },
+            "id": "Terminal.OpenNewTabProfile9"
         }
     ],
     "launchMode": "maximized",
@@ -67,6 +74,10 @@
         {
             "id": "User.NewTab",
             "keys": "ctrl+n"
+        },
+        {
+            "id": "Terminal.OpenNewTabProfile9",
+            "keys": "ctrl+shift+0"
         }
     ],
     "newTabMenu":
@@ -79,6 +90,10 @@
         },
         {
             "profile": "{caa37a69-2b95-4277-8f08-1064a3fef5a2}",
+            "type": "profile"
+        },
+        {
+            "profile": "{e6846116-99a8-4ff8-8c16-d515fd910ee0}",
             "type": "profile"
         }
     ],
@@ -156,6 +171,13 @@
                 "guid": "{caa37a69-2b95-4277-8f08-1064a3fef5a2}",
                 "hidden": false,
                 "name": "Explorer: Terminal folder"
+            },
+            {
+                "closeOnExit": "always",
+                "commandline": "explorer.exe shell:MyComputerFolder",
+                "guid": "{e6846116-99a8-4ff8-8c16-d515fd910ee0}",
+                "hidden": false,
+                "name": "Explorer: This PC"
             }
         ]
     },

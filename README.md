@@ -606,15 +606,24 @@ not the current Git `settings/settings.json`.
 <a id="обновление-резервной-копии"></a>
 ## Updating the recovery copy
 
-Current accepted runtime configuration on this PC:
+Accepted runtime configuration on this PC:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-menu2\terminal-1.25.2733.0\settings\settings.json`.
-Its SHA-256 is `d662100c4bf90241f2ef2234949fcf91f74cba3a49f1764abe7f15b3fa68317a`,
-matching the repository snapshot checked on 2026-11-03. The snapshot adds a
-new-tab-menu profile `Explorer: Terminal folder` (GUID
-`{caa37a69-2b95-4277-8f08-1064a3fef5a2}`) with `"commandline": "explorer.exe"`,
-placed after a `separator` entry. Only a build with the menu patches opens the
-running Terminal's folder without a pane; on an unpatched build the same profile
-starts a pane around a GUI process. The published archives keep the settings
+The repository snapshot was updated on 2026-11-06 for the pending `lf-menu3`
+candidate, so it no longer matches that runtime until the owner accepts the
+candidate and routing switches; `build/Test-RuntimeState.sh` reports this
+settings drift until then. The snapshot SHA-256 is
+`c574f90e6892f9f602a70ead39079b13d9e572673491f5ffc83aee0dd08fb8e3`. It adds two
+new-tab-menu profiles after a `separator` entry: `Explorer: Terminal folder`
+(GUID `{caa37a69-2b95-4277-8f08-1064a3fef5a2}`, `"commandline":
+"explorer.exe"`) and `Explorer: This PC` (GUID
+`{e6846116-99a8-4ff8-8c16-d515fd910ee0}`, `"commandline": "explorer.exe
+shell:MyComputerFolder"`). Default keybindings cover profile indexes 0–8 only,
+so `Ctrl+Shift+9` labels the terminal-folder profile (index 8) through
+`Terminal.OpenNewTabProfile8`; index 9 needs the explicit
+`Terminal.OpenNewTabProfile9` action bound to `Ctrl+Shift+0`, whose manual
+verification is pending. Only a build with the menu patches opens these folders
+without a pane; on an unpatched build the same profiles start panes around a
+GUI process. The published archives keep the settings
 snapshot they were packaged with. The
 published
 `layout-fix.2` settings path under `WT-Layout-Fix-1.25.1912.0-clipboard-files-test`
