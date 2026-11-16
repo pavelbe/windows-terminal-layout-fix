@@ -532,7 +532,13 @@ check above records the later migration to `rmb3`.
 | `Ctrl+W` | Close the entire tab and its panes; Terminal intercepts the application's shortcut |
 | `Ctrl+N` | New default-profile (Ubuntu) tab, like **+** |
 | `Ctrl+Enter`, `Shift+Enter` | `User.AgentNewline`: send LF (`\n`) to the application |
+| `Alt+G` / `Alt+П` | `User.AgentCompact`: send `ESC+g` in both EN/RU layouts; Claude binds `/compact`, HCA handles it for interactive Codex |
 | `Ctrl+Shift+F`, `Ctrl+Shift+P` | Standard search and command palette |
+
+`alt+g` matches Windows virtual key `G` in both layouts. The `sendInput` action
+avoids Claude Code 2.1.322/2.1.323 losing Alt on legacy Cyrillic input. It applies
+to every tab; the receiving application determines what `ESC+g` does. Claude's
+binding lives separately in `~/.claude/keybindings.json`; Alt+PageUp is removed.
 
 Automatic URL detection was restored on 2026-09-19 in the daily portable
 configuration and the then-running `clipboard-files-test` candidate. It had remained
@@ -613,7 +619,7 @@ not the current Git `settings/settings.json`.
 
 Accepted runtime configuration on this PC:
 `%LOCALAPPDATA%\Programs\WT-Layout-Fix-1.25.2733.0-lf-menu3\terminal-1.25.2733.0\settings\settings.json`.
-It matches the repository snapshot reviewed on 2026-11-06; SHA-256
+On 2026-11-06 it matched the reviewed repository snapshot; SHA-256
 `94089b4422f452f73112ffa767aa4a96df7d874a426f198405187df435ed62af`. It adds two
 new-tab-menu profiles after a `separator` entry: `Explorer: Terminal folder`
 (GUID `{caa37a69-2b95-4277-8f08-1064a3fef5a2}`, `"commandline":
@@ -637,6 +643,11 @@ automatic URL detection, newline bindings, Ctrl+N/Ctrl+W and disabled Kitty mode
 for Ubuntu. After later changes review only this JSON first: it may contain
 personal paths and command lines. Buffers, runtime state and authentication stay
 out of Git.
+
+On 2026-11-13, `Alt+G/П` was added to both the snapshot and live settings.
+Other live settings differ from the snapshot, including profiles, menu entries
+and utility keybindings. Review those differences before restoring the full
+snapshot to the current WSL.
 
 In WSL, from this repository root, after reviewing the changes:
 

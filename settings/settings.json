@@ -6,6 +6,13 @@
         {
             "command": {
                 "action": "sendInput",
+                "input": "\u001bg"
+            },
+            "id": "User.AgentCompact"
+        },
+        {
+            "command": {
+                "action": "sendInput",
                 "input": "\n"
             },
             "id": "User.AgentNewline"
@@ -43,6 +50,10 @@
     "firstWindowPreference": "persistedLayoutAndContent",
     "keybindings":
     [
+        {
+            "id": "User.AgentCompact",
+            "keys": "alt+g"
+        },
         {
             "id": "User.AgentNewline",
             "keys": "ctrl+enter"
